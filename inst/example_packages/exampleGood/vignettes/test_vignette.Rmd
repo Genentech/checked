@@ -1,0 +1,23 @@
+---
+title: "test_vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{test_vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(exampleGood)
+```
+
+```{r step}
+hypotenuse(1, 2, 3)
+```

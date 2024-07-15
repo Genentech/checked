@@ -1,0 +1,59 @@
+---
+title: checked
+output: github_document
+always_allow_html: yes
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE, cache = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README",
+  out.width = "100%",
+  asciicast_theme = if (Sys.getenv("IN_PKGDOWN") == "true") {
+    "pkgdown"
+  } else {
+    "readme"
+  }
+)
+
+asciicast::init_knitr_engine(
+  startup = bquote({
+    options(repos = .(getOption("repos")))
+  }),
+  echo_input = FALSE
+)
+```
+
+> Batch `R CMD check` management
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/maksymiuks/checked/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/maksymiuks/checked/actions/workflows/R-CMD-check.yaml/badge.svg)
+[![CRAN](https://img.shields.io/cran/v/checked.svg)](https://cran.r-project.org/package=checked)
+[![coverage](https://img.shields.io/codecov/c/github/maksimiuks/checked/main.svg)](https://app.codecov.io/gh/maksimiuks/checked?branch=main) 
+<!-- badges: end -->
+
+
+# Reverse-dependency Checks
+
+```{sh clone-dev-praise, echo = FALSE, results = "hide"}
+# praise chosen for having few direct and reverse dependencies
+rm -rf /tmp/praise
+git clone https://github.com/gaborcsardi/praise /tmp/praise
+```
+
+```r
+library(checked)
+run("/home/dev/praise")
+```
+```{asciicast ansi-tty-example, cache = FALSE}
+#| asciicast_knitr_output = "svg",
+#| asciicast_at = "all",
+#| asciicast_cursor = FALSE
+options(checked.tty_tick_interval = 200)
+checked::run("/tmp/praise")
+cat()
+```
+
