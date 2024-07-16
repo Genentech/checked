@@ -213,18 +213,3 @@ checks_simplify <- function(x) {
   names(checks) <- trimws(x[, "check"])
   checks
 }
-
-#' Message if isolation impossible
-#' 
-#' If _R_CHECK_SUGGESTS_ONLY_ is set to true, R CMD check will isolate package 
-#' installation into temporary directory for running tests and examples. However,
-#' isolation is not applied to dependencies installed in the R_HOME library.
-#' The function informs about possible isolation problem if there are any non
-#' base/recommended packages installed in the .Library (R_HOME).
-message_possible_isolation_problems <- function() {
-  ip_home <- utils::installed.packages(lib.loc = .Library)
-  if (any(is.na(ip_home[, "Priority"]))) {
-    message("Non-standard packages identified under R_HOME (.Library) library. ",
-            "R CMD check might not be able to isolate dependencies while running.")
-  }
-}
