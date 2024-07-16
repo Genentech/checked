@@ -8,11 +8,11 @@ new_rev_dep_check_design <- function(x, ...) {
 }
 
 #' @title Check Design Object
-#' 
+#'
 #' @description
-#' Abstract object that drives all separate processes required to run 
+#' Abstract object that drives all separate processes required to run
 #' R CMD check sequence.
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' library(checked)
@@ -20,7 +20,7 @@ new_rev_dep_check_design <- function(x, ...) {
 #'  system.file("example_packages", "exampleBad", package = "checked"),
 #'  system.file("example_packages", "exampleGood", package = "checked")
 #' ))
-#' 
+#'
 #' plan <- check_design$new(df, n = 10, repos = "https://cran.r-project.org/")
 #' while (!plan$is_done()) {
 #'  plan$start_next_task()
@@ -35,23 +35,23 @@ check_design <- R6::R6Class(
     #' are required prior to execution of each check task.
     #' Created with \code{\link[checked]{task_graph_create}}
     graph = NULL,
-    
+
     #' @field input (`data.fragme()`)\cr
-    #' Checks data.frame which is the source of all the checks 
+    #' Checks data.frame which is the source of all the checks
     #' Created with \code{\link[checked]{source_check_tasks_df}}
     input = NULL,
-    
+
     #' @field output (`character(1)`)\cr
     #' Output directory where raw results and temporary library will
     #' be created and stored.
     output = tempfile(paste(packageName(), Sys.Date(), sep = "-")),
-    
+
     #' @description
     #' Initialize a new check design
-    #' 
+    #'
     #' Use checks data.frame to generate task graph in which all dependencies
     #' and installation order are embedded.
-    #' 
+    #'
     #' @param df checks data.frame.
     #' @param n integer value indicating maximum number of subprocesses that can
     #' be simultaneously spawned when executing tasks.
@@ -64,7 +64,7 @@ check_design <- R6::R6Class(
     #' before running checks. If FALSE, an attempt will me made to restore previous
     #' progress from the same \code{output}
     #' @param ... other parameters
-    #' 
+    #'
     #' @return [check_design].
     initialize = function(
         # styler: off
@@ -82,9 +82,9 @@ check_design <- R6::R6Class(
         "Custom package aliases cannot be duplicates of check aliases" = !any(uulist(drlapply(df$custom, `[[`, "alias")) %in% df$alias)
       )
       message_possible_isolation_problems()
-      
+
       if (!restore) unlink(output, recursive = TRUE, force = TRUE)
-      
+
       self$input <- df
       self$output <- output
       private$n <- n
@@ -95,7 +95,7 @@ check_design <- R6::R6Class(
       self$graph <- task_graph_update_done(g, c(path_lib(output), lib.loc))
       self$restore_complete_checks()
     },
-    
+
     #' @description
     #' Get Active Processes list
     active_processes = function() {
@@ -104,7 +104,7 @@ check_design <- R6::R6Class(
 
     #' @description
     #' Terminate Design Processes
-    #' 
+    #'
     #' Immedaitely termiantes all the active processes.
     terminate = function() {
       invisible(lapply(private$active, function(process) process$finalize()))
@@ -112,7 +112,7 @@ check_design <- R6::R6Class(
 
     #' @description
     #' Fill Available Processes with Tasks
-    #' 
+    #'
     #' @return A logical value, indicating whether processes are actively
     #'   running.
     step = function() {
@@ -122,7 +122,7 @@ check_design <- R6::R6Class(
 
     #' @description
     #' Start Next Task
-    #' 
+    #'
     #' @return A integer value, coercible to logical to indicate whether a new
     #'   process was spawned, or `-1` if all tasks have finished.
     start_next_task = function() {
@@ -132,7 +132,7 @@ check_design <- R6::R6Class(
           process$finalize()
         }
       }
-      
+
       if (self$is_done()) {
         return(-1L)
       }
@@ -161,30 +161,30 @@ check_design <- R6::R6Class(
     },
     #' @description
     #' Get process
-    #' 
+    #'
     #' Return active process for task associated with a given name.
-    #' 
+    #'
     #' @param name name of the task
     get_process = function(name) {
       private$active[[name]]
     },
     #' @description
     #' Remove active process
-    #' 
-    #' Remove process for the task associated with a given name from the active 
+    #'
+    #' Remove process for the task associated with a given name from the active
     #' process list.
-    #' 
+    #'
     #' @param name name of the task
     pop_process = function(name) {
       private$active[[name]] <- NULL
     },
     #' @description
     #' Add active process
-    #' 
-    #' Adds process for the task associated with a given name to the active the 
+    #'
+    #' Adds process for the task associated with a given name to the active the
     #' active process list. Adds finalizer to the process which is always run
     #' when the process finishes.
-    #' 
+    #'
     #' @param task name of the task or igraph node object
     #' @param x process object to be pushed
     push_process = function(task, x) {
@@ -201,7 +201,7 @@ check_design <- R6::R6Class(
     },
     #' @description
     #' Check if checks are done
-    #' 
+    #'
     #' Checks whether all the scheduled tasks were successfully executed.
     is_done = function() {
       checks <- igraph::V(self$graph)[igraph::V(self$graph)$type == "check"]
@@ -209,7 +209,7 @@ check_design <- R6::R6Class(
     },
     #' @description
     #' Restore complete checks
-    #' 
+    #'
     #' Read through the output directory and make an attempt to restore checks
     #' that have already been done. Set identified checks statuses to DONE.
     restore_complete_checks = function() {
@@ -224,7 +224,7 @@ check_design <- R6::R6Class(
     # maximum child process count
     n = 2L,
     # lib.loc of allowed packages,
-    lib.loc = .libPaths(),
+    lib.loc = NULL,
     # repositories to fetch dependencies from
     repos = getOption("repos"),
     # active processes
