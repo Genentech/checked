@@ -1,3 +1,10 @@
+empty_checks_df <- data.frame(
+  alias = character(0),
+  version = character(0),
+  package = character(0),
+  custom = character(0)
+)
+
 #' Check schedule data frame
 #'
 #' Create data.frame which each row defines a package for which R CMD check 
@@ -51,11 +58,23 @@ rev_dep_check_tasks_df <- function(path, repos = getOption("repos"), development
   package <- get_package_name(path)
   package_v <- ap[package, "Version"]
   revdeps <- tools::package_dependencies(package, which = "all", reverse = TRUE, db = ap)[[1]]
+  if (length(revdeps) == 0) {
+    return(empty_checks_df)
+  }
   version <- ap[revdeps, "Version"]
   df_dev <- df_rel <- data.frame(
     alias = revdeps,
     version = version
   )
+  
+  if (!package %in% ap[, "Package"] && !development_only) {
+    warning(sprintf(
+      "Package `%s` not found in repositories `%s`. Setting `development_only` to TRUE", 
+      package, 
+      paste0(repos, collapse = ", "))
+    )
+    development_only <- TRUE
+  }
   
   task_specs_function <- if (development_only) {
     rev_dep_check_tasks_specs_development
