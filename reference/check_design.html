@@ -18,7 +18,7 @@ R CMD check sequence."><!-- mathjax --><script src="https://cdnjs.cloudflare.com
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">checked</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0.9000</span>
       </span>
     </div>
 
@@ -83,11 +83,7 @@ be created and stored.</p></dd>
 <li><p><a href="#method-check_design-terminate"><code>check_design$terminate()</code></a></p></li>
 <li><p><a href="#method-check_design-step"><code>check_design$step()</code></a></p></li>
 <li><p><a href="#method-check_design-start_next_task"><code>check_design$start_next_task()</code></a></p></li>
-<li><p><a href="#method-check_design-get_process"><code>check_design$get_process()</code></a></p></li>
-<li><p><a href="#method-check_design-pop_process"><code>check_design$pop_process()</code></a></p></li>
-<li><p><a href="#method-check_design-push_process"><code>check_design$push_process()</code></a></p></li>
 <li><p><a href="#method-check_design-is_done"><code>check_design$is_done()</code></a></p></li>
-<li><p><a href="#method-check_design-restore_complete_checks"><code>check_design$restore_complete_checks()</code></a></p></li>
 <li><p><a href="#method-check_design-clone"><code>check_design$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-check_design-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
@@ -191,92 +187,24 @@ running.</p>
 process was spawned, or <code>-1</code> if all tasks have finished.</p>
 </div>
 
-</div><p></p><hr><a id="method-check_design-get_process"></a><div class="section">
-<h3 id="method-get-process-">Method <code>get_process()</code><a class="anchor" aria-label="anchor" href="#method-get-process-"></a></h3>
-<p>Get process</p>
-<p>Return active process for task associated with a given name.</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">check_design</span><span class="op">$</span><span class="fu">get_process</span><span class="op">(</span><span class="va">name</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>name</code></dt>
-<dd><p>name of the task</p></dd>
-
-
-</dl><p></p></div>
-</div>
-
-</div><p></p><hr><a id="method-check_design-pop_process"></a><div class="section">
-<h3 id="method-pop-process-">Method <code>pop_process()</code><a class="anchor" aria-label="anchor" href="#method-pop-process-"></a></h3>
-<p>Remove active process</p>
-<p>Remove process for the task associated with a given name from the active
-process list.</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">check_design</span><span class="op">$</span><span class="fu">pop_process</span><span class="op">(</span><span class="va">name</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>name</code></dt>
-<dd><p>name of the task</p></dd>
-
-
-</dl><p></p></div>
-</div>
-
-</div><p></p><hr><a id="method-check_design-push_process"></a><div class="section">
-<h3 id="method-push-process-">Method <code>push_process()</code><a class="anchor" aria-label="anchor" href="#method-push-process-"></a></h3>
-<p>Add active process</p>
-<p>Adds process for the task associated with a given name to the active the
-active process list. Adds finalizer to the process which is always run
-when the process finishes.</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">check_design</span><span class="op">$</span><span class="fu">push_process</span><span class="op">(</span><span class="va">task</span>, <span class="va">x</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>task</code></dt>
-<dd><p>name of the task or igraph node object</p></dd>
-
-
-<dt><code>x</code></dt>
-<dd><p>process object to be pushed</p></dd>
-
-
-</dl><p></p></div>
-</div>
-
 </div><p></p><hr><a id="method-check_design-is_done"></a><div class="section">
 <h3 id="method-is-done-">Method <code>is_done()</code><a class="anchor" aria-label="anchor" href="#method-is-done-"></a></h3>
 <p>Check if checks are done</p>
 <p>Checks whether all the scheduled tasks were successfully executed.</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">check_design</span><span class="op">$</span><span class="fu">is_done</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-
-</div><p></p><hr><a id="method-check_design-restore_complete_checks"></a><div class="section">
-<h3 id="method-restore-complete-checks-">Method <code>restore_complete_checks()</code><a class="anchor" aria-label="anchor" href="#method-restore-complete-checks-"></a></h3>
-<p>Restore complete checks</p>
-<p>Read through the output directory and make an attempt to restore checks
-that have already been done. Set identified checks statuses to DONE.</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">check_design</span><span class="op">$</span><span class="fu">restore_complete_checks</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 
 </div><p></p><hr><a id="method-check_design-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">check_design</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
