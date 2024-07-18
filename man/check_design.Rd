@@ -47,11 +47,7 @@ be created and stored.}
 \item \href{#method-check_design-terminate}{\code{check_design$terminate()}}
 \item \href{#method-check_design-step}{\code{check_design$step()}}
 \item \href{#method-check_design-start_next_task}{\code{check_design$start_next_task()}}
-\item \href{#method-check_design-get_process}{\code{check_design$get_process()}}
-\item \href{#method-check_design-pop_process}{\code{check_design$pop_process()}}
-\item \href{#method-check_design-push_process}{\code{check_design$push_process()}}
 \item \href{#method-check_design-is_done}{\code{check_design$is_done()}}
-\item \href{#method-check_design-restore_complete_checks}{\code{check_design$restore_complete_checks()}}
 \item \href{#method-check_design-clone}{\code{check_design$clone()}}
 }
 }
@@ -154,68 +150,6 @@ process was spawned, or \code{-1} if all tasks have finished.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-check_design-get_process"></a>}}
-\if{latex}{\out{\hypertarget{method-check_design-get_process}{}}}
-\subsection{Method \code{get_process()}}{
-Get process
-
-Return active process for task associated with a given name.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{check_design$get_process(name)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{name}}{name of the task}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-check_design-pop_process"></a>}}
-\if{latex}{\out{\hypertarget{method-check_design-pop_process}{}}}
-\subsection{Method \code{pop_process()}}{
-Remove active process
-
-Remove process for the task associated with a given name from the active
-process list.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{check_design$pop_process(name)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{name}}{name of the task}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-check_design-push_process"></a>}}
-\if{latex}{\out{\hypertarget{method-check_design-push_process}{}}}
-\subsection{Method \code{push_process()}}{
-Add active process
-
-Adds process for the task associated with a given name to the active the
-active process list. Adds finalizer to the process which is always run
-when the process finishes.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{check_design$push_process(task, x)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{task}}{name of the task or igraph node object}
-
-\item{\code{x}}{process object to be pushed}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-check_design-is_done"></a>}}
 \if{latex}{\out{\hypertarget{method-check_design-is_done}{}}}
 \subsection{Method \code{is_done()}}{
@@ -224,19 +158,6 @@ Check if checks are done
 Checks whether all the scheduled tasks were successfully executed.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{check_design$is_done()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-check_design-restore_complete_checks"></a>}}
-\if{latex}{\out{\hypertarget{method-check_design-restore_complete_checks}{}}}
-\subsection{Method \code{restore_complete_checks()}}{
-Restore complete checks
-
-Read through the output directory and make an attempt to restore checks
-that have already been done. Set identified checks statuses to DONE.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{check_design$restore_complete_checks()}\if{html}{\out{</div>}}
 }
 
 }
