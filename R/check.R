@@ -92,7 +92,7 @@ check_reverse_dependencies_development <- function(
     reporter = default_reporter(),
     ...
 ) {
-  checks <- rev_dep_check_tasks_df(path = path, repos = repos, development_only = TRUE)
+  checks <- rev_dep_check_tasks_df(path = path, repos = repos, versions = "dev")
   
   plan <- check_design$new(
     checks,
