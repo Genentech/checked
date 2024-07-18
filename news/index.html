@@ -45,7 +45,10 @@
 <h2 class="page-header" data-toc-text="0.1.0.9000" id="checked-0109000-development">checked 0.1.0.9000 (development)<a class="anchor" aria-label="anchor" href="#checked-0109000-development"></a></h2>
 <ul><li><p>Change default private <code>lib.loc</code> value in <code>check_process</code> R6 class to NULL to avoid staged installation failures.</p></li>
 <li><p>Terminate all the subprocesses if the <code>run</code> function is interrupted to comply with CRAN requirements.</p></li>
-<li><p>Reorganize methods in the <code>check_design</code> making some of the private</p></li>
+<li><p>Reorganize methods in the <code>check_design</code> making some of the private.</p></li>
+<li><p>Remove warning about possible problems with isolation.</p></li>
+<li><p>Rename <code>development_only</code> parameter to <code>versions</code> in the <code>rev_dep_check_tasks_df</code></p></li>
+<li><p>Make sure <code>check_reverse_dependencies</code> works when package is not available in the remote sources or has no reverse dependencies.</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.0" id="checked-010">checked 0.1.0<small>2024-07-10</small><a class="anchor" aria-label="anchor" href="#checked-010"></a></h2>
