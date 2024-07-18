@@ -93,7 +93,7 @@ check_design <- R6::R6Class(
 
       g <- task_graph_create(df, repos)
       self$graph <- task_graph_update_done(g, c(path_lib(output), lib.loc))
-      self$restore_complete_checks()
+      private$restore_complete_checks()
     },
 
     #' @description
@@ -107,7 +107,7 @@ check_design <- R6::R6Class(
     #'
     #' Immedaitely termiantes all the active processes.
     terminate = function() {
-      invisible(lapply(private$active, function(process) process$finalize()))
+      invisible(lapply(private$active, function(process) process$kill()))
     },
 
     #' @description
@@ -152,52 +152,12 @@ check_design <- R6::R6Class(
           lib.loc = private$lib.loc
         )
 
-        success <- self$push_process(next_task, process)
+        success <- private$push_process(next_task, process)
         return(as.integer(success))
       }
 
       finished <- (length(private$active) == 0) && self$is_done()
       return(-finished)
-    },
-    #' @description
-    #' Get process
-    #'
-    #' Return active process for task associated with a given name.
-    #'
-    #' @param name name of the task
-    get_process = function(name) {
-      private$active[[name]]
-    },
-    #' @description
-    #' Remove active process
-    #'
-    #' Remove process for the task associated with a given name from the active
-    #' process list.
-    #'
-    #' @param name name of the task
-    pop_process = function(name) {
-      private$active[[name]] <- NULL
-    },
-    #' @description
-    #' Add active process
-    #'
-    #' Adds process for the task associated with a given name to the active the
-    #' active process list. Adds finalizer to the process which is always run
-    #' when the process finishes.
-    #'
-    #' @param task name of the task or igraph node object
-    #' @param x process object to be pushed
-    push_process = function(task, x) {
-      task_graph_task_process(self$graph, task) <- x
-      name <- task_graph_task_name(self$graph, task)
-      task_graph_package_status(self$graph, task) <- STATUS$`in progress`
-      x$set_finalizer(function(process) {
-        # TODO: Implement warning if the process failed before finalizing
-        self$pop_process(name)
-        task_graph_package_status(self$graph, task) <- STATUS$done
-      })
-      private$active[[name]] <- x
-      TRUE
     },
     #' @description
     #' Check if checks are done
@@ -206,21 +166,11 @@ check_design <- R6::R6Class(
     is_done = function() {
       checks <- igraph::V(self$graph)[igraph::V(self$graph)$type == "check"]
       all(checks$status == STATUS$done)
-    },
-    #' @description
-    #' Restore complete checks
-    #'
-    #' Read through the output directory and make an attempt to restore checks
-    #' that have already been done. Set identified checks statuses to DONE.
-    restore_complete_checks = function() {
-      checks <- self$input$alias
-      check_done <- vlapply(checks, function(check) {
-        file.exists(file.path(path_check_output(self$output, check), "result.json"))
-      })
-      self$graph <- task_graph_set_package_status(self$graph, checks[check_done], STATUS$done)
     }
   ),
   private = list(
+    # Values
+
     # maximum child process count
     n = 2L,
     # lib.loc of allowed packages,
@@ -228,7 +178,32 @@ check_design <- R6::R6Class(
     # repositories to fetch dependencies from
     repos = getOption("repos"),
     # active processes
-    active = list()
+    active = list(),
+
+    # Methods
+
+    push_process = function(task, x) {
+      task_graph_task_process(self$graph, task) <- x
+      name <- task_graph_task_name(self$graph, task)
+      task_graph_package_status(self$graph, task) <- STATUS$`in progress`
+      x$set_finalizer(function(process) {
+        # TODO: Implement warning if the process failed before finalizing
+        private$pop_process(name)
+        task_graph_package_status(self$graph, task) <- STATUS$done
+      })
+      private$active[[name]] <- x
+      TRUE
+    },
+    restore_complete_checks = function() {
+      checks <- self$input$alias
+      check_done <- vlapply(checks, function(check) {
+        file.exists(file.path(path_check_output(self$output, check), "result.json"))
+      })
+      self$graph <- task_graph_set_package_status(self$graph, checks[check_done], STATUS$done)
+    },
+    pop_process = function(name) {
+      private$active[[name]] <- NULL
+    }
   )
 )
 
