@@ -31,7 +31,7 @@ test_that("rev_dep_check_tasks_df development_only = TRUE", {
     df <- rev_dep_check_tasks_df(
       test_path("testing_pkgs", "DALEXtra"),
       repos = "https://cran.r-project.org/",
-      development_only = TRUE
+      versions = "dev"
     )
   )
   expect_s3_class(df, "data.frame")

@@ -197,6 +197,13 @@ fetch_package_source <- function(archive_url, destdir) {
   }
 }
 
+.package_dependencies <- function(packages = NULL, ...) {
+  if (length(packages) == 0) {
+    NULL
+  } else {
+    tools::package_dependencies(packages = packages, ...)
+  }
+}
 
 #' @import cli
 "_PACKAGE"

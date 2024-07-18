@@ -9,7 +9,7 @@
 rev_dep_check_tasks_df(
   path,
   repos = getOption("repos"),
-  development_only = FALSE
+  versions = c("dev", "release")
 )
 
 source_check_tasks_df(path)
@@ -19,10 +19,12 @@ source_check_tasks_df(path)
 
 \item{repos}{repository used to identify reverse dependencies.}
 
-\item{development_only}{logical whether reverse dependency check should be run
-only against development version of the package. Applicable mostly when checking
+\item{versions}{character vector indicating against which versions of the package
+reverse dependency should be checked. \code{c("dev", "release")} (default) stands
+for the classical reverse dependency check. \code{"dev"} checks only against
+development version of the package which is applicable mostly when checking
 whether adding new package would break tests of packages already in the
-repository and taking the package as suggests dependency. Default to FALSE.}
+repository and take the package as suggests dependency.}
 }
 \value{
 The check schedule data.frame has strict structure and consists of following columns:

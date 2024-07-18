@@ -1,3 +1,10 @@
+empty_checks_df <- data.frame(
+  alias = character(0),
+  version = character(0),
+  package = character(0),
+  custom = character(0)
+)
+
 #' Check schedule data frame
 #'
 #' Create data.frame which each row defines a package for which R CMD check 
@@ -7,10 +14,12 @@
 #' 
 #' @param path path to the package source. See Details.
 #' @param repos repository used to identify reverse dependencies.
-#' @param development_only logical whether reverse dependency check should be run
-#' only against development version of the package. Applicable mostly when checking
+#' @param versions character vector indicating against which versions of the package
+#' reverse dependency should be checked. \code{c("dev", "release")} (default) stands
+#' for the classical reverse dependency check. \code{"dev"} checks only against 
+#' development version of the package which is applicable mostly when checking
 #' whether adding new package would break tests of packages already in the
-#' repository and taking the package as suggests dependency. Default to FALSE.
+#' repository and take the package as suggests dependency.
 #' 
 #' @details
 #' 
@@ -42,48 +51,70 @@ NULL
 
 #' @export
 #' @rdname checks_df
-rev_dep_check_tasks_df <- function(path, repos = getOption("repos"), development_only = FALSE) {
+rev_dep_check_tasks_df <- function(path, repos = getOption("repos"), versions = c("dev", "release")) {
   stopifnot(
     "rev_dep_check_tasks_df requires path argument of length 1" = length(path) == 1
     )
+  versions <- match.arg(versions, c("dev", "release"), several.ok = TRUE)
   ap <- utils::available.packages(repos = repos)
   path <- check_path_is_pkg_source(path)
   package <- get_package_name(path)
-  package_v <- ap[package, "Version"]
   revdeps <- tools::package_dependencies(package, which = "all", reverse = TRUE, db = ap)[[1]]
+  if (length(revdeps) == 0) {
+    return(empty_checks_df)
+  }
   version <- ap[revdeps, "Version"]
   df_dev <- df_rel <- data.frame(
     alias = revdeps,
     version = version
   )
   
-  task_specs_function <- if (development_only) {
-    rev_dep_check_tasks_specs_development
-  } else {
+  if (!package %in% ap[, "Package"] && "release" %in% versions) {
+    warning(sprintf(
+      "Package `%s` not found in repositories `%s`. Skipping 'release' in 'versions'", 
+      package, 
+      paste0(repos, collapse = ", ")),
+      immediate. = TRUE
+    )
+    if ("dev" %in% versions) {
+      versions <- "dev"
+    } else {
+      return(empty_checks_df)
+    }
+  }
+  
+  task_specs_function <- if (all(c("dev", "release") %in% versions)) {
     rev_dep_check_tasks_specs
+  } else {
+    rev_dep_check_tasks_specs_development
   }
 
-  df_dev$alias <- paste0(df_dev$alias, " (dev)")
-  df_dev$package <- task_specs_function(revdeps, repos, df_dev$alias, "new")
-  df_dev$custom <- rep(list(custom_install_task_spec(
-    alias = paste0(package, " (dev)"),
-    package = package_spec_source(name = package, path = path),
-    type = "source"
-  )), times = NROW(df_dev))
-  
-  if (development_only) {
-    df_dev$package <- list_of_task_spec(df_dev$package)
-    df_dev$custom <- list_of_task_spec(df_dev$custom)
-    return(df_dev)
+  if ("dev" %in% versions) {
+    df_dev$alias <- paste0(df_dev$alias, " (dev)")
+    df_dev$package <- task_specs_function(revdeps, repos, df_dev$alias, "new")
+    df_dev$custom <- rep(list(custom_install_task_spec(
+      alias = paste0(package, " (dev)"),
+      package = package_spec_source(name = package, path = path),
+      type = "source"
+    )), times = NROW(df_dev))
   }
   
-  df_rel$alias <- paste0(df_rel$alias, " (v", package_v, ")")
-  df_rel$package <- task_specs_function(revdeps, repos, df_rel$alias, "old")
-  df_rel$custom <- rep(list(custom_install_task_spec()), times = NROW(df_dev))
+  if ("release" %in% versions) {
+    package_v <- ap[package, "Version"]
+    df_rel$alias <- paste0(df_rel$alias, " (v", package_v, ")")
+    df_rel$package <- task_specs_function(revdeps, repos, df_rel$alias, "old")
+    df_rel$custom <- rep(list(custom_install_task_spec()), times = NROW(df_dev))
+  }
   
-  idx <- rep(seq_len(nrow(df_rel)), each = 2) + c(0, nrow(df_rel))
-  df <- rbind(df_dev, df_rel)[idx, ]
-  
+  if (identical(versions, "dev")) {
+    df <- df_dev
+  } else if (identical(versions, "release")) {
+    df <- df_rel
+  } else {
+    idx <- rep(seq_len(nrow(df_rel)), each = 2) + c(0, nrow(df_rel))
+    df <- rbind(df_dev, df_rel)[idx, ]
+  } 
+
   df$package <- list_of_task_spec(df$package)
   df$custom <- list_of_task_spec(df$custom)
   df

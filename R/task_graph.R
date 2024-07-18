@@ -25,11 +25,14 @@ task_graph_create <- function(df, repos = getOption("repos")) {
 }
 
 task_edges_df <- function(df, repos) {
+  
+  if (NROW(df) == 0) {
+    return(empty_edge)
+  }
+  
   db <- utils::available.packages(repos = repos)[, DB_COLNAMES]
   
   # For checks alias has to have different name than package name
-  # Use repos = NULL to derive whether dependencies should be taken from release version
-  # of the package or from the source
 
   # Add custom packages to db
   custom_aliases_idx <- which(vlapply(df$custom, function(x) !is.null(x$alias)))
@@ -64,7 +67,7 @@ task_edges_df <- function(df, repos) {
 
   # Get suggests end enhances dependencies first so we can derive hard
   # dependencies for them as well
-  suggests_dependencies <- uulist(tools::package_dependencies(
+  suggests_dependencies <- uulist(.package_dependencies(
     df$alias,
     db = db,
     which = c("Suggests", "Enhances"),
@@ -72,7 +75,7 @@ task_edges_df <- function(df, repos) {
   ))
 
   # Get recursively strong dependencies for all packages
-  core_dependencies <- tools::package_dependencies(
+  core_dependencies <- .package_dependencies(
     c(df$alias, custom_aliases_map$hash, suggests_dependencies),
     db = db,
     which = "strong",
