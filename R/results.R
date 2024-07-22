@@ -9,8 +9,10 @@ CHECK_ISSUES_TYPES <- c("notes", "warnings", "errors")
 #' when issues are discovered when generating results. "never" means that no
 #' errors are thrown. If "issues" then errors are emitted only on issues, whereas
 #' "potential issues" stands for error on both issues and potential issues.
-#' @param keep_ok logical value whether packages for which no issues were
-#' identified should be kept in the results object.
+#' @param keep character vector indicating which packages should be included
+#' in the results. "all" means that all packages are kept. If "issues" then 
+#' only packages with issues identified, whereas "potential_issues" stands for
+#' keeping packages with both "issues" and "potential_issues".
 #' @param ... other parameters.
 #' 
 #' @export
@@ -20,8 +22,15 @@ results <- function(x, ...) {
 
 #' @export
 #' @rdname results
-results.check_design <- function(x, error_on = c("never", "issues", "potential_issues"), keep_ok = FALSE) {
+results.check_design <- function(
+    x, 
+    error_on = c("never", "issues", "potential_issues"), 
+    keep = c("all", "issues", "potential_issues"),
+    ...) {
+  
   error_on <- match.arg(error_on, c("never", "issues", "potential_issues"))
+  keep <- match.arg(keep, c("all", "issues", "potential_issues"))
+  
   checks_nodes <- igraph::V(x$graph)[igraph::vertex.attributes(x$graph)$type == "check"]
   checks_classes <- vcapply(checks_nodes$spec, function(x) class(x)[[1]])
   classes <- unique(checks_classes)
@@ -34,29 +43,33 @@ results.check_design <- function(x, error_on = c("never", "issues", "potential_i
   
   res <- structure(
     lapply(res, function(y, output) {
+      r <- if(keep == "all") {
+        results(y, output)
+      } else {
+        df <- results_to_df(results(y, output), issues_type = keep)
+        issues <- rowSums(df) != 0
+        results(y, output)[issues]
+      }
+      
       structure(
-        results(y, output),
+        r,
         class = paste0("results_", utils::head(class(y[[1]]), 1L))
       )
     }, output = x$output),
     names = classes,
     class = "checked_results"
   )
-  
-  if (!keep_ok) {
-    df <- summary(res)
-    res <- structure(mapply(function(r, s) {
-        issues <- rowSums(s) != 0
-        out <- r[issues]
-      }, res, df, SIMPLIFY = FALSE, USE.NAMES = TRUE),
-     class = "checked_results")
-  }
 
-  df <- summary(res, issues_type = error_on)
-  if (error_on != "never" &&
-      any(vlapply(df, function(x) any(rowSums(x) != 0)))) {
-    print(res)
-    stop("Issues identified. Aborting.")
+  if (error_on != "never") {
+    potential_errors <- vlapply(res, function(y) {
+      df <- results_to_df(y, issues_type = error_on)
+      any(rowSums(df) != 0)
+    })
+    
+    if (any(potential_errors)) {
+      print(res)
+      stop("Issues identified. Aborting.")
+    }
   }
   
   res
@@ -160,9 +173,37 @@ results.check_task_spec <- function(x, output, ...) {
   )
 }
 
+results_to_df <- function(results, ...) {
+  data.frame(
+    notes = vnapply(results, count, type = "notes", ...),
+    warnings = vnapply(results, count, type = "warnings", ...),
+    errors = vnapply(results, count, type = "errors", ...),
+    row.names = names(results)
+  )
+}
+
+count <- function(d, ...) {
+  UseMethod("count")
+}
+
+#' @export
+count.default <- function(d, type, ...) {
+  sum(vnapply(d[[type]], count, ...))
+}
+
+#' @export
+count.issues <- function(d, ...) {
+  length(d)
+}
+
+#' @export
+count.potential_issues <- function(d, issues_type = "potential_issues", ...) {
+  if (issues_type == "issues") 0 else length(d$new)
+}
+
 #' @export
 summary.check_design <- function(object, ...) {
-  summary(results(object))
+  summary(results(object), ...)
 }
 
 #' @export
@@ -177,12 +218,7 @@ summary.results_revdep_check_task_spec <- function(object, ...) {
 
 #' @export
 summary.results_check_task_spec <- function(object, ...) {
-  data.frame(
-    notes = vnapply(object, count, type = "notes", ...),
-    warnings = vnapply(object, count, type = "warnings", ...),
-    errors = vnapply(object, count, type = "errors", ...),
-    row.names = names(object)
-  )
+  results_to_df(object, ...)
 }
 
 #' @export
@@ -242,25 +278,6 @@ rcmdcheck_from_json <- function(file) {
     if (is.character(parsed)) jsonlite::fromJSON(parsed) else parsed,
     class = "rcmdcheck"
   )
-}
-
-count <- function(d, ...) {
-  UseMethod("count")
-}
-
-#' @export
-count.default <- function(d, type, ...) {
-  sum(vnapply(d[[type]], count, ...))
-}
-
-#' @export
-count.issues <- function(d, ...) {
-  length(d)
-}
-
-#' @export
-count.potential_issues <- function(d, issues_type = "potential_issues", ...) {
-  if (issues_type == "issues") 0 else length(d$new)
 }
 
 #' @export

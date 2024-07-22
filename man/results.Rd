@@ -7,7 +7,12 @@
 \usage{
 results(x, ...)
 
-\method{results}{check_design}(x, error_on = c("never", "issues", "potential_issues"), ...)
+\method{results}{check_design}(
+  x,
+  error_on = c("never", "issues", "potential_issues"),
+  keep = c("all", "issues", "potential_issues"),
+  ...
+)
 }
 \arguments{
 \item{x}{\code{\link[checked]{check_design}} object.}
@@ -18,6 +23,11 @@ results(x, ...)
 when issues are discovered when generating results. "never" means that no
 errors are thrown. If "issues" then errors are emitted only on issues, whereas
 "potential issues" stands for error on both issues and potential issues.}
+
+\item{keep}{character vector indicating which packages should be included
+in the results. "all" means that all packages are kept. If "issues" then
+only packages with issues identified, whereas "potential_issues" stands for
+keeping packages with both "issues" and "potential_issues".}
 }
 \description{
 Get R CMD check results
