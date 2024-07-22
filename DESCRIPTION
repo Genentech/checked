@@ -25,6 +25,8 @@ Description:
     Systematically Run R checks against multiple packages. Checks are run in 
     parallel with strategies to minimize dependency installation. Provides
     out of the box interface for running reverse dependency check.
+URL: https://github.com/Genentech/checked
+BugReports: https://github.com/Genentech/checked/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports:
