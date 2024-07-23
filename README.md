@@ -9,7 +9,7 @@ checked
 
 [![R-CMD-check](https://github.com/Genentech/checked/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Genentech/checked/actions/workflows/R-CMD-check.yaml/badge.svg)
 [![CRAN](https://img.shields.io/cran/v/checked.svg)](https://cran.r-project.org/package=checked)
-[![coverage](https://img.shields.io/codecov/c/github/Genentech/checked/main.svg)](https://app.codecov.io/gh/Genentech/checked?branch=main)
+[![coverage](https://codecov.io/gh/Genentech/checked/branch/main/graph/badge.svg)](https://app.codecov.io/gh/Genentech/checked/tree/main)
 <!-- badges: end -->
 
 # Reverse-dependency Checks
