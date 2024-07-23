@@ -28,7 +28,13 @@
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
-      </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
+      </ul><ul class="nav navbar-nav navbar-right"><li>
+  <a href="https://github.com/Genentech/checked/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+
+  </a>
+</li>
+      </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
@@ -38,7 +44,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1 data-toc-skip>Changelog <small></small></h1>
-
+      <small>Source: <a href="https://github.com/Genentech/checked/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
@@ -49,6 +55,8 @@
 <li><p>Remove warning about possible problems with isolation.</p></li>
 <li><p>Rename <code>development_only</code> parameter to <code>versions</code> in the <code>rev_dep_check_tasks_df</code></p></li>
 <li><p>Make sure <code>check_reverse_dependencies</code> works when package is not available in the remote sources or has no reverse dependencies.</p></li>
+<li><p>Add <code>keep</code> parameters to the the <code>print.checked_results_check_task_spec</code>.</p></li>
+<li><p>Add <code>error_on</code> parameters to the the <code>results.check_design</code>.</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.0" id="checked-010">checked 0.1.0<small>2024-07-10</small><a class="anchor" aria-label="anchor" href="#checked-010"></a></h2>
