@@ -125,6 +125,9 @@ check_process <- R6::R6Class(
         # the final check was fully parsed
         private$parsed_partial_check_output <- ""
       }
+    },
+    get_r_exit_status = function() {
+      as.integer(inherits(try(p$get_result(), silent = TRUE), "try-error"))
     }
   ),
   private = list(

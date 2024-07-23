@@ -37,6 +37,14 @@ report_status.reporter_basic_tty <- function(reporter, design, envir) { # nolint
         "done" = {
           if (is.null(node$process)) {
             cli::cli_fmt(cli::cli_text("finished (restored)"))
+          } else if (node$process$get_r_exit_status() != 0) {
+            # checks processes don't have logs associated with it
+            message <- if (!is.null(p$log)) {
+              sprintf("failed (log: '%s')", p$log)
+            } else {
+              "failed"
+            }
+            cli::cli_fmt(cli::cli_text(message))
           } else {
             dur <- if (!is.null(node$process$get_duration)) {
               node$process$get_duration()

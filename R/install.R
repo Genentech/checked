@@ -4,9 +4,10 @@ install_packages_process <- R6::R6Class(
   "install_package_process",
   inherit = callr::r_process,
   public = list(
+    log = NULL,
     initialize = function(pkgs, ..., lib = .libPaths(), libpaths = .libPaths(), log) {
-      browser()
       private$package <- pkgs
+      self$log <- log
       private$callr_r_bg(
         function(...) {
           tryCatch(
@@ -18,8 +19,7 @@ install_packages_process <- R6::R6Class(
                 grepl("installation of one or more packages failed", w$message)
               
               if (installation_failure) {
-                warning(w$message)
-                simpleError(w$message)
+                stop(w$message)
               }
             }
           )
@@ -47,7 +47,7 @@ install_packages_process <- R6::R6Class(
       if ("finalize" %in% ls(super)) super$finalize()
     },
     get_r_exit_status = function() {
-      as.integer(inherits(self$get_result(), "error"))
+      as.integer(inherits(try(p$get_result(), silent = TRUE), "try-error"))
     }
   ),
   private = list(
