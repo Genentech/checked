@@ -5,9 +5,25 @@ install_packages_process <- R6::R6Class(
   inherit = callr::r_process,
   public = list(
     initialize = function(pkgs, ..., lib = .libPaths(), libpaths = .libPaths(), log) {
+      browser()
       private$package <- pkgs
       private$callr_r_bg(
-        function(...) utils::install.packages(...),
+        function(...) {
+          tryCatch(
+            utils::install.packages(...)
+            warning = function(w) {
+              installation_failure <- grepl("download of package .* failed", w$message) ||
+                grepl("(dependenc|package).*(is|are) not available", w$message) ||
+                grepl("installation of package.*had non-zero exit status", w$message) ||
+                grepl("installation of one or more packages failed", w$message)
+              
+              if (installation_failure) {
+                warning(w$message)
+                simpleError(w$message)
+              }
+            }
+          )
+        },
         args = list(pkgs, ..., lib = lib),
         libpath = libpaths,
         stdout = log,
@@ -29,6 +45,9 @@ install_packages_process <- R6::R6Class(
       private$time_finish <- Sys.time()
       if (is.function(f <- private$finalize_callback)) f(self)
       if ("finalize" %in% ls(super)) super$finalize()
+    },
+    get_r_exit_status = function() {
+      as.integer(inherits(self$get_result(), "error"))
     }
   ),
   private = list(
