@@ -9,6 +9,21 @@ Systematically Run R checks against multiple packages. Checks are run in paralle
 
 Systematically Run R checks against multiple packages. Checks are run in parallel with strategies to minimize dependency installation. Provides out of the box interface for running reverse dependency check.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/Genentech/checked}
+  \item Report bugs at \url{https://github.com/Genentech/checked/issues}
+}
+
+
+Useful links:
+\itemize{
+  \item \url{https://github.com/Genentech/checked}
+  \item Report bugs at \url{https://github.com/Genentech/checked/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Szymon Maksymiuk \email{sz.maksymiuk@gmail.com} (\href{https://orcid.org/0000-0002-3120-1601}{ORCID})
 
