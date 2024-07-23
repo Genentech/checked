@@ -8,11 +8,8 @@ CHECK_ISSUES_TYPES <- c("notes", "warnings", "errors")
 #' @param error_on character vector indicating whether R error should be thrown
 #' when issues are discovered when generating results. "never" means that no
 #' errors are thrown. If "issues" then errors are emitted only on issues, whereas
-#' "potential issues" stands for error on both issues and potential issues.
-#' @param keep character vector indicating which packages should be included
-#' in the results. "all" means that all packages are kept. If "issues" then 
-#' only packages with issues identified, whereas "potential_issues" stands for
-#' keeping packages with both "issues" and "potential_issues".
+#' "potential issues" stands for error on both issues and potential issues. Users 
+#' can set the default value via env variable \code{CHECKED_RESULTS_ERROR_ON}.
 #' @param ... other parameters.
 #' 
 #' @export
@@ -24,13 +21,10 @@ results <- function(x, ...) {
 #' @rdname results
 results.check_design <- function(
     x, 
-    error_on = c("never", "issues", "potential_issues"), 
-    keep = c("all", "issues", "potential_issues"),
+    error_on = Sys.getenv("CHECKED_RESULTS_ERROR_ON", c("never", "issues", "potential_issues")[1]), 
     ...) {
   
   error_on <- match.arg(error_on, c("never", "issues", "potential_issues"))
-  keep <- match.arg(keep, c("all", "issues", "potential_issues"))
-  
   checks_nodes <- igraph::V(x$graph)[igraph::vertex.attributes(x$graph)$type == "check"]
   checks_classes <- vcapply(checks_nodes$spec, function(x) class(x)[[1]])
   classes <- unique(checks_classes)
@@ -43,17 +37,9 @@ results.check_design <- function(
   
   res <- structure(
     lapply(res, function(y, output) {
-      r <- if(keep == "all") {
-        results(y, output)
-      } else {
-        df <- results_to_df(results(y, output), issues_type = keep)
-        issues <- rowSums(df) != 0
-        results(y, output)[issues]
-      }
-      
       structure(
-        r,
-        class = paste0("results_", utils::head(class(y[[1]]), 1L))
+        results(y, output),
+        class = paste0("checked_results_", utils::head(class(y[[1]]), 1L))
       )
     }, output = x$output),
     names = classes,
@@ -212,37 +198,61 @@ summary.checked_results <- function(object, ...) {
 }
 
 #' @export
-summary.results_revdep_check_task_spec <- function(object, ...) {
-  summary.results_check_task_spec(object, ...)
+summary.checked_results_revdep_check_task_spec <- function(object, ...) {
+  summary.checked_results_check_task_spec(object, ...)
 }
 
 #' @export
-summary.results_check_task_spec <- function(object, ...) {
+summary.checked_results_check_task_spec <- function(object, ...) {
   results_to_df(object, ...)
 }
 
+#' Plot checked results
+#'
+#' @param x an object to be printed.
+#' @param keep character vector indicating which packages should be included
+#' in the results. "all" means that all packages are kept. If "issues" then 
+#' only packages with issues identified, whereas "potential_issues" stands for
+#' keeping packages with both "issues" and "potential_issues". Users can set
+#' the default value via env variable \code{CHECKED_RESULTS_KEEP}.
+#' @param ... other parameters described below
+#' 
+#' @rdname print.checked_results
 #' @export
 print.checked_results <- function(x, ...) {
   for (i in seq_along(x)) {
     cat("#", tools::toTitleCase(strsplit(names(x)[i], "_")[[1]]), "\n\n")
-    print(x[[i]])
+    print(x[[i]], ...)
     cat("\n")
   }
   invisible(x)
 }
 
+#' @rdname print.checked_results
 #' @export
-print.results_check_task_spec <- function(x, ...) {
+print.checked_results_check_task_spec <- function(
+    x, 
+    keep = Sys.getenv("CHECKED_RESULTS_KEEP", c("all", "issues", "potential_issues")[1]),
+    ...) {
+  
+  keep <- match.arg(keep, c("all", "issues", "potential_issues"))
+  if (keep != "all") {
+    df <- results_to_df(x, issues_type = keep)
+    issues <- rowSums(df) != 0
+    x <- x[issues]
+  }
+  
   for (i in seq_along(x)) {
-    print(x[[i]])
+    print(x[[i]], ...)
     cat("\n")
   }
   invisible(x)
 }
 
+#' @rdname print.checked_results
 #' @export
-print.results_revdep_check_task_spec <- function(x, ...) {
-  print.results_check_task_spec(x, ...)
+print.checked_results_revdep_check_task_spec <- function(x, ...) {
+  print.checked_results_check_task_spec(x, ...)
 }
 
 get_issue_header <- function(x) {

@@ -9,8 +9,8 @@ results(x, ...)
 
 \method{results}{check_design}(
   x,
-  error_on = c("never", "issues", "potential_issues"),
-  keep = c("all", "issues", "potential_issues"),
+  error_on = Sys.getenv("CHECKED_RESULTS_ERROR_ON", c("never", "issues",
+    "potential_issues")[1]),
   ...
 )
 }
@@ -22,12 +22,8 @@ results(x, ...)
 \item{error_on}{character vector indicating whether R error should be thrown
 when issues are discovered when generating results. "never" means that no
 errors are thrown. If "issues" then errors are emitted only on issues, whereas
-"potential issues" stands for error on both issues and potential issues.}
-
-\item{keep}{character vector indicating which packages should be included
-in the results. "all" means that all packages are kept. If "issues" then
-only packages with issues identified, whereas "potential_issues" stands for
-keeping packages with both "issues" and "potential_issues".}
+"potential issues" stands for error on both issues and potential issues. Users
+can set the default value via env variable \code{CHECKED_RESULTS_ERROR_ON}.}
 }
 \description{
 Get R CMD check results

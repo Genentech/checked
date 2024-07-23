@@ -209,9 +209,9 @@ check_design <- R6::R6Class(
 #' @export
 print.check_design <- function(x, ...) {
   if (x$is_done()) {
-    print(results(x))
+    print(results(x, ...), ...)
   } else {
-    print(x$input)
+    print(x$input, ...)
   }
   invisible(x)
 }
