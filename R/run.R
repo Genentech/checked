@@ -1,25 +1,26 @@
-#' Run Reverse-Dependency Checks
+#' Run a Series of `R CMD check`s
 #'
-#' @param design A reverse-dependency plan, or an object coercible into a
-#'   plan.
-#' @param ... Additional arguments
+#' @param design `character` or `check_design` If a `character` value is
+#'   provided, it is first coerced into a `check_design` using
+#'   [`new_rev_dep_check_design()`].
+#' @param ... Additional arguments passed to [`new_rev_dep_check_design()`]
 #' @param reporter A reporter to provide progress updates. Will default to the
 #'   most expressive command-line reporter given your terminal capabilities.
 #'
 #' @export
-run <- function(design, ..., reporter = default_reporter()) {
+run <- function(design, ..., reporter = reporter_default()) {
   UseMethod("run")
 }
 
 #' @export
-run.character <- function(design, ..., reporter = default_reporter()) {
+run.character <- function(design, ..., reporter = reporter_default()) {
   run(new_rev_dep_check_design(design, ...), reporter = reporter)
 }
 
 #' @export
-run.check_design <- function(design, ..., reporter = default_reporter()) {
+run.check_design <- function(design, ..., reporter = reporter_default()) {
   on.exit(add = TRUE, {
-    design$terminate()
+    design$kill_all()
     report_finalize(reporter, design)
   })
 

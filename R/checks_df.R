@@ -51,7 +51,11 @@ NULL
 
 #' @export
 #' @rdname checks_df
-rev_dep_check_tasks_df <- function(path, repos = getOption("repos"), versions = c("dev", "release")) {
+rev_dep_check_tasks_df <- function(
+  path,
+  repos = getOption("repos"),
+  versions = c("dev", "release")
+) {
   stopifnot(
     "rev_dep_check_tasks_df requires path argument of length 1" = length(path) == 1
     )

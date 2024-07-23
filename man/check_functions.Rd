@@ -16,7 +16,7 @@ check_reverse_dependencies(
   repos = getOption("repos"),
   reverse_repos = repos,
   restore = TRUE,
-  reporter = default_reporter(),
+  reporter = reporter_default(),
   ...
 )
 
@@ -27,7 +27,7 @@ check_reverse_dependencies_development(
   lib.loc = .libPaths(),
   repos = getOption("repos"),
   restore = TRUE,
-  reporter = default_reporter(),
+  reporter = reporter_default(),
   ...
 )
 
@@ -38,7 +38,7 @@ check_packages(
   lib.loc = .libPaths(),
   repos = getOption("repos"),
   restore = TRUE,
-  reporter = default_reporter(),
+  reporter = reporter_default(),
   ...
 )
 
@@ -49,7 +49,7 @@ check_dir(
   lib.loc = .libPaths(),
   repos = getOption("repos"),
   restore = TRUE,
-  reporter = default_reporter(),
+  reporter = reporter_default(),
   ...
 )
 }

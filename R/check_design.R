@@ -1,7 +1,11 @@
+#' @name check_design
+#' @export
 new_check_design <- function(...) {
   check_design$new(...)
 }
 
+#' @name check_design
+#' @export
 new_rev_dep_check_design <- function(x, ...) {
   tasks <- rev_dep_check_tasks_df(x)
   new_check_design(tasks, ...)
@@ -102,10 +106,10 @@ check_design <- R6::R6Class(
     },
 
     #' @description
-    #' Terminate Design Processes
+    #' Kill All Active Design Processes
     #'
-    #' Immedaitely termiantes all the active processes.
-    terminate = function() {
+    #' Immedaitely kills all the active processes.
+    kill_all = function() {
       invisible(lapply(private$active, function(process) process$kill()))
     },
 

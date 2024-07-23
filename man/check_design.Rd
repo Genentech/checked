@@ -2,7 +2,14 @@
 % Please edit documentation in R/check_design.R
 \name{check_design}
 \alias{check_design}
+\alias{new_check_design}
+\alias{new_rev_dep_check_design}
 \title{Check Design Object}
+\usage{
+new_check_design(...)
+
+new_rev_dep_check_design(x, ...)
+}
 \description{
 Abstract object that drives all separate processes required to run
 R CMD check sequence.
@@ -44,7 +51,7 @@ be created and stored.}
 \itemize{
 \item \href{#method-check_design-new}{\code{check_design$new()}}
 \item \href{#method-check_design-active_processes}{\code{check_design$active_processes()}}
-\item \href{#method-check_design-terminate}{\code{check_design$terminate()}}
+\item \href{#method-check_design-kill_all}{\code{check_design$kill_all()}}
 \item \href{#method-check_design-step}{\code{check_design$step()}}
 \item \href{#method-check_design-start_next_task}{\code{check_design$start_next_task()}}
 \item \href{#method-check_design-is_done}{\code{check_design$is_done()}}
@@ -110,14 +117,14 @@ Get Active Processes list
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-check_design-terminate"></a>}}
-\if{latex}{\out{\hypertarget{method-check_design-terminate}{}}}
-\subsection{Method \code{terminate()}}{
-Terminate Design Processes
+\if{html}{\out{<a id="method-check_design-kill_all"></a>}}
+\if{latex}{\out{\hypertarget{method-check_design-kill_all}{}}}
+\subsection{Method \code{kill_all()}}{
+Kill All Active Design Processes
 
-Immedaitely termiantes all the active processes.
+Immedaitely kills all the active processes.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{check_design$terminate()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{check_design$kill_all()}\if{html}{\out{</div>}}
 }
 
 }

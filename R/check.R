@@ -62,7 +62,7 @@ check_reverse_dependencies <- function(
     repos = getOption("repos"),
     reverse_repos = repos,
     restore = TRUE,
-    reporter = default_reporter(),
+    reporter = reporter_default(),
     ...
 ) {
   checks <- rev_dep_check_tasks_df(path = path, repos = reverse_repos)
@@ -89,7 +89,7 @@ check_reverse_dependencies_development <- function(
     lib.loc = .libPaths(),
     repos = getOption("repos"),
     restore = TRUE,
-    reporter = default_reporter(),
+    reporter = reporter_default(),
     ...
 ) {
   checks <- rev_dep_check_tasks_df(path = path, repos = repos, versions = "dev")
@@ -116,7 +116,7 @@ check_packages <- function(
     lib.loc = .libPaths(),
     repos = getOption("repos"),
     restore = TRUE,
-    reporter = default_reporter(),
+    reporter = reporter_default(),
     ...
 ) {
   checks <- source_check_tasks_df(path)
@@ -143,7 +143,7 @@ check_dir <- function(
     lib.loc = .libPaths(),
     repos = getOption("repos"),
     restore = TRUE,
-    reporter = default_reporter(),
+    reporter = reporter_default(),
     ...
 ) {
   dirs <- list.dirs(path, full.names = TRUE, recursive = FALSE)
