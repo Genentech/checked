@@ -14,6 +14,10 @@ checked 0.1.0.9000 (development)
 
 * Make sure `check_reverse_dependencies` works when package is not available
   in the remote sources or has no reverse dependencies.
+  
+* Add `keep` parameters to the the `print.checked_results_check_task_spec`.
+
+* Add `error_on` parameters to the the `results.check_design`.
 
 checked 0.1.0
 ---------------------------------------------------------------

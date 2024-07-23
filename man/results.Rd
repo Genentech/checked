@@ -7,12 +7,23 @@
 \usage{
 results(x, ...)
 
-\method{results}{check_design}(x, ...)
+\method{results}{check_design}(
+  x,
+  error_on = Sys.getenv("CHECKED_RESULTS_ERROR_ON", c("never", "issues",
+    "potential_issues")[1]),
+  ...
+)
 }
 \arguments{
 \item{x}{\code{\link[checked]{check_design}} object.}
 
 \item{...}{other parameters.}
+
+\item{error_on}{character vector indicating whether R error should be thrown
+when issues are discovered when generating results. "never" means that no
+errors are thrown. If "issues" then errors are emitted only on issues, whereas
+"potential issues" stands for error on both issues and potential issues. Users
+can set the default value via env variable \code{CHECKED_RESULTS_ERROR_ON}.}
 }
 \description{
 Get R CMD check results
