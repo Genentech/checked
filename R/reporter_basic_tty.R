@@ -22,12 +22,14 @@ report_status.reporter_basic_tty <- function(reporter, design, envir) { # nolint
   cli_theme()
   for (i in seq_along(igraph::V(design$graph))) {
     node <- igraph::V(design$graph)[[i]]
-
+    
     # skip if queued, but not started
     if (node$status <= STATUS$`pending`) next
-
+    
+    p <- node$process
+    
     # NOTE: for some reason check process never finishes unless we poll checks
-    if (node$type == "check" && !is.null(node$process)) node$process$poll_output()
+    if (node$type == "check" && !is.null(p)) p$poll_output()
 
     # report stating of new checks
     if (!identical(node$status, reporter$statuses[[node$name]])) {
@@ -35,9 +37,9 @@ report_status.reporter_basic_tty <- function(reporter, design, envir) { # nolint
         "pending" = "queued",
         "in progress" = cli::cli_fmt(cli::cli_text("started")),
         "done" = {
-          if (is.null(node$process)) {
+          if (is.null(p)) {
             cli::cli_fmt(cli::cli_text("finished (restored)"))
-          } else if (node$process$get_r_exit_status() != 0) {
+          } else if (p$get_r_exit_status() != 0) {
             # checks processes don't have logs associated with it
             message <- if (!is.null(p$log)) {
               sprintf("failed (log: '%s')", p$log)
@@ -46,12 +48,12 @@ report_status.reporter_basic_tty <- function(reporter, design, envir) { # nolint
             }
             cli::cli_fmt(cli::cli_text(message))
           } else {
-            dur <- if (!is.null(node$process$get_duration)) {
-              node$process$get_duration()
+            dur <- if (!is.null(p$get_duration)) {
+              p$get_duration()
             }
             if (node$type == "check") {
               ewn <- c("ERROR", "WARNING", "NOTE")
-              ewn <- table(node$process$get_checks())[ewn]
+              ewn <- table(p$get_checks())[ewn]
             } else {
               ewn <- c(0, 0, 0)
             }

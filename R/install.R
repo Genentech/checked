@@ -11,7 +11,7 @@ install_packages_process <- R6::R6Class(
       private$callr_r_bg(
         function(...) {
           tryCatch(
-            utils::install.packages(...)
+            utils::install.packages(...),
             warning = function(w) {
               installation_failure <- grepl("download of package .* failed", w$message) ||
                 grepl("(dependenc|package).*(is|are) not available", w$message) ||
@@ -47,7 +47,7 @@ install_packages_process <- R6::R6Class(
       if ("finalize" %in% ls(super)) super$finalize()
     },
     get_r_exit_status = function() {
-      as.integer(inherits(try(p$get_result(), silent = TRUE), "try-error"))
+      as.integer(inherits(try(self$get_result(), silent = TRUE), "try-error"))
     }
   ),
   private = list(
@@ -68,7 +68,7 @@ install_packages_process <- R6::R6Class(
 
       # other things set internally in callr::r_bg
       options$extra <- list()
-      options$load_hook <- ""
+      options$load_hook <- .callr$default_load_hook()
 
       private$options <- options
       super$initialize(options = options)

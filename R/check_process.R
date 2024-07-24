@@ -127,7 +127,7 @@ check_process <- R6::R6Class(
       }
     },
     get_r_exit_status = function() {
-      as.integer(inherits(try(p$get_result(), silent = TRUE), "try-error"))
+      as.integer(inherits(try(self$get_result(), silent = TRUE), "try-error"))
     }
   ),
   private = list(

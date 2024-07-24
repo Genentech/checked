@@ -47,6 +47,10 @@ base_pkgs <- function() {
   c("R", utils::installed.packages(priority = "base")[, "Package"])
 }
 
+.callr <- as.list(getNamespace("callr"), all.names = TRUE)[c(
+  "default_load_hook"
+)]
+
 .tools <- as.list(getNamespace("tools"), all.names = TRUE)[c(
   ".split_dependencies"
 )]

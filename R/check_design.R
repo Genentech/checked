@@ -100,11 +100,17 @@ check_design <- R6::R6Class(
     active_processes = function() {
       private$active
     },
-
+    
+    #' @description
+    #' Get Failed Tasks list
+    failed_tasks = function() {
+      private$failed
+    },
+    
     #' @description
     #' Terminate Design Processes
     #'
-    #' Immedaitely termiantes all the active processes.
+    #' Immediately terminates all the active processes.
     terminate = function() {
       invisible(lapply(private$active, function(process) process$kill()))
     },
@@ -178,7 +184,8 @@ check_design <- R6::R6Class(
     repos = getOption("repos"),
     # active processes
     active = list(),
-
+    # failed tasks
+    failed = list(),
     # Methods
 
     push_process = function(task, x) {
@@ -186,7 +193,9 @@ check_design <- R6::R6Class(
       name <- task_graph_task_name(self$graph, task)
       task_graph_package_status(self$graph, task) <- STATUS$`in progress`
       x$set_finalizer(function(process) {
-        # TODO: Implement warning if the process failed before finalizing
+        if (process$get_r_exit_status() != 0) {
+          private$failed[[name]] <- task
+        }
         private$pop_process(name)
         task_graph_package_status(self$graph, task) <- STATUS$done
       })
