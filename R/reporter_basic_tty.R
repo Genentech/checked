@@ -27,7 +27,6 @@ report_status.reporter_basic_tty <- function(reporter, design, envir) { # nolint
     if (node$status <= STATUS$`pending`) next
     
     p <- node$process
-    
     # NOTE: for some reason check process never finishes unless we poll checks
     if (node$type == "check" && !is.null(p)) p$poll_output()
 

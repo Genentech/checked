@@ -81,7 +81,6 @@ check_design <- R6::R6Class(
         "Check task aliases cannot have the same name as any of the available packages" = !any(df$alias %in% available.packages(repos = repos)[, "Package"]),
         "Custom package aliases cannot be duplicates of check aliases" = !any(uulist(drlapply(df$custom, `[[`, "alias")) %in% df$alias)
       )
-
       if (!restore) unlink(output, recursive = TRUE, force = TRUE)
 
       self$input <- df

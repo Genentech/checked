@@ -23,6 +23,8 @@ checked 0.2.0
 
 * Add warnings to the reporter whenever sub-processes have non-zero exit status.
 
+* Fix race condition when reporting progress for check processes.
+
 checked 0.1.0
 ---------------------------------------------------------------
 * Package released to CRAN

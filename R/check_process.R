@@ -62,6 +62,7 @@ check_process <- R6::R6Class(
       if (!self$is_alive()) callback()
     },
     finalize = function() {
+      self$poll_output()
       path <- file.path(private$check_dir, "result.json")
       rcmdcheck_to_json(self$parse_results(), path)
       if (is.function(f <- private$finalize_callback)) f(self)
