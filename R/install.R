@@ -4,10 +4,26 @@ install_packages_process <- R6::R6Class(
   "install_package_process",
   inherit = callr::r_process,
   public = list(
+    log = NULL,
     initialize = function(pkgs, ..., lib = .libPaths(), libpaths = .libPaths(), log) {
       private$package <- pkgs
+      self$log <- log
       private$callr_r_bg(
-        function(...) utils::install.packages(...),
+        function(...) {
+          tryCatch(
+            utils::install.packages(...),
+            warning = function(w) {
+              installation_failure <- grepl("download of package .* failed", w$message) ||
+                grepl("(dependenc|package).*(is|are) not available", w$message) ||
+                grepl("installation of package.*had non-zero exit status", w$message) ||
+                grepl("installation of one or more packages failed", w$message)
+              
+              if (installation_failure) {
+                stop(w$message)
+              }
+            }
+          )
+        },
         args = list(pkgs, ..., lib = lib),
         libpath = libpaths,
         stdout = log,
@@ -29,6 +45,9 @@ install_packages_process <- R6::R6Class(
       private$time_finish <- Sys.time()
       if (is.function(f <- private$finalize_callback)) f(self)
       if ("finalize" %in% ls(super)) super$finalize()
+    },
+    get_r_exit_status = function() {
+      as.integer(inherits(try(self$get_result(), silent = TRUE), "try-error"))
     }
   ),
   private = list(
@@ -49,7 +68,7 @@ install_packages_process <- R6::R6Class(
 
       # other things set internally in callr::r_bg
       options$extra <- list()
-      options$load_hook <- ""
+      options$load_hook <- .callr$default_load_hook()
 
       private$options <- options
       super$initialize(options = options)

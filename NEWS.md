@@ -1,4 +1,4 @@
-checked 0.1.0.9000 (development)
+checked 0.2.0 
 ---------------------------------------------------------------
 * Change default private `lib.loc` value in `check_process` R6 class
   to NULL to avoid staged installation failures.
@@ -18,6 +18,12 @@ checked 0.1.0.9000 (development)
 * Add `keep` parameters to the the `print.checked_results_check_task_spec`.
 
 * Add `error_on` parameters to the the `results.check_design`.
+
+* Add `$get_r_exit_status()` method to both check and install processes.
+
+* Add warnings to the reporter whenever sub-processes have non-zero exit status.
+
+* Fix race condition when reporting progress for check processes.
 
 checked 0.1.0
 ---------------------------------------------------------------
