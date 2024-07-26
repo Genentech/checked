@@ -165,7 +165,6 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) { # nolint
   
   # for each not-yet finished task, report status
   buffer <- ""
-#  for (idx in which(reporter$status < STATUS$done)) {
   for (idx in seq_along(reporter$status)) {
     # update reported status
     alias <- names(reporter$status)[[idx]]
