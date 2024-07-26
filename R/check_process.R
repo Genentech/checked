@@ -63,7 +63,7 @@ check_process <- R6::R6Class(
     },
     finalize = function() {
       self$poll_output()
-      self$safe_results()
+      self$save_results()
       if (is.function(f <- private$finalize_callback)) f(self)
       if ("finalize" %in% ls(super)) super$finalize()
     },
@@ -136,9 +136,9 @@ check_process <- R6::R6Class(
     get_r_exit_status = function() {
       as.integer(inherits(try(self$get_result(), silent = TRUE), "try-error"))
     },
-    safe_results = function() {
+    save_results = function() {
       path <- file.path(private$check_dir, "result.json")
-      rcmdcheck_to_json(self$parse_results(), path)
+      try(rcmdcheck_to_json(self$parse_results(), path), silent = FALSE)
     }
   ),
   private = list(
