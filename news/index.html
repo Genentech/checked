@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">checked</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -48,7 +48,7 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.1.0.9000" id="checked-0109000-development">checked 0.1.0.9000 (development)<a class="anchor" aria-label="anchor" href="#checked-0109000-development"></a></h2>
+<h2 class="page-header" data-toc-text="0.2.0" id="checked-020">checked 0.2.0<a class="anchor" aria-label="anchor" href="#checked-020"></a></h2>
 <ul><li><p>Change default private <code>lib.loc</code> value in <code>check_process</code> R6 class to NULL to avoid staged installation failures.</p></li>
 <li><p>Terminate all the subprocesses if the <code>run</code> function is interrupted to comply with CRAN requirements.</p></li>
 <li><p>Reorganize methods in the <code>check_design</code> making some of the private.</p></li>
@@ -57,6 +57,9 @@
 <li><p>Make sure <code>check_reverse_dependencies</code> works when package is not available in the remote sources or has no reverse dependencies.</p></li>
 <li><p>Add <code>keep</code> parameters to the the <code>print.checked_results_check_task_spec</code>.</p></li>
 <li><p>Add <code>error_on</code> parameters to the the <code>results.check_design</code>.</p></li>
+<li><p>Add <code>$get_r_exit_status()</code> method to both check and install processes.</p></li>
+<li><p>Add warnings to the reporter whenever sub-processes have non-zero exit status.</p></li>
+<li><p>Fix race condition when reporting progress for check processes.</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.0" id="checked-010">checked 0.1.0<small>2024-07-10</small><a class="anchor" aria-label="anchor" href="#checked-010"></a></h2>
