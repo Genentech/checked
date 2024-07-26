@@ -138,7 +138,7 @@ check_process <- R6::R6Class(
     },
     save_results = function() {
       path <- file.path(private$check_dir, "result.json")
-      try(rcmdcheck_to_json(self$parse_results(), path), silent = FALSE)
+      try(rcmdcheck_to_json(self$parse_results(), path), silent = TRUE)
     }
   ),
   private = list(
