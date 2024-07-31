@@ -62,6 +62,11 @@ results.check_design <- function(
 }
 
 #' @export
+`[.checked_results` <- function(x, ...) {
+  structure(NextMethod(), class = class(x))
+}
+
+#' @export
 #' @noRd
 results.list_revdep_check_task_spec <- function(x, output, ...) {
   name <- vcapply(x, function(y) y$package_spec$name)
@@ -159,13 +164,52 @@ results.check_task_spec <- function(x, output, ...) {
   )
 }
 
+#' Results to file
+#' 
+#' Write \code{checked_results} object to the text file. When converting results
+#' to text, \code{\link[checked]{print.checked_results}} method is used.
+#' 
+#' 
+#' @param results \code{\link[checked]{results}} object.
+#' @param file A connection or character path.
+#' @inheritParams print.checked_results
+#' 
+#' @export
+results_to_file <- function(results, file, keep = "all", ...) {
+  text <- c()
+  for (i in seq_along(results)) {
+    df <- results_to_df(results[[i]], issues_type = keep)
+    if (keep == "all" || any(rowSums(df) > 0)) {
+      text <- c(
+        text,
+        utils::capture.output(print(results[i], keep = keep))
+      )
+    }
+  }
+  
+  if (!any(nzchar(text))) {
+    text <- "No issues identified."
+  }
+  
+  writeLines(text, file) 
+}
+
 results_to_df <- function(results, ...) {
-  data.frame(
-    notes = vnapply(results, count, type = "notes", ...),
-    warnings = vnapply(results, count, type = "warnings", ...),
-    errors = vnapply(results, count, type = "errors", ...),
-    row.names = names(results)
-  )
+  if (length(results) == 0) {
+    data.frame(
+      notes = character(0),
+      warnings = character(0),
+      errors = character(0),
+      row.names = names(results)
+    )
+  } else {
+    data.frame(
+      notes = vnapply(results, count, type = "notes", ...),
+      warnings = vnapply(results, count, type = "warnings", ...),
+      errors = vnapply(results, count, type = "errors", ...),
+      row.names = names(results)
+    )
+  }
 }
 
 count <- function(d, ...) {
@@ -207,7 +251,7 @@ summary.checked_results_check_task_spec <- function(object, ...) {
   results_to_df(object, ...)
 }
 
-#' Plot checked results
+#' Print checked results
 #'
 #' @param x an object to be printed.
 #' @param keep character vector indicating which packages should be included
@@ -215,7 +259,7 @@ summary.checked_results_check_task_spec <- function(object, ...) {
 #' only packages with issues identified, whereas "potential_issues" stands for
 #' keeping packages with both "issues" and "potential_issues". Users can set
 #' the default value via env variable \code{CHECKED_RESULTS_KEEP}.
-#' @param ... other parameters described below
+#' @param ... other parameters.
 #' 
 #' @rdname print.checked_results
 #' @export

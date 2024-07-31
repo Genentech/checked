@@ -4,7 +4,7 @@
 \alias{print.checked_results}
 \alias{print.checked_results_check_task_spec}
 \alias{print.checked_results_revdep_check_task_spec}
-\title{Plot checked results}
+\title{Print checked results}
 \usage{
 \method{print}{checked_results}(x, ...)
 
@@ -19,7 +19,7 @@
 \arguments{
 \item{x}{an object to be printed.}
 
-\item{...}{other parameters described below}
+\item{...}{other parameters.}
 
 \item{keep}{character vector indicating which packages should be included
 in the results. "all" means that all packages are kept. If "issues" then
@@ -28,5 +28,5 @@ keeping packages with both "issues" and "potential_issues". Users can set
 the default value via env variable \code{CHECKED_RESULTS_KEEP}.}
 }
 \description{
-Plot checked results
+Print checked results
 }

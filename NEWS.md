@@ -1,5 +1,9 @@
 checked 0.2.0 
 ---------------------------------------------------------------
+* Add `results_to_file` function.
+
+checked 0.2.0 
+---------------------------------------------------------------
 * Change default private `lib.loc` value in `check_process` R6 class
   to NULL to avoid staged installation failures.
   
