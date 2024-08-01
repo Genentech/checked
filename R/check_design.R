@@ -82,6 +82,7 @@ check_design <- R6::R6Class(
         "Custom package aliases cannot be duplicates of check aliases" = !any(uulist(drlapply(df$custom, `[[`, "alias")) %in% df$alias)
       )
       if (!restore) unlink(output, recursive = TRUE, force = TRUE)
+      dir_create(output)
 
       self$input <- df
       self$output <- output

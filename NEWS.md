@@ -1,4 +1,10 @@
-checked 0.2.0 
+checked 0.2.2
+---------------------------------------------------------------
+* Clear some of the unused utils functions (`can_symlink`, `symlink_or_copy`).
+
+* Make sure output directory is always created.
+
+checked 0.2.1 
 ---------------------------------------------------------------
 * Add `results_to_file` function.
 

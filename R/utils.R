@@ -146,19 +146,6 @@ dir_create <- function(path) {
   }
 }
 
-can_symlink <- function() {
-  dir_create(tmp_dir <- file.path(tempdir(), "symlinktest"))
-  suppressWarnings(file.symlink(tempfile(), tmp_dir))
-}
-
-symlink_or_copy <- function(from, to) {
-  if (can_symlink()) {
-    file.symlink(from = from, to = to)
-  } else {
-    file.copy(from = from, to = to, recursive = TRUE)
-  }
-}
-
 is_package_done <- function(pkg, lib.loc) {
   path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
   length(path) > 0
