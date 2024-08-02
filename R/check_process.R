@@ -58,13 +58,13 @@ check_process <- R6::R6Class(
       super$initialize(...)
     },
     set_finisher = function(callback) {
-      private$finisher_callback <- callback
+      private$finish_callback <- callback
       if (!self$is_alive()) callback(self)
     },
     finish = function() {
       self$poll_output()
       self$save_results()
-      if (is.function(f <- private$finisher_callback)) f(self)
+      if (is.function(f <- private$finish_callback)) f(self)
     },
     get_time_last_check_start = function() {
       private$time_last_check_start
@@ -148,7 +148,7 @@ check_process <- R6::R6Class(
     parsed_partial_check_output = "",
     throttle = NULL,
     spinners = NULL,
-    finisher_callback = NULL
+    finish_callback = NULL
   )
 )
 
