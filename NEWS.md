@@ -1,5 +1,11 @@
 checked 0.2.2
 ---------------------------------------------------------------
+* Use custom `checked` `finisher`'s instead of the `processx` `finalizer`'s
+  when cleaning up finished processes to avoid executing callbacks when
+  objects are garbage collected.
+
+checked 0.2.2
+---------------------------------------------------------------
 * Clear some of the unused utils functions (`can_symlink`, `symlink_or_copy`).
 
 * Make sure output directory is always created.

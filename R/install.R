@@ -37,14 +37,13 @@ install_packages_process <- R6::R6Class(
       }
       (private$time_finish %||% Sys.time()) - self$get_start_time()
     },
-    set_finalizer = function(callback) {
-      private$finalize_callback <- callback
-      if (!self$is_alive()) callback()
+    set_finisher = function(callback) {
+      private$finisher_callback <- callback
+      if (!self$is_alive()) callback(self)
     },
-    finalize = function() {
+    finish = function() {
       private$time_finish <- Sys.time()
-      if (is.function(f <- private$finalize_callback)) f(self)
-      if ("finalize" %in% ls(super)) super$finalize()
+      if (is.function(f <- private$finisher_callback)) f(self)
     },
     get_r_exit_status = function() {
       as.integer(inherits(try(self$get_result(), silent = TRUE), "try-error"))
@@ -53,7 +52,7 @@ install_packages_process <- R6::R6Class(
   private = list(
     options = NULL,
     package = NULL,
-    finalize_callback = NULL,
+    finisher_callback = NULL,
     time_finish = NULL,
     callr_r_bg = function(...) {
       # default formal argument values

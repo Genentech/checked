@@ -131,10 +131,10 @@ check_design <- R6::R6Class(
     #' @return A integer value, coercible to logical to indicate whether a new
     #'   process was spawned, or `-1` if all tasks have finished.
     start_next_task = function() {
-      # finalize any finished processes
+      # finish any finished processes
       for (process in private$active) {
         if (!process$is_alive()) {
-          process$finalize()
+          process$finish()
         }
       }
 
@@ -192,7 +192,7 @@ check_design <- R6::R6Class(
       task_graph_task_process(self$graph, task) <- x
       name <- task_graph_task_name(self$graph, task)
       task_graph_package_status(self$graph, task) <- STATUS$`in progress`
-      x$set_finalizer(function(process) {
+      x$set_finisher(function(process) {
         if (process$get_r_exit_status() != 0) {
           private$failed[[name]] <- task
         }
