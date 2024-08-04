@@ -25,7 +25,8 @@ results.check_design <- function(
     ...) {
   
   error_on <- match.arg(error_on, c("never", "issues", "potential_issues"))
-  checks_nodes <- igraph::V(x$graph)[igraph::vertex.attributes(x$graph)$type == "check"]
+  checks_nodes <- igraph::V(x$graph)[
+    igraph::vertex.attributes(x$graph)$type == "check" & igraph::vertex.attributes(x$graph)$status == STATUS$done]
   checks_classes <- vcapply(checks_nodes$spec, function(x) class(x)[[1]])
   classes <- unique(checks_classes)
   res <- lapply(classes, function(x) {
@@ -70,6 +71,9 @@ results.check_design <- function(
 #' @noRd
 results.list_revdep_check_task_spec <- function(x, output, ...) {
   name <- vcapply(x, function(y) y$package_spec$name)
+  is_ready <- vcapply(name, function(y) {
+    
+  })
   revdep <- vcapply(x, `[[`, "revdep")
   
   new <- lapply(sort(unique(name)), function(y) {

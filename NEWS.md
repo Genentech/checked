@@ -1,8 +1,12 @@
-checked 0.2.2
+checked 0.2.3
 ---------------------------------------------------------------
 * Use custom `checked` `finisher`'s instead of the `processx` `finalizer`'s
   when cleaning up finished processes to avoid executing callbacks when
   objects are garbage collected.
+  
+* In `rev_dep_check_tasks_df` add custom package value for each check associated
+  with the release version of the package to make sure, the current release
+  version of the package is always fetched and installed.
 
 checked 0.2.2
 ---------------------------------------------------------------
