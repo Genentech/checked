@@ -71,22 +71,26 @@ results.check_design <- function(
 #' @noRd
 results.list_revdep_check_task_spec <- function(x, output, ...) {
   name <- vcapply(x, function(y) y$package_spec$name)
-  is_ready <- vcapply(name, function(y) {
-    
-  })
   revdep <- vcapply(x, `[[`, "revdep")
+  count <- table(name, revdep)
+  is_complete_pair <- vlapply(name, function(y) {
+    identical(unname(count[y, ]), c(1L, 1L))
+  })
   
-  new <- lapply(sort(unique(name)), function(y) {
+  names_complete <- sort(unique(name[is_complete_pair]))
+  
+  
+  new <- lapply(names_complete, function(y) {
     x[[which(name == y & revdep == "new")]]
   })
   
-  old <- lapply(sort(unique(name)), function(y) {
+  old <- lapply(names_complete, function(y) {
     x[[which(name == y & revdep == "old")]]
   })
   
   structure(
     mapply(results, x = new, y = old, output = output, SIMPLIFY = FALSE),
-    names = sort(unique(name))
+    names = names_complete
   )
 }
 

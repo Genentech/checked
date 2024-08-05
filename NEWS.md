@@ -7,6 +7,8 @@ checked 0.2.3
 * In `rev_dep_check_tasks_df` add custom package value for each check associated
   with the release version of the package to make sure, the current release
   version of the package is always fetched and installed.
+  
+* Prevent `results` from attempting to read results for unfinished checks.
 
 checked 0.2.2
 ---------------------------------------------------------------
