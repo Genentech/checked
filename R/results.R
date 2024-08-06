@@ -25,7 +25,8 @@ results.check_design <- function(
     ...) {
   
   error_on <- match.arg(error_on, c("never", "issues", "potential_issues"))
-  checks_nodes <- igraph::V(x$graph)[igraph::vertex.attributes(x$graph)$type == "check"]
+  checks_nodes <- igraph::V(x$graph)[
+    igraph::vertex.attributes(x$graph)$type == "check" & igraph::vertex.attributes(x$graph)$status == STATUS$done]
   checks_classes <- vcapply(checks_nodes$spec, function(x) class(x)[[1]])
   classes <- unique(checks_classes)
   res <- lapply(classes, function(x) {
@@ -71,18 +72,25 @@ results.check_design <- function(
 results.list_revdep_check_task_spec <- function(x, output, ...) {
   name <- vcapply(x, function(y) y$package_spec$name)
   revdep <- vcapply(x, `[[`, "revdep")
+  count <- table(name, revdep)
+  is_complete_pair <- vlapply(name, function(y) {
+    identical(unname(count[y, ]), c(1L, 1L))
+  })
   
-  new <- lapply(sort(unique(name)), function(y) {
+  names_complete <- sort(unique(name[is_complete_pair]))
+  
+  
+  new <- lapply(names_complete, function(y) {
     x[[which(name == y & revdep == "new")]]
   })
   
-  old <- lapply(sort(unique(name)), function(y) {
+  old <- lapply(names_complete, function(y) {
     x[[which(name == y & revdep == "old")]]
   })
   
   structure(
     mapply(results, x = new, y = old, output = output, SIMPLIFY = FALSE),
-    names = sort(unique(name))
+    names = names_complete
   )
 }
 

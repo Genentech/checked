@@ -57,15 +57,14 @@ check_process <- R6::R6Class(
 
       super$initialize(...)
     },
-    set_finalizer = function(callback) {
-      private$finalize_callback <- callback
-      if (!self$is_alive()) callback()
+    set_finisher = function(callback) {
+      private$finish_callback <- callback
+      if (!self$is_alive()) callback(self)
     },
-    finalize = function() {
+    finish = function() {
       self$poll_output()
       self$save_results()
-      if (is.function(f <- private$finalize_callback)) f(self)
-      if ("finalize" %in% ls(super)) super$finalize()
+      if (is.function(f <- private$finish_callback)) f(self)
     },
     get_time_last_check_start = function() {
       private$time_last_check_start
@@ -101,7 +100,7 @@ check_process <- R6::R6Class(
       
       # TODO: For some reason we need to read the output twice, otherwise
       # it might not be captured.
-      # When forcing interruption, finalizer is called, hence try() to make
+      # When forcing interruption, finisher is called, hence try() to make
       # sure it does not break after process is killed
       out <- try(paste0(
         private$parsed_partial_check_output,
@@ -149,7 +148,7 @@ check_process <- R6::R6Class(
     parsed_partial_check_output = "",
     throttle = NULL,
     spinners = NULL,
-    finalize_callback = NULL
+    finish_callback = NULL
   )
 )
 

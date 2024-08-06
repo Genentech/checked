@@ -103,7 +103,12 @@ rev_dep_check_tasks_df <- function(path, repos = getOption("repos"), versions = 
     package_v <- ap[package, "Version"]
     df_rel$alias <- paste0(df_rel$alias, " (v", package_v, ")")
     df_rel$package <- task_specs_function(revdeps, repos, df_rel$alias, "old")
-    df_rel$custom <- rep(list(custom_install_task_spec()), times = NROW(df_dev))
+    df_rel$custom <- rep(list(custom_install_task_spec(
+      alias = paste0(package, " (release)"),
+      package = package_spec(name = package, repos = repos),
+      # make sure to use the release version built against the same system
+      type = "source" 
+    )), times = NROW(df_dev))
   }
   
   if (identical(versions, "dev")) {
