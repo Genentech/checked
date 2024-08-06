@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">checked</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.3</span>
       </span>
     </div>
 
@@ -47,6 +47,12 @@
       <small>Source: <a href="https://github.com/Genentech/checked/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.2.3" id="checked-023">checked 0.2.3<a class="anchor" aria-label="anchor" href="#checked-023"></a></h2>
+<ul><li><p>Use custom <code>checked</code> <code>finisher</code>’s instead of the <code>processx</code> <code>finalizer</code>’s when cleaning up finished processes to avoid executing callbacks when objects are garbage collected.</p></li>
+<li><p>In <code>rev_dep_check_tasks_df</code> add custom package value for each check associated with the release version of the package to make sure, the current release version of the package is always fetched and installed.</p></li>
+<li><p>Prevent <code>results</code> from attempting to read results for unfinished checks.</p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.2" id="checked-022">checked 0.2.2<a class="anchor" aria-label="anchor" href="#checked-022"></a></h2>
 <ul><li><p>Clear some of the unused utils functions (<code>can_symlink</code>, <code>symlink_or_copy</code>).</p></li>
