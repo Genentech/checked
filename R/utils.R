@@ -47,6 +47,10 @@ base_pkgs <- function() {
   c("R", utils::installed.packages(priority = "base")[, "Package"])
 }
 
+.callr <- as.list(getNamespace("callr"), all.names = TRUE)[c(
+  "default_load_hook"
+)]
+
 .tools <- as.list(getNamespace("tools"), all.names = TRUE)[c(
   ".split_dependencies"
 )]
@@ -139,19 +143,6 @@ get_package_version <- function(path) {
 dir_create <- function(path) {
   if (!dir.exists(path)) {
     dir.create(path, showWarnings = FALSE, recursive = TRUE)
-  }
-}
-
-can_symlink <- function() {
-  dir_create(tmp_dir <- file.path(tempdir(), "symlinktest"))
-  suppressWarnings(file.symlink(tempfile(), tmp_dir))
-}
-
-symlink_or_copy <- function(from, to) {
-  if (can_symlink()) {
-    file.symlink(from = from, to = to)
-  } else {
-    file.copy(from = from, to = to, recursive = TRUE)
   }
 }
 

@@ -15,7 +15,7 @@ test_that("rev_dep_check_tasks_df works with deafult params", {
   
   expect_s3_class(df$custom, "list_of_task_spec")
   expect_equal(unique(vcapply(df$custom, function(x) class(x)[[1]])), "custom_install_task_spec")
-  expect_equal(unique(vcapply(df$custom, function(x) class(x$package_spec)[[1]])), c("package_spec_source", "NULL"))
+  expect_equal(unique(vcapply(df$custom, function(x) class(x$package_spec)[[1]])), c("package_spec_source", "package_spec"))
   
   expect_true(all(endsWith(df$alias[seq(1, NROW(df), by = 2)], "(dev)")))
   expect_true(all(endsWith(df$alias[seq(2, NROW(df), by = 2)], "(v2.3.0)")))

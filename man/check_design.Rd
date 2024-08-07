@@ -51,7 +51,8 @@ be created and stored.}
 \itemize{
 \item \href{#method-check_design-new}{\code{check_design$new()}}
 \item \href{#method-check_design-active_processes}{\code{check_design$active_processes()}}
-\item \href{#method-check_design-kill_all}{\code{check_design$kill_all()}}
+\item \href{#method-check_design-failed_tasks}{\code{check_design$failed_tasks()}}
+\item \href{#method-check_design-terminate}{\code{check_design$terminate()}}
 \item \href{#method-check_design-step}{\code{check_design$step()}}
 \item \href{#method-check_design-start_next_task}{\code{check_design$start_next_task()}}
 \item \href{#method-check_design-is_done}{\code{check_design$is_done()}}
@@ -117,12 +118,31 @@ Get Active Processes list
 
 }
 \if{html}{\out{<hr>}}
+<<<<<<< HEAD
 \if{html}{\out{<a id="method-check_design-kill_all"></a>}}
 \if{latex}{\out{\hypertarget{method-check_design-kill_all}{}}}
 \subsection{Method \code{kill_all()}}{
 Kill All Active Design Processes
 
 Immedaitely kills all the active processes.
+=======
+\if{html}{\out{<a id="method-check_design-failed_tasks"></a>}}
+\if{latex}{\out{\hypertarget{method-check_design-failed_tasks}{}}}
+\subsection{Method \code{failed_tasks()}}{
+Get Failed Tasks list
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{check_design$failed_tasks()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-check_design-terminate"></a>}}
+\if{latex}{\out{\hypertarget{method-check_design-terminate}{}}}
+\subsection{Method \code{terminate()}}{
+Terminate Design Processes
+
+Immediately terminates all the active processes.
+>>>>>>> main
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{check_design$kill_all()}\if{html}{\out{</div>}}
 }

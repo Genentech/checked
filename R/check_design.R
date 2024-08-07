@@ -85,8 +85,8 @@ check_design <- R6::R6Class(
         "Check task aliases cannot have the same name as any of the available packages" = !any(df$alias %in% available.packages(repos = repos)[, "Package"]),
         "Custom package aliases cannot be duplicates of check aliases" = !any(uulist(drlapply(df$custom, `[[`, "alias")) %in% df$alias)
       )
-
       if (!restore) unlink(output, recursive = TRUE, force = TRUE)
+      dir_create(output)
 
       self$input <- df
       self$output <- output
@@ -104,12 +104,18 @@ check_design <- R6::R6Class(
     active_processes = function() {
       private$active
     },
-
+    
+    #' @description
+    #' Get Failed Tasks list
+    failed_tasks = function() {
+      private$failed
+    },
+    
     #' @description
     #' Kill All Active Design Processes
     #'
-    #' Immedaitely kills all the active processes.
-    kill_all = function() {
+    #' Immediately terminates all the active processes.
+    terminate = function() {
       invisible(lapply(private$active, function(process) process$kill()))
     },
 
@@ -129,10 +135,13 @@ check_design <- R6::R6Class(
     #' @return A integer value, coercible to logical to indicate whether a new
     #'   process was spawned, or `-1` if all tasks have finished.
     start_next_task = function() {
-      # finalize any finished processes
+      # finish any finished processes
       for (process in private$active) {
         if (!process$is_alive()) {
-          process$finalize()
+          process$finish()
+        } else if (inherits(process, "check_process")) {
+          # NOTE: for some reason check process never finishes unless we poll checks
+          process$poll_output()
         }
       }
 
@@ -182,15 +191,18 @@ check_design <- R6::R6Class(
     repos = getOption("repos"),
     # active processes
     active = list(),
-
+    # failed tasks
+    failed = list(),
     # Methods
 
     push_process = function(task, x) {
       task_graph_task_process(self$graph, task) <- x
       name <- task_graph_task_name(self$graph, task)
       task_graph_package_status(self$graph, task) <- STATUS$`in progress`
-      x$set_finalizer(function(process) {
-        # TODO: Implement warning if the process failed before finalizing
+      x$set_finisher(function(process) {
+        if (process$get_r_exit_status() != 0) {
+          private$failed[[name]] <- task
+        }
         private$pop_process(name)
         task_graph_package_status(self$graph, task) <- STATUS$done
       })
