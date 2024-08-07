@@ -5,7 +5,11 @@ install_packages_process <- R6::R6Class(
   inherit = callr::r_process,
   public = list(
     log = NULL,
-    initialize = function(pkgs, ..., lib = .libPaths(), libpaths = .libPaths(), log) {
+    initialize = function(pkgs,
+                          ...,
+                          lib = .libPaths(),
+                          libpaths = .libPaths(),
+                          log) {
       private$package <- pkgs
       self$log <- log
       private$callr_r_bg(
@@ -13,11 +17,7 @@ install_packages_process <- R6::R6Class(
           tryCatch(
             utils::install.packages(...),
             warning = function(w) {
-              installation_failure <- grepl("download of package .* failed", w$message) ||
-                grepl("(dependenc|package).*(is|are) not available", w$message) ||
-                grepl("installation of package.*had non-zero exit status", w$message) ||
-                grepl("installation of one or more packages failed", w$message)
-              
+              installation_failure <- is_install_failure_warning(w)
               if (installation_failure) {
                 stop(w$message)
               }

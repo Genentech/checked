@@ -59,9 +59,10 @@ reporter_default <- function() {
 #' Each of the internal methods for reporters take a reporter, the check
 #' design object and a calling environment.
 #'
-#' @param reporter [`reporter()`] Each reporter is a thin wrapper around
-#'   an environment with a class name for dispatch. The reporter is mutable
-#'   and captures any necessary state that needs to be tracked while reporting.
+#' @param reporter A object produced using [`reporters`]. Each reporter is a
+#'   thin wrapper around an environment with a class name for dispatch. The
+#'   reporter is mutable and captures any necessary state that needs to be
+#'   tracked while reporting.
 #' @param design [`check_design`] The check design to report as it evaluates.
 #' @param envir `environment` An environment to attach to, to leverage on-exit
 #'   hooks.

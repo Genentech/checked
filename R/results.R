@@ -1,17 +1,17 @@
 CHECK_ISSUES_TYPES <- c("notes", "warnings", "errors")
 
 #' Check results
-#' 
+#'
 #' Get R CMD check results
-#' 
+#'
 #' @param x \code{\link[checked]{check_design}} object.
 #' @param error_on character vector indicating whether R error should be thrown
 #' when issues are discovered when generating results. "never" means that no
 #' errors are thrown. If "issues" then errors are emitted only on issues, whereas
-#' "potential issues" stands for error on both issues and potential issues. Users 
+#' "potential issues" stands for error on both issues and potential issues. Users
 #' can set the default value via env variable \code{CHECKED_RESULTS_ERROR_ON}.
 #' @param ... other parameters.
-#' 
+#'
 #' @export
 results <- function(x, ...) {
   UseMethod("results")
@@ -20,13 +20,13 @@ results <- function(x, ...) {
 #' @export
 #' @rdname results
 results.check_design <- function(
-    x, 
-    error_on = Sys.getenv("CHECKED_RESULTS_ERROR_ON", c("never", "issues", "potential_issues")[1]), 
+    x,
+    error_on = Sys.getenv("CHECKED_RESULTS_ERROR_ON", c("never", "issues", "potential_issues")[1]),
     ...) {
-  
   error_on <- match.arg(error_on, c("never", "issues", "potential_issues"))
   checks_nodes <- igraph::V(x$graph)[
-    igraph::vertex.attributes(x$graph)$type == "check" & igraph::vertex.attributes(x$graph)$status == STATUS$done]
+    igraph::vertex.attributes(x$graph)$type == "check" & igraph::vertex.attributes(x$graph)$status == STATUS$done
+  ]
   checks_classes <- vcapply(checks_nodes$spec, function(x) class(x)[[1]])
   classes <- unique(checks_classes)
   res <- lapply(classes, function(x) {
@@ -35,7 +35,7 @@ results.check_design <- function(
       class = paste0("list_", x)
     )
   })
-  
+
   res <- structure(
     lapply(res, function(y, output) {
       structure(
@@ -52,13 +52,13 @@ results.check_design <- function(
       df <- results_to_df(y, issues_type = error_on)
       any(rowSums(df) != 0)
     })
-    
+
     if (any(potential_errors)) {
       print(res)
       stop("Issues identified. Aborting.")
     }
   }
-  
+
   res
 }
 
@@ -76,18 +76,18 @@ results.list_revdep_check_task_spec <- function(x, output, ...) {
   is_complete_pair <- vlapply(name, function(y) {
     identical(unname(count[y, ]), c(1L, 1L))
   })
-  
+
   names_complete <- sort(unique(name[is_complete_pair]))
-  
-  
+
+
   new <- lapply(names_complete, function(y) {
     x[[which(name == y & revdep == "new")]]
   })
-  
+
   old <- lapply(names_complete, function(y) {
     x[[which(name == y & revdep == "old")]]
   })
-  
+
   structure(
     mapply(results, x = new, y = old, output = output, SIMPLIFY = FALSE),
     names = names_complete
@@ -110,15 +110,15 @@ results.revdep_check_task_spec <- function(x, y, output, ...) {
         old[[i]],
         names = get_issue_header(old[[i]])
       )
-      
+
       matching_headers_idx <- names(new_i) %in% names(old_i)
       # Create temporary object with "See <path> for details" path
-      # stripped out as it will always emit potential issues due to the path 
+      # stripped out as it will always emit potential issues due to the path
       # differences
       new_i_tmp <- strip_details_from_issue(new_i)
       old_i_tmp <- strip_details_from_issue(old_i)
       matching_messages_idx <- new_i_tmp %in% old_i_tmp
-      
+
       new_issues <- structure(
         unname(new_i[!matching_headers_idx]),
         class = "issues"
@@ -131,7 +131,7 @@ results.revdep_check_task_spec <- function(x, y, output, ...) {
         ),
         class = "potential_issues"
       )
-      
+
       list("issues" = new_issues, "potential_issues" = new_potential_issues)
     }),
     names = CHECK_ISSUES_TYPES,
@@ -154,16 +154,16 @@ results.list_check_task_spec <- function(x, output, ...) {
 #' @noRd
 results.check_task_spec <- function(x, output, ...) {
   x <- rcmdcheck_from_json(file.path(path_check_output(output, x$alias), "result.json"))
-  
+
   structure(
     lapply(CHECK_ISSUES_TYPES, function(i) {
       x_i <- x[[i]]
-      
+
       new_issues <- structure(
         unname(x_i),
         class = "issues"
       )
-      
+
       list("issues" = new_issues)
     }),
     names = CHECK_ISSUES_TYPES,
@@ -173,15 +173,15 @@ results.check_task_spec <- function(x, output, ...) {
 }
 
 #' Results to file
-#' 
+#'
 #' Write \code{checked_results} object to the text file. When converting results
 #' to text, \code{\link[checked]{print.checked_results}} method is used.
-#' 
-#' 
+#'
+#'
 #' @param results \code{\link[checked]{results}} object.
 #' @param file A connection or character path.
 #' @inheritParams print.checked_results
-#' 
+#'
 #' @export
 results_to_file <- function(results, file, keep = "all", ...) {
   text <- c()
@@ -194,12 +194,12 @@ results_to_file <- function(results, file, keep = "all", ...) {
       )
     }
   }
-  
+
   if (!any(nzchar(text))) {
     text <- "No issues identified."
   }
-  
-  writeLines(text, file) 
+
+  writeLines(text, file)
 }
 
 results_to_df <- function(results, ...) {
@@ -263,12 +263,12 @@ summary.checked_results_check_task_spec <- function(object, ...) {
 #'
 #' @param x an object to be printed.
 #' @param keep character vector indicating which packages should be included
-#' in the results. "all" means that all packages are kept. If "issues" then 
+#' in the results. "all" means that all packages are kept. If "issues" then
 #' only packages with issues identified, whereas "potential_issues" stands for
 #' keeping packages with both "issues" and "potential_issues". Users can set
 #' the default value via env variable \code{CHECKED_RESULTS_KEEP}.
 #' @param ... other parameters.
-#' 
+#'
 #' @rdname print.checked_results
 #' @export
 print.checked_results <- function(x, ...) {
@@ -283,17 +283,16 @@ print.checked_results <- function(x, ...) {
 #' @rdname print.checked_results
 #' @export
 print.checked_results_check_task_spec <- function(
-    x, 
+    x,
     keep = Sys.getenv("CHECKED_RESULTS_KEEP", c("all", "issues", "potential_issues")[1]),
     ...) {
-  
   keep <- match.arg(keep, c("all", "issues", "potential_issues"))
   if (keep != "all") {
     df <- results_to_df(x, issues_type = keep)
     issues <- rowSums(df) != 0
     x <- x[issues]
   }
-  
+
   for (i in seq_along(x)) {
     print(x[[i]], ...)
     cat("\n")
@@ -323,18 +322,18 @@ rcmdcheck_to_json <- function(rcheck, file = NULL) {
     pretty = TRUE,
     force = TRUE # This is crucial to skip any environments in the rcheck object
   )
-  
+
   if (!is.null(file)) {
     jsonlite::write_json(json, file, auto_unbox = TRUE)
   }
-  
+
   json
 }
 
 
 rcmdcheck_from_json <- function(file) {
   stopifnot(file.exists(file))
-  
+
   parsed <- jsonlite::fromJSON(file)
   structure(
     if (is.character(parsed)) jsonlite::fromJSON(parsed) else parsed,
@@ -353,7 +352,7 @@ print.rcmdcheck_diff <- function(x, ...) {
     } else {
       "OK"
     }
-    
+
     cat(sprintf("%s: %s", i, status), "\n")
     if (status != "OK") {
       if (!is.null(x[[i]]$issues)) print(x[[i]]$issues)

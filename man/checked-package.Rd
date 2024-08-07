@@ -2,21 +2,13 @@
 % Please edit documentation in R/utils.R
 \docType{package}
 \name{checked-package}
+\alias{checked}
 \alias{checked-package}
 \title{checked: Systematically Run R CMD Checks}
 \description{
 Systematically Run R checks against multiple packages. Checks are run in parallel with strategies to minimize dependency installation. Provides out of the box interface for running reverse dependency check.
-
-Systematically Run R checks against multiple packages. Checks are run in parallel with strategies to minimize dependency installation. Provides out of the box interface for running reverse dependency check.
 }
 \seealso{
-Useful links:
-\itemize{
-  \item \url{https://github.com/Genentech/checked}
-  \item Report bugs at \url{https://github.com/Genentech/checked/issues}
-}
-
-
 Useful links:
 \itemize{
   \item \url{https://github.com/Genentech/checked}

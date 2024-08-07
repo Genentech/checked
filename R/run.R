@@ -1,5 +1,10 @@
 #' Run a Series of `R CMD check`s
 #'
+#' [`run()`] provides a generic, and is the central interface for executing
+#' [`check_design`]s. If a path is provided, a new reverse dependency check
+#' plan is generated from the source code path. Otherwise a plan can be
+#' built separately and executed using [`run()`].
+#'
 #' @param design `character` or `check_design` If a `character` value is
 #'   provided, it is first coerced into a `check_design` using
 #'   [`new_rev_dep_check_design()`].

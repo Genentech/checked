@@ -20,9 +20,10 @@ report_status(reporter, design, envir = parent.frame())
 report_finalize(reporter, design)
 }
 \arguments{
-\item{reporter}{\code{\link[=reporter]{reporter()}} Each reporter is a thin wrapper around
-an environment with a class name for dispatch. The reporter is mutable
-and captures any necessary state that needs to be tracked while reporting.}
+\item{reporter}{A object produced using \code{\link{reporters}}. Each reporter is a
+thin wrapper around an environment with a class name for dispatch. The
+reporter is mutable and captures any necessary state that needs to be
+tracked while reporting.}
 
 \item{design}{\code{\link{check_design}} The check design to report as it evaluates.}
 

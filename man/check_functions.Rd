@@ -2,13 +2,13 @@
 % Please edit documentation in R/check.R
 \name{check_functions}
 \alias{check_functions}
-\alias{check_reverse_dependencies}
-\alias{check_reverse_dependencies_development}
-\alias{check_packages}
+\alias{check_rev_deps}
+\alias{check_dev_rev_deps}
+\alias{check_pkgs}
 \alias{check_dir}
 \title{Check functions}
 \usage{
-check_reverse_dependencies(
+check_rev_deps(
   path,
   n = 2L,
   output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
@@ -20,25 +20,23 @@ check_reverse_dependencies(
   ...
 )
 
-check_reverse_dependencies_development(
+check_dev_rev_deps(
   path,
   n = 2L,
   output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
   lib.loc = .libPaths(),
   repos = getOption("repos"),
   restore = TRUE,
-  reporter = reporter_default(),
   ...
 )
 
-check_packages(
+check_pkgs(
   path,
   n = 2L,
   output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
   lib.loc = .libPaths(),
   repos = getOption("repos"),
   restore = TRUE,
-  reporter = reporter_default(),
   ...
 )
 
@@ -49,66 +47,69 @@ check_dir(
   lib.loc = .libPaths(),
   repos = getOption("repos"),
   restore = TRUE,
-  reporter = reporter_default(),
   ...
 )
 }
 \arguments{
-\item{path}{path to the package source.}
+\item{path}{file path to the package source directory}
 
-\item{n}{integer value indicating maximum number of subprocesses that can
+\item{n}{\code{integer} value indicating maximum number of subprocesses that can
 be simultaneously spawned when executing tasks.}
 
-\item{output}{character value specifying path where the output should be stored.}
+\item{output}{\code{character} value specifying path where the output should be
+stored.}
 
-\item{lib.loc}{character vector with libraries allowed to be used when
-checking packages, defaults to entire .libPaths().}
+\item{lib.loc}{\code{character} vector with libraries allowed to be used when
+checking packages, defaults to entire \code{\link[=.libPaths]{.libPaths()}}.}
 
-\item{repos}{character vector of repositories which will be used when
+\item{repos}{\code{character} vector of repositories which will be used when
 generating task graph and later pulling dependencies.}
 
-\item{reverse_repos}{character vector of repositories which will be used
+\item{reverse_repos}{\code{character} vector of repositories which will be used
 to pull sources for reverse dependencies. In some cases, for instance using
-binaries on Linux, we want to use different repositories when pulling sources
-to check and different when installing dependencies.}
+binaries on Linux, we want to use different repositories when pulling
+sources to check and different when installing dependencies.}
 
-\item{restore}{logical value, whether output directory should be unlinked
-before running checks. If FALSE, an attempt will me made to restore previous
-progress from the same \code{output}}
+\item{restore}{\code{logical} indicating whether output directory should be
+unlinked before running checks. If \code{FALSE}, an attempt will me made to
+restore previous progress from the same \code{output}}
 
 \item{reporter}{A reporter to provide progress updates. Will default to the
 most expressive command-line reporter given your terminal capabilities.}
 
-\item{...}{other parameters}
+\item{...}{Additional arguments passed to \code{\link[=run]{run()}}}
 }
 \value{
-\code{\link[checked]{check_design}} R6 class storing all the details
-regarding checks that run. Can be combined with \code{\link[checked]{results}}
-and \code{summary} methods to generate results.
+\code{\link[=check_design]{check_design()}} R6 class storing all the details
+regarding checks that run. Can be combined with
+\code{\link{results}} and \code{\link[=summary]{summary()}} methods to generate results.
 }
 \description{
-Set of functions to run orchestrated R CMD checks and automatically manage
+Set of functions to run orchestrated \verb{R CMD check}s and automatically manage
 the dependencies installation. Each functions prepares the plan based on the
 supplied package source(s) which includes installing dependencies and running
-required R CMD checks. All the functions are parallelized through sperate processes
+required \verb{R CMD check}s. All the functions are parallelized through sperate
+processes
 }
 \details{
-\code{check_reverse_dependencies} runs classical reverse dependency check for
-the given source package. It first identifies reverse dependencies available
-in repos. Then, after installing all required dependencies, it runs the R CMD check
-twice for each package, one time with the release version of the package and
-the second time with the development version. Both R CMD checks are later compared
-to get the result.
+\code{\link[=check_rev_deps]{check_rev_deps()}} runs classical reverse dependency checks
+for the given source package. It first identifies reverse dependencies
+available in \code{repos}. Then, after installing all required dependencies, runs
+\verb{R CMD check} twice for each package, one time with the release version of
+the given source package installed from \code{repos} and a second time with the
+development version installed from local source. Both \verb{R CMD checks} are
+later compared to identify changes in reverse dependency behaviors.
 
-\code{check_reverse_dependencies_development} works similarly to \code{check_reverse_dependencies}
-but it runs R CMD check only once for each package, with the development version of
-the package installed. It is advantageous to check whether adding a new
-package into repository breaks existing packages that possibly take said package
-as Suggests dependency.
+\code{\link[=check_dev_rev_deps]{check_dev_rev_deps()}} works similarly to
+\code{\link[=check_rev_deps]{check_rev_deps()}} but it runs R CMD check only once for each
+package, with the development version of the package installed. It is
+advantageous to check whether adding a new package into repository breaks
+existing packages that possibly take said package as a \code{Suggests} dependency.
 
-\code{check_packages} Installs all dependencies and runs parallelly R CMD checks
-for all source packages specified by \code{path} parameter
+\code{\link[=check_pkgs]{check_pkgs()}} Installs all dependencies and runs \verb{R CMD check}s
+in parallel for all source packages whose source code is found in the
+\code{path} directory
 
-\code{check_dir} Identifies all R packages in the given directory (non-recursively)
-and passes them to the \code{check_packages}
+\code{\link[=check_dir]{check_dir()}} Identifies all R packages in the given directory
+(non-recursively) and passes them to the \code{\link[=check_pkgs]{check_pkgs()}}
 }

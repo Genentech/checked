@@ -17,5 +17,8 @@ provided, it is first coerced into a \code{check_design} using
 most expressive command-line reporter given your terminal capabilities.}
 }
 \description{
-Run a Series of \verb{R CMD check}s
+\code{\link[=run]{run()}} provides a generic, and is the central interface for executing
+\code{\link{check_design}}s. If a path is provided, a new reverse dependency check
+plan is generated from the source code path. Otherwise a plan can be
+built separately and executed using \code{\link[=run]{run()}}.
 }
