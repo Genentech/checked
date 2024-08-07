@@ -76,21 +76,3 @@ options(checked.tty_tick_interval = 200)
 checked::run("/tmp/praise")
 cat()
 ```
-
-If all else fails, you'll automatically fall back to a less dynamic interface.
-This output can be helpful for rendering to log files, when you're running on a
-less capable server, or just when you want a record of all the output.
-
-```r
-library(checked)
-run("/home/dev/praise", reporter = reporter_basic_tty())
-```
-```{asciicast ansi-basic-tty-example, cache = TRUE}
-#| asciicast_knitr_output = "svg",
-#| asciicast_at = "all",
-#| asciicast_cursor = FALSE,
-#| asciicast_rows = 5
-options(checked.tty_tick_interval = 200)
-checked::run("/tmp/praise")
-cat()
-```

@@ -108,7 +108,7 @@ rev_dep_check_tasks_df <- function(
     df_dev$package <- task_specs_function(revdeps, repos, df_dev$alias, "new")
     df_dev$custom <- rep(list(custom_install_task_spec(
       alias = paste0(package, " (dev)"),
-      package = package_spec_source(name = package, path = path),
+      package_spec = package_spec_source(name = package, path = path),
       type = "source"
     )), times = NROW(df_dev))
   }
@@ -119,7 +119,7 @@ rev_dep_check_tasks_df <- function(
     df_rel$package <- task_specs_function(revdeps, repos, df_rel$alias, "old")
     df_rel$custom <- rep(list(custom_install_task_spec(
       alias = paste0(package, " (release)"),
-      package = package_spec(name = package, repos = repos),
+      package_spec = package_spec(name = package, repos = repos),
       # make sure to use the release version built against the same system
       type = "source"
     )), times = NROW(df_dev))

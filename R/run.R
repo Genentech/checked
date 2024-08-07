@@ -25,7 +25,7 @@ run.character <- function(design, ..., reporter = reporter_default()) {
 #' @export
 run.check_design <- function(design, ..., reporter = reporter_default()) {
   on.exit(add = TRUE, {
-    design$kill_all()
+    design$terminate()
     report_finalize(reporter, design)
   })
 
