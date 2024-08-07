@@ -135,6 +135,9 @@ check_design <- R6::R6Class(
       for (process in private$active) {
         if (!process$is_alive()) {
           process$finish()
+        } else if (inherits(process, "check_process")) {
+          # NOTE: for some reason check process never finishes unless we poll checks
+          process$poll_output()
         }
       }
 

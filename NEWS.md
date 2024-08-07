@@ -1,3 +1,7 @@
+checked 0.2.3 (development)
+---------------------------------------------------------------
+* Fix check processes hanging forever in some system configurations.
+
 checked 0.2.3
 ---------------------------------------------------------------
 * Use custom `checked` `finisher`'s instead of the `processx` `finalizer`'s
