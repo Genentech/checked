@@ -1,4 +1,4 @@
-## checked 0.2.3 (dev)
+# checked 0.2.3 (dev)
 
 * Fix check processes hanging forever in some system configurations.
 
@@ -8,7 +8,7 @@
   For example, `check_reverse_dependencies_development()` was shortened to
   `check_dev_rev_deps()` (@dgkf-roche)
 
-## checked 0.2.3
+# checked 0.2.3
 
 * Use custom `checked` `finisher`'s instead of the `processx` `finalizer`'s
   when cleaning up finished processes to avoid executing callbacks when
@@ -20,17 +20,17 @@
   
 * Prevent `results` from attempting to read results for unfinished checks.
 
-## checked 0.2.2
+# checked 0.2.2
 
 * Clear some of the unused utils functions (`can_symlink`, `symlink_or_copy`).
 
 * Make sure output directory is always created.
 
-## checked 0.2.1 
+# checked 0.2.1 
 
 * Add `results_to_file` function.
 
-## checked 0.2.0 
+# checked 0.2.0 
 
 * Change default private `lib.loc` value in `check_process` R6 class
   to NULL to avoid staged installation failures.
@@ -57,6 +57,6 @@
 
 * Fix race condition when reporting progress for check processes.
 
-## checked 0.1.0
+# checked 0.1.0
 
 * Package released to CRAN
