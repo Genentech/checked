@@ -2,6 +2,9 @@
 
 * Fix check processes hanging forever in some system configurations.
 
+* Remove all whitespaces (`"[[:space:]]"`) before comparing potential issues
+  to skip most of the false positives.
+
 * Shortened many user-facing function names. In general, uses of `reverse`
   were shortened to `rev`, `dependencies` was shortened to `deps`,
   `development` was shortened to `dev` and `package` was shortened to `pkg`.
