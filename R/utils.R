@@ -51,15 +51,3 @@ vcapply <- function(...) vapply(..., FUN.VALUE = character(1L))
 vlapply <- function(...) vapply(..., FUN.VALUE = logical(1L))
 viapply <- function(...) vapply(..., FUN.VALUE = integer(1L))
 vnapply <- function(...) vapply(..., FUN.VALUE = numeric(1L))
-
-is_install_failure_warning <- function(w) {
-  patterns <- c(
-    "download of package .* failed",
-    "(dependenc|package).*(is|are) not available",
-    "installation of package.*had non-zero exit status",
-    "installation of one or more packages failed"
-  )
-
-  re <- paste0("(", paste0(patterns, collapse = "|"), ")")
-  grepl(re, w$message)
-}
