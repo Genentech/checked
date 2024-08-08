@@ -113,8 +113,8 @@ results.revdep_check_task_spec <- function(x, y, output, ...) {
       
       matching_headers_idx <- names(new_i) %in% names(old_i)
       # Create temporary object with "See <path> for details" path
-      # stripped out as it will always emit potential issues due to the path 
-      # differences
+      # stripped out as well as all whitespaces. As they will always emit 
+      # potential issues due to the path or screen differences
       new_i_tmp <- strip_details_from_issue(new_i)
       old_i_tmp <- strip_details_from_issue(old_i)
       matching_messages_idx <- new_i_tmp %in% old_i_tmp
@@ -383,5 +383,6 @@ print.potential_issues <- function(x, ...) {
 }
 
 strip_details_from_issue <- function(x) {
-  gsub("See(.*?)for details", "See <path> for details", x)
+  x <- gsub("See(.*?)for details", "See <path> for details", "", x)
+  gsub("[[:space:]]", "", x)
 }
