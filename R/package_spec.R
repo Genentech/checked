@@ -1,14 +1,14 @@
 #' Package specification
-#' 
+#'
 #' Create package specification list which consists of all the details required
 #' to identify and acquire source of the package.
-#' 
+#'
 #' @param name name of the package.
 #' @param repos repository where package with given name should identified.
 #' @param path path to the source of the package (either bundled or not). URLs
 #' are acceptable.
 #' @param ... parameters passed to downstream constructors
-#' 
+#'
 #' @export
 #' @rdname package_spec
 package_spec <- function(name = NULL, repos = NULL) {
@@ -34,7 +34,7 @@ package_spec_source <- function(path = NULL, ...) {
 #' @rdname package_spec
 package_spec_archive_source <- function(path = NULL, ...) {
   package_spec <- package_spec_source(path, ...)
-  
+
   class(package_spec) <- c("package_spec_archive_source", class(package_spec))
   package_spec
 }

@@ -8,10 +8,10 @@ format_status_line_ansi.check_process <- function(
     ...,
     width = getOption("width", 80L)) {
   checks <- process$get_checks()
-  
+
   # runtime of process
   process_time <- paste0(format_time(process$get_duration()), " ")
-  
+
   # runtime of current check (only displayed if >30s)
   check_time <- Sys.time() - process$get_time_last_check_start()
   if (length(check_time) == 0 || check_time < difftime(30, 0)) {
@@ -19,7 +19,7 @@ format_status_line_ansi.check_process <- function(
   } else {
     check_time <- cli::col_grey("(", format_time(check_time), ") ")
   }
-  
+
   msg <- ""
   status <- max(as.numeric(checks), -1)
   if (length(checks) == 0) {
@@ -35,7 +35,7 @@ format_status_line_ansi.check_process <- function(
     # done
     process_time <- cli::col_grey(process_time)
   }
-  
+
   msg <- cli::format_inline("{process_time}{check_time}{msg}")
   counts <- table(process$get_checks())
   out <- cli_table_row(
@@ -46,7 +46,7 @@ format_status_line_ansi.check_process <- function(
     errors = counts[["ERROR"]],
     msg
   )
-  
+
   cli::ansi_substring(out, 1, width)
 }
 
@@ -55,7 +55,6 @@ format_status_line_ansi.default <- function(
     process,
     ...,
     width = getOption("width", 80L)) {
-  
   out <- cli_table_row(
     status = "NONE",
     ok = 0,
@@ -64,7 +63,7 @@ format_status_line_ansi.default <- function(
     errors = 0,
     "restored from system file."
   )
-  
+
   cli::ansi_substring(out, 1, width)
 }
 
@@ -136,16 +135,18 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) { # nolint
     reporter$status <- c(reporter$status, new)
     cat(strrep("\n", length(new_idx)))
   }
-  
+
   if (length(reporter$failed_packaged) != length(failed_packages)) {
     # Add failed packages warning to the buffer
     failures_buffer <- rev(unlist(lapply(failed_packages, function(x) {
-      list(cli_wrap_lines(cli::cli_fmt(cli::cli_alert_danger(
-        sprintf("%s package installation had non-zero exit status", x$name)
-      ))),
-      cli_wrap_lines(as.character(cli::style_dim(
-        sprintf("log: %s", x$process[[1]]$log)
-      ))))
+      list(
+        cli_wrap_lines(cli::cli_fmt(cli::cli_alert_danger(
+          sprintf("%s package installation had non-zero exit status", x$name)
+        ))),
+        cli_wrap_lines(as.character(cli::style_dim(
+          sprintf("log: %s", x$process[[1]]$log)
+        )))
+      )
     })))
 
     reporter$failures_buffer <- vcapply(seq_along(failures_buffer), function(i) {
@@ -157,12 +158,12 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) { # nolint
         sep = ""
       )
     })
-    
+
     # For performance store these value in the environment to redraw warnings
     # buffer only when necessary
     reporter$failed_packaged <- failed_packages
   }
-  
+
   # for each not-yet finished task, report status
   buffer <- ""
   for (idx in seq_along(reporter$status)) {
@@ -184,13 +185,13 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) { # nolint
       ansi_line_erase(),
       " ", strrep(" ", n_char_titles - nchar(task_name)), task_name, " ",
       format_status_line_ansi(process, width = width),
-      ansi_move_line_rel(- (n_lines + length(reporter$failures_buffer))),
+      ansi_move_line_rel(-(n_lines + length(reporter$failures_buffer))),
       sep = ""
     )
   }
 
   cat(paste0(buffer, reporter$failures_buffer))
-  
+
   is_inst <- vlapply(design$active_processes(), inherits, "install_package_process") # nolint
   inst_pkgs <- names(design$active_processes()[is_inst])
   if (length(inst_pkgs)) {
@@ -203,7 +204,8 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) { # nolint
   cli::cli_progress_update(
     set = n_finished,
     extra = list(
-      message = inst_msg),
+      message = inst_msg
+    ),
     .envir = reporter
   )
 }

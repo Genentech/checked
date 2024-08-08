@@ -1,9 +1,3 @@
-empty_edge <- data.frame(
-  dep = character(0),
-  root = character(0),
-  type = character(0)
-)
-
 #' Create Task Graph
 #'
 #' @param df data.frame listing
@@ -19,19 +13,19 @@ task_graph_create <- function(df, repos = getOption("repos")) {
   vertices <- task_vertices_df(df, edges, repos)
 
   g <- igraph::graph_from_data_frame(edges, vertices = vertices)
-  igraph::V(g)$status <- STATUS$pending
+  igraph::V(g)$status <- STATUS$pending  # nolint object_name_linter
   igraph::V(g)$process <- rep_len(list(), length(g))
   task_graph_sort(g)
 }
 
 task_edges_df <- function(df, repos) {
-  
+
   if (NROW(df) == 0) {
     return(empty_edge)
   }
-  
+
   db <- utils::available.packages(repos = repos)[, DB_COLNAMES]
-  
+
   # For checks alias has to have different name than package name
 
   # Add custom packages to db
@@ -39,9 +33,9 @@ task_edges_df <- function(df, repos) {
   custom_aliases <- vcapply(df$custom[custom_aliases_idx], `[[`, "alias")
   custom_aliases_map <- unique(data.frame(
     value = custom_aliases,
-    hash = vcapply(custom_aliases, raw_based_hash)
+    hash = vcapply(custom_aliases, hash_alias)
   ))
-  
+
   desc <- drlapply(df$custom, function(x) {
     row <- get_package_spec_dependencies(x$package_spec)
     hash <- custom_aliases_map[custom_aliases_map$value == x$alias, ]$hash
@@ -57,17 +51,22 @@ task_edges_df <- function(df, repos) {
     row <- get_package_spec_dependencies(x$package_spec)
     row[, "Package"] <- x$alias
     if (!is.null(p$custom[[1]]$alias)) {
-      hash <- custom_aliases_map[custom_aliases_map$value == p$custom[[1]]$alias, ]$hash
-      row[, "Depends"] <- ifelse(is.na(row[, "Depends"]), hash, paste0(row[, "Depends"], ", ", hash))
+      row_idx <- custom_aliases_map$value == p$custom[[1]]$alias
+      hash <- custom_aliases_map[row_idx, ]$hash
+      row[, "Depends"] <- ifelse(
+        is.na(row[, "Depends"]),
+        hash,
+        paste0(row[, "Depends"], ", ", hash)
+      )
     }
     row
   })
-  
+
   db <- rbind(db, desc, checks)
 
   # Get suggests end enhances dependencies first so we can derive hard
   # dependencies for them as well
-  suggests_dependencies <- uulist(.package_dependencies(
+  suggests_dependencies <- uulist(package_deps(
     df$alias,
     db = db,
     which = c("Suggests", "Enhances"),
@@ -75,7 +74,7 @@ task_edges_df <- function(df, repos) {
   ))
 
   # Get recursively strong dependencies for all packages
-  core_dependencies <- .package_dependencies(
+  core_dependencies <- package_deps(
     c(df$alias, custom_aliases_map$hash, suggests_dependencies),
     db = db,
     which = "strong",
@@ -83,7 +82,9 @@ task_edges_df <- function(df, repos) {
   )
 
   dependencies <- uulist(c(
-    df$alias, # tools::package_dependencies do not include package itself, hence we add it at this stage
+    # tools::package_dependencies do not include package itself.
+    # we add it at this stage
+    df$alias,
     custom_aliases_map$hash,
     suggests_dependencies,
     core_dependencies
@@ -144,7 +145,7 @@ task_vertices_df <- function(df, edges, repos) {
 #' Find Task Neighborhood
 #'
 #' @param g A task graph, as produced with [task_graph_create()]
-#' @param nodes Names or nodes objects of packages whose neighborhoods 
+#' @param nodes Names or nodes objects of packages whose neighborhoods
 #' should be calculated.
 #'
 #' @importFrom igraph neighborhood
@@ -215,17 +216,17 @@ task_graph_sort <- function(g) {
 #' @param status status name. Nodes in v fill be filtered to consists only nodes
 #' with that status.
 #' @param ... parametrs passed to down-stream functions.
-#' 
+#'
 #' @details
-#' There are helpers defined for particular use cases that strictly rely on the 
-#' \code{task_graph_which_satisfied}, they are: 
-#' 
+#' There are helpers defined for particular use cases that strictly rely on the
+#' \code{task_graph_which_satisfied}, they are:
+#'
 #' \code{task_graph_which_satisfied_strong} - List vertices whose strong dependencies are satisfied.
-#' 
+#'
 #' \code{task_graph_which_check_satisfied} - List root vertices whose all dependencies are satisfied.
-#' 
+#'
 #' \code{task_graph_which_install_satisfied} - List install vertices whose dependencies are all satisfied
-#' 
+#'
 #' @return The name of the next package to prioritize
 #' @rdname dep_graph_which_satisfied
 #' @importFrom igraph incident_edges tail_of
@@ -285,6 +286,12 @@ task_graph_which_install_satisfied <- function(
   )
 }
 
+empty_edge <- data.frame(
+  dep = character(0),
+  root = character(0),
+  type = character(0)
+)
+
 task_graph_set_package_status <- function(g, v, status) {
   if (is.character(status)) status <- STATUS[[status]]
   igraph::set_vertex_attr(g, "status", v, status)
@@ -324,3 +331,9 @@ task_graph_update_done <- function(g, lib.loc) {
   which_done <- which(vlapply(v$name, is_package_done, lib.loc = lib.loc))
   task_graph_set_package_status(g, v[which_done], STATUS$done)
 }
+
+is_package_done <- function(pkg, lib.loc) {  # nolint object_name_linter
+  path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
+  length(path) > 0
+}
+

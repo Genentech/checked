@@ -19,23 +19,23 @@ source_check_tasks_df(path)
 
 \item{repos}{repository used to identify reverse dependencies.}
 
-\item{versions}{character vector indicating against which versions of the package
-reverse dependency should be checked. \code{c("dev", "release")} (default) stands
-for the classical reverse dependency check. \code{"dev"} checks only against
-development version of the package which is applicable mostly when checking
-whether adding new package would break tests of packages already in the
-repository and take the package as suggests dependency.}
+\item{versions}{character vector indicating against which versions of the
+package reverse dependency should be checked. \code{c("dev", "release")}
+(default) stands for the classical reverse dependency check. \code{"dev"}
+checks only against development version of the package which is applicable
+mostly when checking whether adding new package would break tests of
+packages already in the repository and take the package as suggests
+dependency.}
 }
 \value{
-The check schedule data.frame has strict structure and consists of following columns:
-
+The check schedule \code{data.frame} with the following columns:
 \itemize{
-\item \code{alias} The alias of the check to run. It also serves the purpose of u
-unique identifier and node name in the task graph.
-\item \code{version} Version of the package to be checked.
-\item \code{package} Object that inherits from \code{\link[checked]{check_task_spec}}.
+\item \code{alias}: The alias of the check to run. It also serves the purpose of
+providing a unique identifier and node name in the task graph.
+\item \code{version}: Version of the package to be checked.
+\item \code{package}: Object that inherits from \code{\link[=check_task_spec]{check_task_spec()}}.
 Defines how package to be checked can be acquired.
-\item \code{custom}  Object that inherits from \code{\link[checked]{custom_install_task_spec}}.
+\item \code{custom}:  Object that inherits from \code{\link[=custom_install_task_spec]{custom_install_task_spec()}}.
 Defines custom package, for instance only available from local source, that
 should be installed before checking the package.
 }
@@ -43,17 +43,17 @@ should be installed before checking the package.
 \description{
 Create data.frame which each row defines a package for which R CMD check
 should be run. Such data.frame is a prerequisite for generating
-\code{\link[checked]{check_design}} which orchestrates all the processes
+\code{\link[=check_design]{check_design()}} which orchestrates all the processes
 including dependencies installation.
 }
 \details{
-\code{rev_dep_check_tasks_df} generates checks schedule data.frame appropriate
+\code{\link[=rev_dep_check_tasks_df]{rev_dep_check_tasks_df()}} generates checks schedule data.frame appropriate
 for running reverse dependency check for certain source package. In such case
 \code{path} parameter should point to the source of the development version of
 the package and \code{repos} should be a repository for which reverse
 dependencies should be identified.
 
-\code{source_check_tasks_df} generates checks schedule data.frame for all source
-packages specified by the \code{path}. Therefore it accepts it to be a vector
-of an arbitrary length.
+\code{\link[=source_check_tasks_df]{source_check_tasks_df()}} generates checks schedule \code{data.frame} for
+all source packages specified by the \code{path}. Therefore it accepts it to be
+a vector of an arbitrary length.
 }

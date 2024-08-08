@@ -13,7 +13,7 @@ path_lib <- function(path) {
 }
 
 path_custom_lib <- function(path, custom) {
-  valid_name <- raw_based_hash(custom)
+  valid_name <- hash_alias(custom)
   dir_create(p <- file.path(path_libs(path), valid_name))
   normalizePath(p)
 }
@@ -36,4 +36,19 @@ path_sources <- function() {
 path_check_output <- function(path, check) {
   dir_create(p <- file.path(path, "checks"))
   normalizePath(file.path(p, check), mustWork = FALSE)
+}
+
+check_path_is_pkg_source <- function(pkg) {
+  stopifnot(
+    is.character(pkg),
+    length(pkg) == 1,
+    dir.exists(pkg),
+    path_is_pkg(pkg)
+  )
+
+  normalizePath(pkg, mustWork = TRUE)
+}
+
+path_is_pkg <- function(path) {
+  file.exists(file.path(path, "DESCRIPTION"))
 }

@@ -2,22 +2,22 @@
 % Please edit documentation in R/check_design.R
 \name{check_design}
 \alias{check_design}
-\title{Check Design Object}
+\title{Check Design}
 \description{
-Abstract object that drives all separate processes required to run
-R CMD check sequence.
+A stateful object that orchestrates all separate processes required to
+manage installation, library setup and run \verb{R CMD check}s in sequence.
 }
 \examples{
 \dontrun{
 library(checked)
 df <- source_check_tasks_df(c(
- system.file("example_packages", "exampleBad", package = "checked"),
- system.file("example_packages", "exampleGood", package = "checked")
+  system.file("example_packages", "exampleBad", package = "checked"),
+  system.file("example_packages", "exampleGood", package = "checked")
 ))
 
 plan <- check_design$new(df, n = 10, repos = "https://cran.r-project.org/")
 while (!plan$is_done()) {
- plan$start_next_task()
+  plan$start_next_task()
 }
 }
 }
@@ -75,24 +75,25 @@ and installation order are embedded.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{df}}{checks data.frame.}
+\item{\code{df}}{\code{check_design} data.frame.}
 
-\item{\code{n}}{integer value indicating maximum number of subprocesses that can
-be simultaneously spawned when executing tasks.}
+\item{\code{n}}{\code{integer} value indicating maximum number of subprocesses that
+can be simultaneously spawned when executing tasks.}
 
-\item{\code{output}}{character value specifying path where the output should be stored.}
+\item{\code{output}}{\code{character} value specifying path where the output should
+be stored.}
 
-\item{\code{lib.loc}}{character vector with libraries allowed to be used when
+\item{\code{lib.loc}}{\code{character} vector with libraries allowed to be used when
 checking packages, defaults to entire .libPaths().}
 
-\item{\code{repos}}{character vector of repositories which will be used when
+\item{\code{repos}}{\code{character} vector of repositories which will be used when
 generating task graph and later pulling dependencies.}
 
-\item{\code{restore}}{logical value, whether output directory should be unlinked
-before running checks. If FALSE, an attempt will me made to restore previous
-progress from the same \code{output}}
+\item{\code{restore}}{\code{logical} value, whether output directory should be
+unlinked before running checks. If \code{FALSE}, an attempt will me made to
+restore previous progress from the same \code{output}.}
 
-\item{\code{...}}{other parameters}
+\item{\code{...}}{Additional arguments unused}
 }
 \if{html}{\out{</div>}}
 }
@@ -124,7 +125,7 @@ Get Failed Tasks list
 \if{html}{\out{<a id="method-check_design-terminate"></a>}}
 \if{latex}{\out{\hypertarget{method-check_design-terminate}{}}}
 \subsection{Method \code{terminate()}}{
-Terminate Design Processes
+Kill All Active Design Processes
 
 Immediately terminates all the active processes.
 \subsection{Usage}{

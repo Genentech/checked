@@ -97,7 +97,7 @@ check_process <- R6::R6Class(
         private$time_last_check_start <- NULL
         private$time_finish <- private$time_finish %||% Sys.time()
       }
-      
+
       # TODO: For some reason we need to read the output twice, otherwise
       # it might not be captured.
       # When forcing interruption, finisher is called, hence try() to make
@@ -107,8 +107,10 @@ check_process <- R6::R6Class(
         paste(super$read_output_lines(), collapse = "\n"),
         paste(super$read_output_lines(), collapse = "\n")
       ), silent = TRUE)
-      
-      if (inherits(out, "try-error")) return()
+
+      if (inherits(out, "try-error")) {
+        return()
+      }
 
       captures <- checks_capture(out)
       checks <- checks_simplify(captures)
