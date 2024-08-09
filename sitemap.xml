@@ -5,6 +5,10 @@
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/news/index.html</loc></url>
+<url><loc>/reference/DB_COLNAMES.html</loc></url>
+<url><loc>/reference/DEP.html</loc></url>
+<url><loc>/reference/DEP_STRONG.html</loc></url>
+<url><loc>/reference/STATUS.html</loc></url>
 <url><loc>/reference/ansi.html</loc></url>
 <url><loc>/reference/check_design.html</loc></url>
 <url><loc>/reference/check_functions.html</loc></url>
@@ -12,11 +16,15 @@
 <url><loc>/reference/checks_capture.html</loc></url>
 <url><loc>/reference/checks_df.html</loc></url>
 <url><loc>/reference/checks_simplify.html</loc></url>
+<url><loc>/reference/cli.html</loc></url>
 <url><loc>/reference/dep_graph_which_satisfied.html</loc></url>
 <url><loc>/reference/devnull.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/new_check_design.html</loc></url>
 <url><loc>/reference/package_spec.html</loc></url>
 <url><loc>/reference/print.checked_results.html</loc></url>
+<url><loc>/reference/reporters-internal.html</loc></url>
+<url><loc>/reference/reporters.html</loc></url>
 <url><loc>/reference/results.html</loc></url>
 <url><loc>/reference/results_to_file.html</loc></url>
 <url><loc>/reference/run.html</loc></url>

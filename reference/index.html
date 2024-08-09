@@ -57,13 +57,13 @@
       </tr><tr><td>
           <p><code><a href="check_design.html">check_design</a></code> </p>
         </td>
-        <td><p>Check Design Object</p></td>
+        <td><p>Check Design</p></td>
       </tr><tr><td>
-          <p><code><a href="check_functions.html">check_reverse_dependencies()</a></code> <code><a href="check_functions.html">check_reverse_dependencies_development()</a></code> <code><a href="check_functions.html">check_packages()</a></code> <code><a href="check_functions.html">check_dir()</a></code> </p>
+          <p><code><a href="check_functions.html">check_rev_deps()</a></code> <code><a href="check_functions.html">check_dev_rev_deps()</a></code> <code><a href="check_functions.html">check_pkgs()</a></code> <code><a href="check_functions.html">check_dir()</a></code> </p>
         </td>
         <td><p>Check functions</p></td>
       </tr><tr><td>
-          <p><code><a href="checked-package.html">checked-package</a></code> </p>
+          <p><code><a href="checked-package.html">checked</a></code> <code><a href="checked-package.html">checked-package</a></code> </p>
         </td>
         <td><p>checked: Systematically Run R CMD Checks</p></td>
       </tr><tr><td>
@@ -83,9 +83,9 @@
         </td>
         <td><p>Find the Next Packages Not Dependent on an Unavailable Package</p></td>
       </tr><tr><td>
-          <p><code><a href="devnull.html">devnull()</a></code> </p>
+          <p><code><a href="new_check_design.html">new_check_design()</a></code> <code><a href="new_check_design.html">new_rev_dep_check_design()</a></code> </p>
         </td>
-        <td><p>Reuse or Create A Null File Connection</p></td>
+        <td><p>Create a New Check Design</p></td>
       </tr><tr><td>
           <p><code><a href="package_spec.html">package_spec()</a></code> <code><a href="package_spec.html">package_spec_source()</a></code> <code><a href="package_spec.html">package_spec_archive_source()</a></code> </p>
         </td>
@@ -94,6 +94,10 @@
           <p><code><a href="print.checked_results.html">print(<i>&lt;checked_results&gt;</i>)</a></code> <code><a href="print.checked_results.html">print(<i>&lt;checked_results_check_task_spec&gt;</i>)</a></code> <code><a href="print.checked_results.html">print(<i>&lt;checked_results_revdep_check_task_spec&gt;</i>)</a></code> </p>
         </td>
         <td><p>Print checked results</p></td>
+      </tr><tr><td>
+          <p><code><a href="reporters.html">reporter_ansi_tty()</a></code> <code><a href="reporters.html">reporter_basic_tty()</a></code> <code><a href="reporters.html">reporter_default()</a></code> </p>
+        </td>
+        <td><p>Check Design Runner Reporters</p></td>
       </tr><tr><td>
           <p><code><a href="results.html">results()</a></code> </p>
         </td>
@@ -105,11 +109,7 @@
       </tr><tr><td>
           <p><code><a href="run.html">run()</a></code> </p>
         </td>
-        <td><p>Run Reverse-Dependency Checks</p></td>
-      </tr><tr><td>
-          <p><code><a href="silent_spinner.html">silent_spinner()</a></code> </p>
-        </td>
-        <td><p>Create a 'cli' Spinner With Suppressed Output</p></td>
+        <td><p>Run a Series of <code>R CMD check</code>s</p></td>
       </tr><tr><td>
           <p><code><a href="task_graph_create.html">task_graph_create()</a></code> </p>
         </td>

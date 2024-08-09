@@ -77,12 +77,22 @@
 
 </div>
 <div class="section level1">
-<h1 id="reverse-dependency-checks">Reverse-dependency Checks<a class="anchor" aria-label="anchor" href="#reverse-dependency-checks"></a>
+<h1 id="running-checks">Running Checks<a class="anchor" aria-label="anchor" href="#running-checks"></a>
 </h1>
+<p>Although <code>checked</code> is broadly capable of running arbitrary sets of <code>R CMD check</code> tasks, reverse dependency checking is one of the most common use cases where batch <code>R CMD check</code>s are needed.</p>
+<p>Running reverse dependency checks is as easy as</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">checked</span><span class="fu">::</span><span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span><span class="st">"path/to/package"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="monitoring-runs">Monitoring Runs<a class="anchor" aria-label="anchor" href="#monitoring-runs"></a>
+</h2>
+<p>Because running many checks in parallel can be a difficult process to monitor, capable interfaces will provide a convenient output for tracking various runs, check results and package installations; keeping a log of any issues that might arise during the process.</p>
+<p>If your editor doesn’t support the full output, you might consider launching your checks in a terminal which should be less constrained. This would also free up your preferred editor for you to use while your checks run.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Genentech/checked" class="external-link">checked</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span><span class="st">"/home/dev/praise"</span><span class="op">)</span></span></code></pre></div>
 <p><picture><source media="(prefers-color-scheme: dark)" srcset="reference/figures/README/ansi-tty-example-dark.svg"><img src="reference/figures/README/ansi-tty-example.svg" width="100%"></source></picture></p>
+</div>
 </div>
 
   </div>
