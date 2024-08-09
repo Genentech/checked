@@ -1,33 +1,44 @@
+#' Create a New Check Design
+#'
+#' Instantiate a check design from a path or directory.
+#'
+#' @param x A file path, passed to [`rev_dep_check_tasks_df()`]
+#' @param ... Additional arguments passed to [`new_check_design()`]
+#'
+#' @name new_check_design
+#' @export
 new_check_design <- function(...) {
   check_design$new(...)
 }
 
+#' @name new_check_design
+#' @export
 new_rev_dep_check_design <- function(x, ...) {
   tasks <- rev_dep_check_tasks_df(x)
   new_check_design(tasks, ...)
 }
 
-#' @title Check Design Object
+#' Check Design
 #'
 #' @description
-#' Abstract object that drives all separate processes required to run
-#' R CMD check sequence.
+#' A stateful object that orchestrates all separate processes required to
+#' manage installation, library setup and run `R CMD check`s in sequence.
 #'
 #' @examples
 #' \dontrun{
 #' library(checked)
 #' df <- source_check_tasks_df(c(
-#'  system.file("example_packages", "exampleBad", package = "checked"),
-#'  system.file("example_packages", "exampleGood", package = "checked")
+#'   system.file("example_packages", "exampleBad", package = "checked"),
+#'   system.file("example_packages", "exampleGood", package = "checked")
 #' ))
 #'
 #' plan <- check_design$new(df, n = 10, repos = "https://cran.r-project.org/")
 #' while (!plan$is_done()) {
-#'  plan$start_next_task()
+#'   plan$start_next_task()
 #' }
-#'}
+#' }
 #' @export
-check_design <- R6::R6Class(
+check_design <- R6::R6Class( # nolint cyclocomp_linter
   "check_design",
   public = list(
     #' @field graph (`igraph::igraph()`)\cr
@@ -52,35 +63,40 @@ check_design <- R6::R6Class(
     #' Use checks data.frame to generate task graph in which all dependencies
     #' and installation order are embedded.
     #'
-    #' @param df checks data.frame.
-    #' @param n integer value indicating maximum number of subprocesses that can
-    #' be simultaneously spawned when executing tasks.
-    #' @param output character value specifying path where the output should be stored.
-    #' @param lib.loc character vector with libraries allowed to be used when
-    #' checking packages, defaults to entire .libPaths().
-    #' @param repos character vector of repositories which will be used when
-    #' generating task graph and later pulling dependencies.
-    #' @param restore logical value, whether output directory should be unlinked
-    #' before running checks. If FALSE, an attempt will me made to restore previous
-    #' progress from the same \code{output}
-    #' @param ... other parameters
+    #' @param df `check_design` data.frame.
+    #' @param n `integer` value indicating maximum number of subprocesses that
+    #'    can be simultaneously spawned when executing tasks.
+    #' @param output `character` value specifying path where the output should
+    #'   be stored.
+    #' @param lib.loc `character` vector with libraries allowed to be used when
+    #'   checking packages, defaults to entire .libPaths().
+    #' @param repos `character` vector of repositories which will be used when
+    #'   generating task graph and later pulling dependencies.
+    #' @param restore `logical` value, whether output directory should be
+    #'   unlinked before running checks. If `FALSE`, an attempt will me made to
+    #'   restore previous progress from the same `output`.
+    #' @param ... Additional arguments unused
     #'
     #' @return [check_design].
     initialize = function(
-        # styler: off
-        df,
-        n = 2L,
-        output = tempfile(paste(packageName(), Sys.Date(), sep = "-")),
-        lib.loc = .libPaths(),
-        repos = getOption("repos"),
-        restore = TRUE,
-        ...) { # styler: on
+      df,
+      n = 2L,
+      output = tempfile(paste(packageName(), Sys.Date(), sep = "-")),
+      lib.loc = .libPaths(), # nolint object_name_linter
+      repos = getOption("repos"),
+      restore = TRUE,
+      ...
+    ) {
       # Make sure all aliases are unique
       stopifnot(
-        "Check task aliases has to be unique" = !any(duplicated(df$alias)),
-        "Check task aliases cannot have the same name as any of the available packages" = !any(df$alias %in% available.packages(repos = repos)[, "Package"]),
-        "Custom package aliases cannot be duplicates of check aliases" = !any(uulist(drlapply(df$custom, `[[`, "alias")) %in% df$alias)
+        "Check task aliases has to be unique" =
+          !any(duplicated(df$alias)),
+        "Check task aliases cannot have the same name as any of the available packages" = # nolint
+          !any(df$alias %in% available.packages(repos = repos)[, "Package"]),
+        "Custom package aliases cannot be duplicates of check aliases" =
+          !any(uulist(drlapply(df$custom, `[[`, "alias")) %in% df$alias)
       )
+
       if (!restore) unlink(output, recursive = TRUE, force = TRUE)
       dir_create(output)
 
@@ -100,15 +116,15 @@ check_design <- R6::R6Class(
     active_processes = function() {
       private$active
     },
-    
+
     #' @description
     #' Get Failed Tasks list
     failed_tasks = function() {
       private$failed
     },
-    
+
     #' @description
-    #' Terminate Design Processes
+    #' Kill All Active Design Processes
     #'
     #' Immediately terminates all the active processes.
     terminate = function() {
@@ -136,7 +152,7 @@ check_design <- R6::R6Class(
         if (!process$is_alive()) {
           process$finish()
         } else if (inherits(process, "check_process")) {
-          # NOTE: for some reason check process never finishes unless we poll checks
+          # NOTE: check process never finishes unless we poll checks
           process$poll_output()
         }
       }
@@ -208,9 +224,16 @@ check_design <- R6::R6Class(
     restore_complete_checks = function() {
       checks <- self$input$alias
       check_done <- vlapply(checks, function(check) {
-        file.exists(file.path(path_check_output(self$output, check), "result.json"))
+        file.exists(file.path(
+          path_check_output(self$output, check),
+          "result.json"
+        ))
       })
-      self$graph <- task_graph_set_package_status(self$graph, checks[check_done], STATUS$done)
+      self$graph <- task_graph_set_package_status(
+        self$graph,
+        checks[check_done],
+        STATUS$done
+      )
     },
     pop_process = function(name) {
       private$active[[name]] <- NULL

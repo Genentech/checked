@@ -1,5 +1,27 @@
+#' Internal Utilities for Command-line Output
+#'
+#' Various helper functions for consistent cli output, including theming and
+#' formatting.
+#'
+#' @param status,ok,notes,warnings,errors `character[1L]` A value to include
+#'   in the respective columns of the table. Will be coerced to `character`
+#'   if another type is provided.
+#' @param msg `character[1L]` A message to include to the right of the  table
+#'   row entry.
+#' @param ...,.envir Additional arguments passed to [`cli::cli_div()`]
+#'
+#' @name cli
+#' @keywords internal
+NULL
+
+#' @name cli
 cli_table_row <- function(
-    status, ok = "OK", notes = "N", warnings = "W", errors = "E", msg = "",
+    status,
+    ok = "OK",
+    notes = "N",
+    warnings = "W",
+    errors = "E",
+    msg = "",
     title = FALSE) {
   cli_theme()
   status <- trimws(as.character(status))
@@ -39,6 +61,7 @@ cli_table_row <- function(
   cli::format_inline(fmt)
 }
 
+#' @name cli
 cli_theme <- function(..., .envir = parent.frame()) {
   cli_div(..., .envir = .envir, theme = list(
     span.ok = list(),
