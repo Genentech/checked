@@ -7,8 +7,10 @@
 enum <- function(...) {
   x <- c(...)
   f <- factor(x, levels = x)
-  names(f) <- levels(f)
-  lapply(f, identity)
+  structure(
+    lapply(f, identity),
+    names = levels(f)
+  )
 }
 
 #' Internally provide extended mathematical operators for enums
