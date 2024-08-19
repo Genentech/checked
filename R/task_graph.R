@@ -7,6 +7,7 @@
 #'   indicating whether the package as one of the roots used to create the
 #'   graph), "status" (installation status) and "order" (installation order).
 #'
+#' @keywords internal
 #' @importFrom igraph V
 task_graph_create <- function(df, repos = getOption("repos")) {
   edges <- task_edges_df(df, repos)
@@ -149,6 +150,7 @@ task_vertices_df <- function(df, edges, repos) {
 #' should be calculated.
 #'
 #' @importFrom igraph neighborhood
+#' @keywords internal
 task_graph_neighborhoods <- function(g, nodes) {
   igraph::neighborhood(
     g,
@@ -174,6 +176,7 @@ task_graph_neighborhoods <- function(g, nodes) {
 #'   installation order.
 #'
 #' @importFrom igraph vertex_attr neighborhood subgraph.edges permute topo_sort E V E<- V<-
+#' @keywords internal
 task_graph_sort <- function(g) {
   roots <- which(igraph::vertex_attr(g, "type") == "check")
 
@@ -207,6 +210,17 @@ task_graph_sort <- function(g) {
 #'
 #' While other packages are in progress, ensure that the next selected package
 #' already has its dependencies done.
+#' 
+#' @details
+#' There are helpers defined for particular use cases that strictly rely on the
+#' [`task_graph_which_satisfied()`], they are:
+#'
+#' * [`task_graph_which_satisfied_strong()`] - List vertices whose strong 
+#'   dependencies are satisfied.
+#' * [`task_graph_which_check_satisfied()`] - List root vertices whose all 
+#'   dependencies are satisfied.
+#' * [`task_graph_which_install_satisfied()`] - List install vertices whose 
+#'   dependencies are all satisfied
 #'
 #' @param g A dependency graph, as produced with [task_graph_create()].
 #' @param v Names or nodes objects of packages whose satisfiability should be
@@ -217,19 +231,10 @@ task_graph_sort <- function(g) {
 #' with that status.
 #' @param ... parametrs passed to down-stream functions.
 #'
-#' @details
-#' There are helpers defined for particular use cases that strictly rely on the
-#' \code{task_graph_which_satisfied}, they are:
-#'
-#' \code{task_graph_which_satisfied_strong} - List vertices whose strong dependencies are satisfied.
-#'
-#' \code{task_graph_which_check_satisfied} - List root vertices whose all dependencies are satisfied.
-#'
-#' \code{task_graph_which_install_satisfied} - List install vertices whose dependencies are all satisfied
-#'
 #' @return The name of the next package to prioritize
-#' @rdname dep_graph_which_satisfied
+#'
 #' @importFrom igraph incident_edges tail_of
+#' @keywords internal
 task_graph_which_satisfied <- function(
     g,
     v = igraph::V(g),
@@ -251,12 +256,10 @@ task_graph_which_satisfied <- function(
   names(deps_met[deps_met])
 }
 
-#' @rdname dep_graph_which_satisfied
 task_graph_which_satisfied_strong <- function(..., dependencies = "strong") { # nolint
   task_graph_which_satisfied(..., dependencies = dependencies)
 }
 
-#' @rdname dep_graph_which_satisfied
 task_graph_which_check_satisfied <- function(
     g,
     ...,
@@ -271,7 +274,6 @@ task_graph_which_check_satisfied <- function(
   )
 }
 
-#' @rdname dep_graph_which_satisfied
 task_graph_which_install_satisfied <- function(
     g,
     ...,

@@ -31,3 +31,4 @@ check_output <- "
 checks_capture(check_output)
 
 }
+\keyword{internal}

@@ -162,6 +162,7 @@ check_process <- R6::R6Class(
 #'   returns a logical value indicating whether the throttle interval has
 #'   passed (TRUE if the interval has not yet passed).
 #'
+#' @keywords internal
 throttle <- function(interval = 0.2) {
   e <- environment()
   e$since <- Sys.time()
@@ -195,7 +196,7 @@ throttle <- function(interval = 0.2) {
 #'
 #' checks_capture(check_output)
 #'
-#' @export
+#' @keywords internal
 checks_capture <- function(x) {
   m <- gregexec(RE_CHECK, x, perl = TRUE)[[1]]
 
@@ -223,6 +224,7 @@ checks_capture <- function(x) {
 #' @param x Matrix of regex captures as produced by [checks_capture].
 #' @return A vector of check status, with names indicating the check
 #'
+#' @keywords internal
 checks_simplify <- function(x) {
   checks <- trimws(x[, "status"])
   names(checks) <- trimws(x[, "check"])

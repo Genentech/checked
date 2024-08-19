@@ -2,31 +2,12 @@
 % Please edit documentation in R/task_graph.R
 \name{task_graph_which_satisfied}
 \alias{task_graph_which_satisfied}
-\alias{task_graph_which_satisfied_strong}
-\alias{task_graph_which_check_satisfied}
-\alias{task_graph_which_install_satisfied}
 \title{Find the Next Packages Not Dependent on an Unavailable Package}
 \usage{
 task_graph_which_satisfied(
   g,
   v = igraph::V(g),
   dependencies = TRUE,
-  status = STATUS$pending
-)
-
-task_graph_which_satisfied_strong(..., dependencies = "strong")
-
-task_graph_which_check_satisfied(
-  g,
-  ...,
-  dependencies = "all",
-  status = STATUS$pending
-)
-
-task_graph_which_install_satisfied(
-  g,
-  ...,
-  dependencies = "strong",
   status = STATUS$pending
 )
 }
@@ -53,11 +34,14 @@ already has its dependencies done.
 }
 \details{
 There are helpers defined for particular use cases that strictly rely on the
-\code{task_graph_which_satisfied}, they are:
-
-\code{task_graph_which_satisfied_strong} - List vertices whose strong dependencies are satisfied.
-
-\code{task_graph_which_check_satisfied} - List root vertices whose all dependencies are satisfied.
-
-\code{task_graph_which_install_satisfied} - List install vertices whose dependencies are all satisfied
+\code{\link[=task_graph_which_satisfied]{task_graph_which_satisfied()}}, they are:
+\itemize{
+\item \code{\link[=task_graph_which_satisfied_strong]{task_graph_which_satisfied_strong()}} - List vertices whose strong
+dependencies are satisfied.
+\item \code{\link[=task_graph_which_check_satisfied]{task_graph_which_check_satisfied()}} - List root vertices whose all
+dependencies are satisfied.
+\item \code{\link[=task_graph_which_install_satisfied]{task_graph_which_install_satisfied()}} - List install vertices whose
+dependencies are all satisfied
 }
+}
+\keyword{internal}

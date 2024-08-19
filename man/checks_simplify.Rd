@@ -15,3 +15,4 @@ A vector of check status, with names indicating the check
 \description{
 Simplify Captures into Vector
 }
+\keyword{internal}

@@ -23,3 +23,9 @@ the default value via env variable \code{CHECKED_RESULTS_KEEP}.}
 Write \code{checked_results} object to the text file. When converting results
 to text, \code{\link[checked]{print.checked_results}} method is used.
 }
+\seealso{
+Other results: 
+\code{\link{print.checked_results}()},
+\code{\link{results}()}
+}
+\concept{results}

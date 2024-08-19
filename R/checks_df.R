@@ -24,12 +24,6 @@ empty_checks_df <- data.frame(
 #'
 #' @details
 #'
-#' [`rev_dep_check_tasks_df()`] generates checks schedule data.frame appropriate
-#' for running reverse dependency check for certain source package. In such case
-#' `path` parameter should point to the source of the development version of
-#' the package and `repos` should be a repository for which reverse
-#' dependencies should be identified.
-#'
 #' [`source_check_tasks_df()`] generates checks schedule `data.frame` for
 #' all source packages specified by the `path`. Therefore it accepts it to be
 #' a vector of an arbitrary length.
@@ -45,11 +39,22 @@ empty_checks_df <- data.frame(
 #'   Defines custom package, for instance only available from local source, that
 #'   should be installed before checking the package.
 #'
-#' @name checks_df
+#' @family tasks
+#' @name checked-task-df
 NULL
 
+#' Build Tasks for Reverse Dependency Checks
+#' 
+#' Generates checks schedule data.frame appropriate for running reverse
+#' dependency check for certain source package. In such case `path` parameter
+#' should point to the source of the development version of the package and
+#' `repos` should be a repository for which reverse dependencies should be
+#' identified.
+#'
+#' @inherit checked-task-df
+#'
+#' @family tasks
 #' @export
-#' @rdname checks_df
 rev_dep_check_tasks_df <- function(
   path,
   repos = getOption("repos"),
@@ -178,7 +183,7 @@ rev_dep_check_tasks_specs_development <- function(packages, repos, aliases, ...)
 
 
 #' @export
-#' @rdname checks_df
+#' @name checked-task-df
 source_check_tasks_df <- function(path) {
   name <- names(path)
   path <- vcapply(path, check_path_is_pkg_source, USE.NAMES = FALSE)

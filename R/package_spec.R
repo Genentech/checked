@@ -9,8 +9,8 @@
 #' are acceptable.
 #' @param ... parameters passed to downstream constructors
 #'
+#' @family specs
 #' @export
-#' @rdname package_spec
 package_spec <- function(name = NULL, repos = NULL) {
   structure(
     list(

@@ -3,7 +3,7 @@
 \name{new_check_design}
 \alias{new_check_design}
 \alias{new_rev_dep_check_design}
-\title{Create a New Check Design}
+\title{Creating new Check Design Objects}
 \usage{
 new_check_design(...)
 
@@ -17,3 +17,19 @@ new_rev_dep_check_design(x, ...)
 \description{
 Instantiate a check design from a path or directory.
 }
+\seealso{
+Other checks: 
+\code{\link{check_design}},
+\code{\link{check_dev_rev_deps}()},
+\code{\link{check_dir}()},
+\code{\link{check_pkgs}()},
+\code{\link{check_rev_deps}()}
+
+Other checks: 
+\code{\link{check_design}},
+\code{\link{check_dev_rev_deps}()},
+\code{\link{check_dir}()},
+\code{\link{check_pkgs}()},
+\code{\link{check_rev_deps}()}
+}
+\concept{checks}

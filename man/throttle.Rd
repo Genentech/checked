@@ -18,3 +18,4 @@ passed (TRUE if the interval has not yet passed).
 \description{
 Generate A Rate Limiting Throttle Function
 }
+\keyword{internal}

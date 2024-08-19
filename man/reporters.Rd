@@ -39,3 +39,4 @@ A line-feed reporter presenting output one line at a time, providing
 a reporter with minimal assumptions about terminal capabilities.
 }
 }
+\concept{reporters}

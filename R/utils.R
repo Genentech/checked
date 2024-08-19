@@ -1,5 +1,5 @@
 #' @import cli
-"_PACKAGE"
+NULL
 
 base_pkgs <- function() {
   c("R", utils::installed.packages(priority = "base")[, "Package"])
@@ -29,13 +29,7 @@ dir_create <- function(path) {
   }
 }
 
-`%||%` <- function(x, y) {
-  if (!is.null(x)) {
-    x
-  } else {
-    y
-  }
-}
+`%||%` <- function(lhs, rhs) if (is.null(lhs)) rhs else lhs
 
 drlapply <- function(...) {
   do.call(rbind, lapply(...))
@@ -46,7 +40,6 @@ drmapply <- function(...) {
 }
 
 uulist <- function(...) unique(as.character(unlist(...)))
-`%||%` <- function(lhs, rhs) if (is.null(lhs)) rhs else lhs
 vcapply <- function(...) vapply(..., FUN.VALUE = character(1L))
 vlapply <- function(...) vapply(..., FUN.VALUE = logical(1L))
 viapply <- function(...) vapply(..., FUN.VALUE = integer(1L))

@@ -23,40 +23,36 @@
 #'   unlinked before running checks. If `FALSE`, an attempt will me made to
 #'   restore previous progress from the same `output`
 #' @param ... Additional arguments passed to [`run()`]
-#' @inheritParams run
-#'
-#' @details
-#'
-#' [`check_rev_deps()`] runs classical reverse dependency checks
-#' for the given source package. It first identifies reverse dependencies
-#' available in `repos`. Then, after installing all required dependencies, runs
-#' `R CMD check` twice for each package, one time with the release version of
-#' the given source package installed from `repos` and a second time with the
-#' development version installed from local source. Both `R CMD checks` are
-#' later compared to identify changes in reverse dependency behaviors.
-#'
-#' [`check_dev_rev_deps()`] works similarly to
-#' [`check_rev_deps()`] but it runs R CMD check only once for each
-#' package, with the development version of the package installed. It is
-#' advantageous to check whether adding a new package into repository breaks
-#' existing packages that possibly take said package as a `Suggests` dependency.
-#'
-#' [`check_pkgs()`] Installs all dependencies and runs `R CMD check`s
-#' in parallel for all source packages whose source code is found in the
-#' `path` directory
-#'
-#' [`check_dir()`] Identifies all R packages in the given directory
-#' (non-recursively) and passes them to the [`check_pkgs()`]
 #'
 #' @return
 #'   [`check_design()`] R6 class storing all the details
 #'   regarding checks that run. Can be combined with
 #'   [`results`] and [`summary()`] methods to generate results.
 #'
+#' @keywords internal
 #' @name check_functions
 NULL
 
-#' @rdname check_functions
+#' Check reverse dependencies
+#'
+#' Check a package's reverse dependencies in order to identify differences
+#' in reverse dependency check results when run alongside your package's
+#' development and release versions.
+#'
+#' Runs classical reverse dependency checks for the given source package. It
+#' first identifies reverse dependencies available in `repos`. Then, after
+#' installing all required dependencies, runs `R CMD check` twice for each
+#' package, one time with the release version of the given source package
+#' installed from `repos` and a second time with the development version
+#' installed from local source. Both `R CMD checks` are later compared to
+#' identify changes in reverse dependency behaviors.
+#'
+#' @inheritParams check_functions
+#' @inheritParams run
+#' 
+#' @inherit check_functions return
+#'
+#' @family checks
 #' @export
 check_rev_deps <- function(
     path,
@@ -82,7 +78,20 @@ check_rev_deps <- function(
   plan
 }
 
-#' @rdname check_functions
+#' Run reverse dependency checks against a development version only
+#'
+#' [`check_dev_rev_deps()`] works similarly to [`check_rev_deps()`] but it runs
+#' R CMD check only once for each package, with the development version of the
+#' package installed. It is advantageous to check whether adding a new package
+#' into a repository breaks existing packages that possibly take said package
+#' as a `Suggests` dependency.
+#'
+#' @inheritParams check_functions
+#' @inheritParams run
+#' 
+#' @inherit check_functions return
+#' 
+#' @family checks
 #' @export
 check_dev_rev_deps <- function(
     path,
@@ -107,7 +116,18 @@ check_dev_rev_deps <- function(
   plan
 }
 
-#' @rdname check_functions
+#' Check one or more package source directories
+#' 
+#' [`check_pkgs()`] Installs all dependencies and runs `R CMD check`s
+#' in parallel for all source packages whose source code is found in the
+#' `path` directory
+#'
+#' @inheritParams check_functions
+#' @inheritParams run
+#' 
+#' @inherit check_functions return
+#'
+#' @family checks
 #' @export
 check_pkgs <- function(
     path,
@@ -132,7 +152,17 @@ check_pkgs <- function(
   plan
 }
 
-#' @rdname check_functions
+#' Check all package source directories in current directory
+#'
+#' [`check_dir()`] Identifies all R packages in the given directory
+#' (non-recursively) and passes them to the [`check_pkgs()`]
+#'
+#' @inheritParams check_functions
+#' @inheritParams run
+#' 
+#' @inherit check_functions return
+#' 
+#' @family checks
 #' @export
 check_dir <- function(
     path,

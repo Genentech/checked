@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_design.R
 \name{check_design}
 \alias{check_design}
-\title{Check Design}
+\title{\code{R6} Checks Coordinator}
 \description{
 A stateful object that orchestrates all separate processes required to
 manage installation, library setup and run \verb{R CMD check}s in sequence.
@@ -20,7 +20,17 @@ while (!plan$is_done()) {
   plan$start_next_task()
 }
 }
+
 }
+\seealso{
+Other checks: 
+\code{\link{check_dev_rev_deps}()},
+\code{\link{check_dir}()},
+\code{\link{check_pkgs}()},
+\code{\link{check_rev_deps}()},
+\code{\link{new_check_design}()}
+}
+\concept{checks}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{

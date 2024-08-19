@@ -7,15 +7,9 @@
 #' @param package_spec \code{\link[checked]{package_spec}} object
 #' @param env environmental variables to be set in separate process running
 #' specific task.
-#' @param revdep character indicating whether the task specification describes
-#' check associated with the development (new) or release (old) version of the
-#' for which reverse dependency check is run.
-#' @param ... parameters passed to downstream constructors
-#' @inheritParams utils::install.packages
-#' @inheritParams rcmdcheck::rcmdcheck
 #'
+#' @family tasks
 #' @export
-#' @rdname task_spec
 task_spec <- function(alias = NULL, package_spec = NULL, env = NULL) {
   structure(
     list(
@@ -31,23 +25,31 @@ list_of_task_spec <- function(x, ...) {
   structure(x, class = c("list_of_task_spec", "list"))
 }
 
+#' @family tasks
 #' @export
 print.task_spec <- function(x, ...) {
   cat(format(x, ...), "\n")
 }
 
+#' @family tasks
 #' @export
 format.task_spec <- function(x, ...) {
   paste0("<task ", x$alias, ">")
 }
 
+#' @family tasks
 #' @export
 format.list_of_task_spec <- function(x, ...) {
   vcapply(x, format)
 }
 
+#' Create a task to install a package and dependencies
+#' 
+#' @param ... Additional parameters passed to [`task_spec()`]
+#' @inheritParams utils::install.packages
+#' 
+#' @family tasks
 #' @export
-#' @rdname task_spec
 install_task_spec <- function(type = getOption("pkgType"), INSTALL_opts = NULL, ...) {
   task_spec <- task_spec(...)
   install_spec <- list(
@@ -60,17 +62,20 @@ install_task_spec <- function(type = getOption("pkgType"), INSTALL_opts = NULL, 
   )
 }
 
+#' @family tasks
 #' @export
-#' @rdname task_spec
 custom_install_task_spec <- function(...) {
   task_spec <- install_task_spec(...)
-
   class(task_spec) <- c("custom_install_task_spec", class(task_spec))
   task_spec
 }
 
+#' Create a task to run `R CMD check`
+#'
+#' @inheritParams rcmdcheck::rcmdcheck
+#'
+#' @family tasks
 #' @export
-#' @rdname task_spec
 check_task_spec <- function(args = NULL, build_args = NULL, ...) {
   task_spec <- task_spec(...)
   check_spec <- list(
@@ -84,8 +89,15 @@ check_task_spec <- function(args = NULL, build_args = NULL, ...) {
   )
 }
 
+#' Create a task to run reverse dependency checks
+#'
+#' @param revdep character indicating whether the task specification describes
+#' check associated with the development (new) or release (old) version of the
+#' for which reverse dependency check is run.
+#' @param ... Additional parameters passed to [`task_spec()`]
+#'
+#' @family tasks
 #' @export
-#' @rdname task_spec
 revdep_check_task_spec <- function(revdep, ...) {
   task_spec <- check_task_spec(...)
   task_spec["revdep"] <- list(revdep)

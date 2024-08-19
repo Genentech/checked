@@ -1,16 +1,17 @@
-#' Create a New Check Design
+#' Creating new Check Design Objects
 #'
 #' Instantiate a check design from a path or directory.
 #'
 #' @param x A file path, passed to [`rev_dep_check_tasks_df()`]
 #' @param ... Additional arguments passed to [`new_check_design()`]
 #'
-#' @name new_check_design
+#' @family checks
 #' @export
 new_check_design <- function(...) {
   check_design$new(...)
 }
 
+#' @family checks
 #' @name new_check_design
 #' @export
 new_rev_dep_check_design <- function(x, ...) {
@@ -18,7 +19,7 @@ new_rev_dep_check_design <- function(x, ...) {
   new_check_design(tasks, ...)
 }
 
-#' Check Design
+#' `R6` Checks Coordinator
 #'
 #' @description
 #' A stateful object that orchestrates all separate processes required to
@@ -37,6 +38,8 @@ new_rev_dep_check_design <- function(x, ...) {
 #'   plan$start_next_task()
 #' }
 #' }
+#'
+#' @family checks
 #' @export
 check_design <- R6::R6Class( # nolint cyclocomp_linter
   "check_design",
