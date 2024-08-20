@@ -20,6 +20,15 @@ Pass each argument as a single element of this character vector (do not use
 spaces to delimit arguments like you would in the shell). For example,
 \code{build_args = c("--force", "--keep-empty-dirs")} is a correct usage and
 \code{build_args = "--force --keep-empty-dirs"} is incorrect.}
+
+\item{...}{
+  Arguments passed on to \code{\link[=task_spec]{task_spec}}
+  \describe{
+    \item{\code{alias}}{task alias which also serves as unique identifier of the task.}
+    \item{\code{package_spec}}{\code{\link[checked]{package_spec}} object}
+    \item{\code{env}}{environmental variables to be set in separate process running
+specific task.}
+  }}
 }
 \description{
 Create a task to run \verb{R CMD check}
@@ -27,9 +36,11 @@ Create a task to run \verb{R CMD check}
 \seealso{
 Other tasks: 
 \code{\link{checked-task-df}},
+\code{\link{custom_install_task_spec}()},
 \code{\link{install_task_spec}()},
 \code{\link{rev_dep_check_tasks_df}()},
 \code{\link{revdep_check_task_spec}()},
+\code{\link{source_check_tasks_df}()},
 \code{\link{task_spec}()}
 }
 \concept{tasks}

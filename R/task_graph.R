@@ -210,16 +210,16 @@ task_graph_sort <- function(g) {
 #'
 #' While other packages are in progress, ensure that the next selected package
 #' already has its dependencies done.
-#' 
+#'
 #' @details
 #' There are helpers defined for particular use cases that strictly rely on the
 #' [`task_graph_which_satisfied()`], they are:
 #'
-#' * [`task_graph_which_satisfied_strong()`] - List vertices whose strong 
+#' * `task_graph_which_satisfied_strong()` - List vertices whose strong
 #'   dependencies are satisfied.
-#' * [`task_graph_which_check_satisfied()`] - List root vertices whose all 
+#' * `task_graph_which_check_satisfied()` - List root vertices whose all
 #'   dependencies are satisfied.
-#' * [`task_graph_which_install_satisfied()`] - List install vertices whose 
+#' * `task_graph_which_install_satisfied()` - List install vertices whose
 #'   dependencies are all satisfied
 #'
 #' @param g A dependency graph, as produced with [task_graph_create()].
@@ -229,7 +229,6 @@ task_graph_sort <- function(g) {
 #' considered satisfied.
 #' @param status status name. Nodes in v fill be filtered to consists only nodes
 #' with that status.
-#' @param ... parametrs passed to down-stream functions.
 #'
 #' @return The name of the next package to prioritize
 #'

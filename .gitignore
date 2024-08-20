@@ -52,4 +52,6 @@ reversecheck.Rproj
 
 # README.Rmd artifacts
 *.html
+README_cache/
 ^cran-comments\.md$
+docs

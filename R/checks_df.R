@@ -12,21 +12,15 @@ empty_checks_df <- data.frame(
 #' [`check_design()`] which orchestrates all the processes
 #' including dependencies installation.
 #'
-#' @param path path to the package source. See Details.
-#' @param repos repository used to identify reverse dependencies.
-#' @param versions character vector indicating against which versions of the
-#'   package reverse dependency should be checked. `c("dev", "release")`
-#'   (default) stands for the classical reverse dependency check. `"dev"`
-#'   checks only against development version of the package which is applicable
-#'   mostly when checking whether adding new package would break tests of
-#'   packages already in the repository and take the package as suggests
-#'   dependency.
-#'
 #' @details
 #'
-#' [`source_check_tasks_df()`] generates checks schedule `data.frame` for
+#' `_tasks_df()` functions generate check task `data.frame` for
 #' all source packages specified by the `path`. Therefore it accepts it to be
 #' a vector of an arbitrary length.
+#'
+#' @param path path to the package source. Can be either a single source
+#'   code directory or a directory containing multiple package source code
+#'   directories.
 #'
 #' @return The check schedule `data.frame` with the following columns:
 #'
@@ -44,7 +38,7 @@ empty_checks_df <- data.frame(
 NULL
 
 #' Build Tasks for Reverse Dependency Checks
-#' 
+#"
 #' Generates checks schedule data.frame appropriate for running reverse
 #' dependency check for certain source package. In such case `path` parameter
 #' should point to the source of the development version of the package and
@@ -52,6 +46,15 @@ NULL
 #' identified.
 #'
 #' @inherit checked-task-df
+#' @inheritParams checked-task-df
+#' @param repos repository used to identify reverse dependencies.
+#' @param versions character vector indicating against which versions of the
+#'   package reverse dependency should be checked. `c("dev", "release")`
+#'   (default) stands for the classical reverse dependency check. `"dev"`
+#'   checks only against development version of the package which is applicable
+#'   mostly when checking whether adding new package would break tests of
+#'   packages already in the repository and take the package as suggests
+#'   dependency.
 #'
 #' @family tasks
 #' @export
@@ -163,7 +166,12 @@ rev_dep_check_tasks_specs <- function(packages, repos, aliases, revdep) {
   ))
 }
 
-rev_dep_check_tasks_specs_development <- function(packages, repos, aliases, ...) {
+rev_dep_check_tasks_specs_development <- function(
+  packages,
+  repos,
+  aliases,
+  ...
+) {
   list_of_task_spec(mapply(
     function(p, a) {
       check_task_spec(
@@ -181,9 +189,13 @@ rev_dep_check_tasks_specs_development <- function(packages, repos, aliases, ...)
   ))
 }
 
-
+#' Create a Task to Check a Package from Source
+#'
+#' @inherit checked-task-df
+#' @inheritParams checked-task-df
+#'
+#' @family tasks
 #' @export
-#' @name checked-task-df
 source_check_tasks_df <- function(path) {
   name <- names(path)
   path <- vcapply(path, check_path_is_pkg_source, USE.NAMES = FALSE)

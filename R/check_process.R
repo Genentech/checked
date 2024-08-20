@@ -183,6 +183,7 @@ throttle <- function(interval = 0.2) {
 #'   ("OK", "NONE", "NOTE", "WARNING" or "ERROR").
 #'
 #' @examples
+#' \dontrun{
 #' check_output <- "
 #' * checking check one ... OK
 #' * checking check two ... NOTE
@@ -195,6 +196,7 @@ throttle <- function(interval = 0.2) {
 #' "
 #'
 #' checks_capture(check_output)
+#' }
 #'
 #' @keywords internal
 checks_capture <- function(x) {

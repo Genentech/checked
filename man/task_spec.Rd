@@ -22,8 +22,10 @@ to run specific task.
 Other tasks: 
 \code{\link{check_task_spec}()},
 \code{\link{checked-task-df}},
+\code{\link{custom_install_task_spec}()},
 \code{\link{install_task_spec}()},
 \code{\link{rev_dep_check_tasks_df}()},
-\code{\link{revdep_check_task_spec}()}
+\code{\link{revdep_check_task_spec}()},
+\code{\link{source_check_tasks_df}()}
 }
 \concept{tasks}

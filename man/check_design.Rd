@@ -37,11 +37,10 @@ Other checks:
 \item{\code{graph}}{(\code{igraph::igraph()})\cr
 A dependency graph, storing information about which dependencies
 are required prior to execution of each check task.
-Created with \code{\link[checked]{task_graph_create}}}
+Created with \code{\link[=task_graph_create]{task_graph_create()}}}
 
-\item{\code{input}}{(\code{data.fragme()})\cr
-Checks data.frame which is the source of all the checks
-Created with \code{\link[checked]{source_check_tasks_df}}}
+\item{\code{input}}{(\code{data.frame()})\cr
+Checks task \code{data.frame} which is the source of all the checks.}
 
 \item{\code{output}}{(\code{character(1)})\cr
 Output directory where raw results and temporary library will

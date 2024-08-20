@@ -44,10 +44,10 @@ format.list_of_task_spec <- function(x, ...) {
 }
 
 #' Create a task to install a package and dependencies
-#' 
+#'
 #' @param ... Additional parameters passed to [`task_spec()`]
 #' @inheritParams utils::install.packages
-#' 
+#'
 #' @family tasks
 #' @export
 install_task_spec <- function(type = getOption("pkgType"), INSTALL_opts = NULL, ...) {
@@ -62,6 +62,10 @@ install_task_spec <- function(type = getOption("pkgType"), INSTALL_opts = NULL, 
   )
 }
 
+#' Create a custom install task
+#'
+#' @inheritDotParams install_task_spec
+#'
 #' @family tasks
 #' @export
 custom_install_task_spec <- function(...) {
@@ -73,6 +77,7 @@ custom_install_task_spec <- function(...) {
 #' Create a task to run `R CMD check`
 #'
 #' @inheritParams rcmdcheck::rcmdcheck
+#' @inheritDotParams task_spec
 #'
 #' @family tasks
 #' @export

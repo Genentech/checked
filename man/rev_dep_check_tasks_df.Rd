@@ -2,7 +2,12 @@
 % Please edit documentation in R/checks_df.R
 \name{rev_dep_check_tasks_df}
 \alias{rev_dep_check_tasks_df}
-\title{Build Tasks for Reverse Dependency Checks}
+\title{Build Tasks for Reverse Dependency Checks
+Generates checks schedule data.frame appropriate for running reverse
+dependency check for certain source package. In such case \code{path} parameter
+should point to the source of the development version of the package and
+\code{repos} should be a repository for which reverse dependencies should be
+identified.}
 \usage{
 rev_dep_check_tasks_df(
   path,
@@ -11,7 +16,9 @@ rev_dep_check_tasks_df(
 )
 }
 \arguments{
-\item{path}{path to the package source. See Details.}
+\item{path}{path to the package source. Can be either a single source
+code directory or a directory containing multiple package source code
+directories.}
 
 \item{repos}{repository used to identify reverse dependencies.}
 
@@ -37,14 +44,13 @@ should be installed before checking the package.
 }
 }
 \description{
-Generates checks schedule data.frame appropriate for running reverse
-dependency check for certain source package. In such case \code{path} parameter
-should point to the source of the development version of the package and
-\code{repos} should be a repository for which reverse dependencies should be
-identified.
+Create data.frame which each row defines a package for which R CMD check
+should be run. Such data.frame is a prerequisite for generating
+\code{\link[=check_design]{check_design()}} which orchestrates all the processes
+including dependencies installation.
 }
 \details{
-\code{\link[=source_check_tasks_df]{source_check_tasks_df()}} generates checks schedule \code{data.frame} for
+\verb{_tasks_df()} functions generate check task \code{data.frame} for
 all source packages specified by the \code{path}. Therefore it accepts it to be
 a vector of an arbitrary length.
 }
@@ -52,8 +58,10 @@ a vector of an arbitrary length.
 Other tasks: 
 \code{\link{check_task_spec}()},
 \code{\link{checked-task-df}},
+\code{\link{custom_install_task_spec}()},
 \code{\link{install_task_spec}()},
 \code{\link{revdep_check_task_spec}()},
+\code{\link{source_check_tasks_df}()},
 \code{\link{task_spec}()}
 }
 \concept{tasks}

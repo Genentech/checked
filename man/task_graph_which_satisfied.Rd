@@ -22,8 +22,6 @@ considered satisfied.}
 
 \item{status}{status name. Nodes in v fill be filtered to consists only nodes
 with that status.}
-
-\item{...}{parametrs passed to down-stream functions.}
 }
 \value{
 The name of the next package to prioritize
@@ -36,11 +34,11 @@ already has its dependencies done.
 There are helpers defined for particular use cases that strictly rely on the
 \code{\link[=task_graph_which_satisfied]{task_graph_which_satisfied()}}, they are:
 \itemize{
-\item \code{\link[=task_graph_which_satisfied_strong]{task_graph_which_satisfied_strong()}} - List vertices whose strong
+\item \code{task_graph_which_satisfied_strong()} - List vertices whose strong
 dependencies are satisfied.
-\item \code{\link[=task_graph_which_check_satisfied]{task_graph_which_check_satisfied()}} - List root vertices whose all
+\item \code{task_graph_which_check_satisfied()} - List root vertices whose all
 dependencies are satisfied.
-\item \code{\link[=task_graph_which_install_satisfied]{task_graph_which_install_satisfied()}} - List install vertices whose
+\item \code{task_graph_which_install_satisfied()} - List install vertices whose
 dependencies are all satisfied
 }
 }

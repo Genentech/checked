@@ -47,12 +47,11 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
     #' @field graph (`igraph::igraph()`)\cr
     #' A dependency graph, storing information about which dependencies
     #' are required prior to execution of each check task.
-    #' Created with \code{\link[checked]{task_graph_create}}
+    #' Created with [`task_graph_create()`]
     graph = NULL,
 
-    #' @field input (`data.fragme()`)\cr
-    #' Checks data.frame which is the source of all the checks
-    #' Created with \code{\link[checked]{source_check_tasks_df}}
+    #' @field input (`data.frame()`)\cr
+    #' Checks task `data.frame` which is the source of all the checks.
     input = NULL,
 
     #' @field output (`character(1)`)\cr

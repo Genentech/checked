@@ -20,8 +20,10 @@ Create a task to run reverse dependency checks
 Other tasks: 
 \code{\link{check_task_spec}()},
 \code{\link{checked-task-df}},
+\code{\link{custom_install_task_spec}()},
 \code{\link{install_task_spec}()},
 \code{\link{rev_dep_check_tasks_df}()},
+\code{\link{source_check_tasks_df}()},
 \code{\link{task_spec}()}
 }
 \concept{tasks}
