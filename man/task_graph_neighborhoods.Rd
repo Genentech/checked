@@ -15,3 +15,4 @@ should be calculated.}
 \description{
 Find Task Neighborhood
 }
+\keyword{internal}

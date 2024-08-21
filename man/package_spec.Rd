@@ -26,3 +26,4 @@ are acceptable.}
 Create package specification list which consists of all the details required
 to identify and acquire source of the package.
 }
+\concept{specs}

@@ -12,6 +12,7 @@ CHECK_ISSUES_TYPES <- c("notes", "warnings", "errors")
 #' can set the default value via env variable \code{CHECKED_RESULTS_ERROR_ON}.
 #' @param ... other parameters.
 #'
+#' @family results
 #' @export
 results <- function(x, ...) {
   UseMethod("results")
@@ -68,7 +69,6 @@ results.check_design <- function(
 }
 
 #' @export
-#' @noRd
 results.list_revdep_check_task_spec <- function(x, output, ...) {
   name <- vcapply(x, function(y) y$package_spec$name)
   revdep <- vcapply(x, `[[`, "revdep")
@@ -95,7 +95,6 @@ results.list_revdep_check_task_spec <- function(x, output, ...) {
 }
 
 #' @export
-#' @noRd
 results.revdep_check_task_spec <- function(x, y, output, ...) {
   new <- rcmdcheck_from_json(file.path(path_check_output(output, x$alias), "result.json"))
   old <- rcmdcheck_from_json(file.path(path_check_output(output, y$alias), "result.json"))
@@ -141,7 +140,6 @@ results.revdep_check_task_spec <- function(x, y, output, ...) {
 }
 
 #' @export
-#' @noRd
 results.list_check_task_spec <- function(x, output, ...) {
   alias <- vcapply(x, `[[`, "alias")
   structure(
@@ -151,7 +149,6 @@ results.list_check_task_spec <- function(x, output, ...) {
 }
 
 #' @export
-#' @noRd
 results.check_task_spec <- function(x, output, ...) {
   x <- rcmdcheck_from_json(file.path(path_check_output(output, x$alias), "result.json"))
 
@@ -182,6 +179,7 @@ results.check_task_spec <- function(x, output, ...) {
 #' @param file A connection or character path.
 #' @inheritParams print.checked_results
 #'
+#' @family results
 #' @export
 results_to_file <- function(results, file, keep = "all", ...) {
   text <- c()
@@ -269,7 +267,7 @@ summary.checked_results_check_task_spec <- function(object, ...) {
 #' the default value via env variable \code{CHECKED_RESULTS_KEEP}.
 #' @param ... other parameters.
 #'
-#' @rdname print.checked_results
+#' @family results
 #' @export
 print.checked_results <- function(x, ...) {
   for (i in seq_along(x)) {
@@ -280,7 +278,7 @@ print.checked_results <- function(x, ...) {
   invisible(x)
 }
 
-#' @rdname print.checked_results
+#' @name print.checked_results
 #' @export
 print.checked_results_check_task_spec <- function(
     x,
@@ -300,7 +298,7 @@ print.checked_results_check_task_spec <- function(
   invisible(x)
 }
 
-#' @rdname print.checked_results
+#' @name print.checked_results
 #' @export
 print.checked_results_revdep_check_task_spec <- function(x, ...) {
   print.checked_results_check_task_spec(x, ...)

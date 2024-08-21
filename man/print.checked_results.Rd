@@ -30,3 +30,9 @@ the default value via env variable \code{CHECKED_RESULTS_KEEP}.}
 \description{
 Print checked results
 }
+\seealso{
+Other results: 
+\code{\link{results}()},
+\code{\link{results_to_file}()}
+}
+\concept{results}

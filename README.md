@@ -6,7 +6,8 @@ checked
 > Batch `R CMD check` management
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/Genentech/checked/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Genentech/checked/actions/workflows/R-CMD-check.yaml/badge.svg)
+
+<https://github.com/Genentech/checked/actions/workflows/R-CMD-check.yaml/badge.svg>
 [![CRAN](https://img.shields.io/cran/v/checked.svg)](https://cran.r-project.org/package=checked)
 [![coverage](https://codecov.io/gh/Genentech/checked/branch/main/graph/badge.svg)](https://app.codecov.io/gh/Genentech/checked/tree/main)
 <!-- badges: end -->
@@ -20,8 +21,22 @@ use cases where batch `R CMD check`s are needed.
 Running reverse dependency checks is as easy as
 
 ``` r
-checked::run("path/to/package")
+library(checked)
+x <- run("/home/dev/praise")
+results(x)
 ```
+
+    #> # Revdep Check Task Spec 
+    #> 
+    #> goodpractice package R CMD check diff 
+    #> notes: OK 
+    #> warnings: OK 
+    #> errors: OK 
+    #> 
+    #> testthat package R CMD check diff 
+    #> notes: OK 
+    #> warnings: OK 
+    #> errors: OK
 
 ## Monitoring Runs
 

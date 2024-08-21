@@ -17,6 +17,7 @@ A matrix of matches and capture groups "check" and "status"
 Parse R CMD checks from a partial check output string
 }
 \examples{
+\dontrun{
 check_output <- "
 * checking check one ... OK
 * checking check two ... NOTE
@@ -29,5 +30,7 @@ check_output <- "
 "
 
 checks_capture(check_output)
+}
 
 }
+\keyword{internal}

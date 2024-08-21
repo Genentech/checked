@@ -1,16 +1,17 @@
-#' Create a New Check Design
+#' Creating new Check Design Objects
 #'
 #' Instantiate a check design from a path or directory.
 #'
 #' @param x A file path, passed to [`rev_dep_check_tasks_df()`]
 #' @param ... Additional arguments passed to [`new_check_design()`]
 #'
-#' @name new_check_design
+#' @family checks
 #' @export
 new_check_design <- function(...) {
   check_design$new(...)
 }
 
+#' @family checks
 #' @name new_check_design
 #' @export
 new_rev_dep_check_design <- function(x, ...) {
@@ -18,7 +19,7 @@ new_rev_dep_check_design <- function(x, ...) {
   new_check_design(tasks, ...)
 }
 
-#' Check Design
+#' `R6` Checks Coordinator
 #'
 #' @description
 #' A stateful object that orchestrates all separate processes required to
@@ -37,6 +38,8 @@ new_rev_dep_check_design <- function(x, ...) {
 #'   plan$start_next_task()
 #' }
 #' }
+#'
+#' @family checks
 #' @export
 check_design <- R6::R6Class( # nolint cyclocomp_linter
   "check_design",
@@ -44,18 +47,17 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
     #' @field graph (`igraph::igraph()`)\cr
     #' A dependency graph, storing information about which dependencies
     #' are required prior to execution of each check task.
-    #' Created with \code{\link[checked]{task_graph_create}}
+    #' Created with [`task_graph_create()`]
     graph = NULL,
 
-    #' @field input (`data.fragme()`)\cr
-    #' Checks data.frame which is the source of all the checks
-    #' Created with \code{\link[checked]{source_check_tasks_df}}
+    #' @field input (`data.frame()`)\cr
+    #' Checks task `data.frame` which is the source of all the checks.
     input = NULL,
 
     #' @field output (`character(1)`)\cr
     #' Output directory where raw results and temporary library will
     #' be created and stored.
-    output = tempfile(paste(packageName(), Sys.Date(), sep = "-")),
+    output = tempfile(paste(packageName(), Sys.Date(), "", sep = "-")),
 
     #' @description
     #' Initialize a new check design

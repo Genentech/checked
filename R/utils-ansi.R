@@ -1,4 +1,5 @@
 #' Various utilities for formatting ANSI output
+#' @keywords internal
 #' @name ansi
 NULL
 

@@ -17,15 +17,17 @@ Authors@R:
         comment = c(ORCID = "0009-0003-7845-4061")
       ),
       person(
-      "F. Hoffmann-La Roche AG", 
-      role = c("cph", "fnd")
+        "F. Hoffmann-La Roche AG", 
+        role = c("cph", "fnd")
       )
     )
 Description: 
     Systematically Run R checks against multiple packages. Checks are run in 
     parallel with strategies to minimize dependency installation. Provides
     out of the box interface for running reverse dependency check.
-URL: https://github.com/Genentech/checked
+URL: 
+    https://Genentech.github.io/checked/,
+    https://github.com/Genentech/checked
 BugReports: https://github.com/Genentech/checked/issues
 License: MIT + file LICENSE
 Encoding: UTF-8

@@ -23,3 +23,4 @@ Various utilities for formatting ANSI output
 \item \code{ansi_move_line_rel()}: Offset the cursor by a relative number of lines
 
 }}
+\keyword{internal}

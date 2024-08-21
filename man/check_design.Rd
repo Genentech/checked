@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_design.R
 \name{check_design}
 \alias{check_design}
-\title{Check Design}
+\title{\code{R6} Checks Coordinator}
 \description{
 A stateful object that orchestrates all separate processes required to
 manage installation, library setup and run \verb{R CMD check}s in sequence.
@@ -20,18 +20,27 @@ while (!plan$is_done()) {
   plan$start_next_task()
 }
 }
+
 }
+\seealso{
+Other checks: 
+\code{\link{check_dev_rev_deps}()},
+\code{\link{check_dir}()},
+\code{\link{check_pkgs}()},
+\code{\link{check_rev_deps}()},
+\code{\link{new_check_design}()}
+}
+\concept{checks}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{graph}}{(\code{igraph::igraph()})\cr
 A dependency graph, storing information about which dependencies
 are required prior to execution of each check task.
-Created with \code{\link[checked]{task_graph_create}}}
+Created with \code{\link[=task_graph_create]{task_graph_create()}}}
 
-\item{\code{input}}{(\code{data.fragme()})\cr
-Checks data.frame which is the source of all the checks
-Created with \code{\link[checked]{source_check_tasks_df}}}
+\item{\code{input}}{(\code{data.frame()})\cr
+Checks task \code{data.frame} which is the source of all the checks.}
 
 \item{\code{output}}{(\code{character(1)})\cr
 Output directory where raw results and temporary library will

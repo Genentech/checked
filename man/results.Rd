@@ -28,3 +28,9 @@ can set the default value via env variable \code{CHECKED_RESULTS_ERROR_ON}.}
 \description{
 Get R CMD check results
 }
+\seealso{
+Other results: 
+\code{\link{print.checked_results}()},
+\code{\link{results_to_file}()}
+}
+\concept{results}

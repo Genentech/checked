@@ -35,6 +35,11 @@ asciicast::init_knitr_engine(
 [![coverage](https://codecov.io/gh/Genentech/checked/branch/main/graph/badge.svg)](https://app.codecov.io/gh/Genentech/checked/tree/main)
 <!-- badges: end -->
 
+```{sh clone-dev-praise, echo = FALSE, results = "hide"}
+# praise chosen for having few direct and reverse dependencies
+rm -rf /tmp/praise
+git clone https://github.com/gaborcsardi/praise /tmp/praise
+```
 
 # Running Checks
 
@@ -45,7 +50,14 @@ batch `R CMD check`s are needed.
 Running reverse dependency checks is as easy as
 
 ```r
-checked::run("path/to/package")
+library(checked)
+x <- run("/home/dev/praise")
+results(x)
+```
+```{r, echo = FALSE}
+library(checked)
+x <- run("/tmp/praise", reporter = NULL)
+results(x)
 ```
 
 ## Monitoring Runs
@@ -59,19 +71,15 @@ If your editor doesn't support the full output, you might consider launching
 your checks in a terminal which should be less constrained. This would also
 free up your preferred editor for you to use while your checks run.
 
-```{sh clone-dev-praise, echo = FALSE, results = "hide"}
-# praise chosen for having few direct and reverse dependencies
-rm -rf /tmp/praise
-git clone https://github.com/gaborcsardi/praise /tmp/praise
-```
 ```r
 library(checked)
 run("/home/dev/praise")
 ```
-```{asciicast ansi-tty-example, cache = TRUE}
+```{asciicast ansi-tty-example, cache = FALSE}
 #| asciicast_knitr_output = "svg",
 #| asciicast_at = "all",
-#| asciicast_cursor = FALSE
+#| asciicast_cursor = FALSE,
+#| asciicast_speed = 2
 options(checked.tty_tick_interval = 200)
 checked::run("/tmp/praise")
 cat()

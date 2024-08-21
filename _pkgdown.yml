@@ -1,0 +1,30 @@
+url: https://Genentech.github.io/checked
+
+template:
+  bootstrap: 5
+  light-switch: true
+
+reference:
+  - title: Running Checks
+    contents:
+      - run
+
+  - title: Designing Check Sets
+    contents:
+      - has_concept("checks")
+
+  - title: Building Tasks
+    contents:
+      - has_concept("tasks")
+
+  - title: Package Specifications
+    contents:
+      - has_concept("specs")
+
+  - title: Check Results
+    contents:
+      - has_concept("results")
+
+  - title: Reporters
+    contents:
+      - has_concept("reporters")
