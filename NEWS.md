@@ -11,6 +11,8 @@
   For example, `check_reverse_dependencies_development()` was shortened to
   `check_dev_rev_deps()` (@dgkf-roche)
 
+* Fix names in the `enum` function for R lower than 4.3.
+
 # checked 0.2.3
 
 * Use custom `checked` `finisher`'s instead of the `processx` `finalizer`'s

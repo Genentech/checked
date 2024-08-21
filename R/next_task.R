@@ -10,6 +10,7 @@ next_task_to_run <- function(g) {
 #' @importFrom igraph .env
 task_get_lib_loc <- function(g, node, output) {
   nhood <- task_graph_neighborhoods(g, node)[[1]]
+  name <- names(node) %||% node # nolint
   nhood <- nhood[names(nhood) != .env$name]
 
   # Custom packages are possible only for the check type nodes which are
