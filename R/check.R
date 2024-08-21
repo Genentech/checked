@@ -49,7 +49,7 @@ NULL
 #'
 #' @inheritParams check_functions
 #' @inheritParams run
-#' 
+#'
 #' @inherit check_functions return
 #'
 #' @family checks
@@ -88,9 +88,9 @@ check_rev_deps <- function(
 #'
 #' @inheritParams check_functions
 #' @inheritParams run
-#' 
+#'
 #' @inherit check_functions return
-#' 
+#'
 #' @family checks
 #' @export
 check_dev_rev_deps <- function(
@@ -117,14 +117,14 @@ check_dev_rev_deps <- function(
 }
 
 #' Check one or more package source directories
-#' 
+#'
 #' [`check_pkgs()`] Installs all dependencies and runs `R CMD check`s
 #' in parallel for all source packages whose source code is found in the
 #' `path` directory
 #'
 #' @inheritParams check_functions
 #' @inheritParams run
-#' 
+#'
 #' @inherit check_functions return
 #'
 #' @family checks
@@ -159,9 +159,9 @@ check_pkgs <- function(
 #'
 #' @inheritParams check_functions
 #' @inheritParams run
-#' 
+#'
 #' @inherit check_functions return
-#' 
+#'
 #' @family checks
 #' @export
 check_dir <- function(

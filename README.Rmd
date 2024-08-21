@@ -75,10 +75,11 @@ free up your preferred editor for you to use while your checks run.
 library(checked)
 run("/home/dev/praise")
 ```
-```{asciicast ansi-tty-example, cache = TRUE}
+```{asciicast ansi-tty-example, cache = FALSE}
 #| asciicast_knitr_output = "svg",
 #| asciicast_at = "all",
-#| asciicast_cursor = FALSE
+#| asciicast_cursor = FALSE,
+#| asciicast_speed = 2
 options(checked.tty_tick_interval = 200)
 checked::run("/tmp/praise")
 cat()

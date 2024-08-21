@@ -57,7 +57,7 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
     #' @field output (`character(1)`)\cr
     #' Output directory where raw results and temporary library will
     #' be created and stored.
-    output = tempfile(paste(packageName(), Sys.Date(), sep = "-")),
+    output = tempfile(paste(packageName(), Sys.Date(), "", sep = "-")),
 
     #' @description
     #' Initialize a new check design

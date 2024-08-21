@@ -22,7 +22,8 @@ Running reverse dependency checks is as easy as
 
 ``` r
 library(checked)
-run("/home/dev/praise") |> results
+x <- run("/home/dev/praise")
+results(x)
 ```
 
     #> # Revdep Check Task Spec 
