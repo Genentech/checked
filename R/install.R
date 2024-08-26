@@ -86,7 +86,8 @@ is_install_failure_warning <- function(w) {
     "download of package .* failed",
     "(dependenc|package).*(is|are) not available",
     "installation of package.*had non-zero exit status",
-    "installation of one or more packages failed"
+    "installation of one or more packages failed",
+    "cannot open compressed file"
   )
 
   re <- paste0("(", paste0(patterns, collapse = "|"), ")")

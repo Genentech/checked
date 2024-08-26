@@ -13,6 +13,8 @@
 
 * Fix names in the `enum` function for R lower than 4.3.
 
+* Add tests for the reverse dependency check use case.
+
 # checked 0.2.3
 
 * Use custom `checked` `finisher`'s instead of the `processx` `finalizer`'s
