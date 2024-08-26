@@ -2,7 +2,7 @@ create_temp_repo <- function(dir, repo_path) {
   dir.create(ctburl <- utils::contrib.url(repo_path, type = "source"), recursive = TRUE)
   sources <- list.files(dir, pattern = "^.*\\.tar\\.gz$", full.names = TRUE)
   vapply(sources, file.copy, FUN.VALUE = logical(1), to = ctburl)
-  tools::write_PACKAGES(ctburl)
+  tools::write_PACKAGES(ctburl, type = "source")
 }
 
 sources_old <- test_path("testing_pkgs", "revdeps", "v1")
