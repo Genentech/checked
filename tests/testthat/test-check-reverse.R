@@ -9,7 +9,7 @@ sources_old <- test_path("testing_pkgs", "revdeps", "v1")
 sources_new <- test_path("testing_pkgs", "revdeps", "v2")
 
 dir.create(repo_dir <- tempfile("repo"))
-repo <- paste0("file://", repo_dir)
+repo <- paste0("file:///", repo_dir)
 create_temp_repo(sources_old, repo_dir)
 
 test_that("check_rev_deps works for package with no revdeps", {
