@@ -19,6 +19,8 @@
   and reuse them when installing packages to ensure consistency with the main
   session filtering.
 
+* Prettify output by stripping excessive new lines.
+
 # checked 0.2.3
 
 * Use custom `checked` `finisher`'s instead of the `processx` `finalizer`'s
