@@ -15,6 +15,10 @@
 
 * Add tests for the reverse dependency check use case.
 
+* Make `install_packages_process` capture session's `available_packages_filters`
+  and reuse them when installing packages to ensure consistency with the main
+  session filtering.
+
 # checked 0.2.3
 
 * Use custom `checked` `finisher`'s instead of the `processx` `finalizer`'s
