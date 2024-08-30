@@ -363,7 +363,7 @@ print.rcmdcheck_diff <- function(x, ...) {
 
 #' @export
 print.issues <- function(x, ...) {
-  cat(x, sep = "\n\n")
+  cat(collapse_new_lines(x), sep = "\n\n")
   invisible(x)
 }
 
@@ -371,8 +371,8 @@ print.issues <- function(x, ...) {
 print.potential_issues <- function(x, ...) {
   for (i in seq_along(x$new)) {
     print(cli::diff_chr(
-      strsplit(x$old[i], "\n")[[1]],
-      strsplit(x$new[i], "\n")[[1]]
+      strsplit(collapse_new_lines(x$old[i]), "\n")[[1]],
+      strsplit(collapse_new_lines(x$new[i]), "\n")[[1]]
     ))
     cat("\n")
   }
@@ -382,4 +382,8 @@ print.potential_issues <- function(x, ...) {
 strip_details_from_issue <- function(x) {
   x <- gsub("See(.*?)for details", "See <path> for details", "", x)
   gsub("[[:space:]]", "", x)
+}
+
+collapse_new_lines <- function(x) {
+  gsub("(\\n\\s*){2,}", "\n\n", x)  
 }
