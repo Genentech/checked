@@ -11,12 +11,14 @@ install_packages_process <- R6::R6Class(
       ...,
       lib = .libPaths(),
       libpaths = .libPaths(),
+      available_packages_filters = getOption("available_packages_filters"),
       log
     ) {
       private$package <- pkgs
       self$log <- log
       private$callr_r_bg(
-        function(..., escalate_warning) {
+        function(..., escalate_warning, available_packages_filters) {
+          options(available_packages_filters = available_packages_filters)
           tryCatch(
             utils::install.packages(...),
             warning = function(w) {
@@ -29,7 +31,8 @@ install_packages_process <- R6::R6Class(
           pkgs,
           ...,
           lib = lib,
-          escalate_warning = is_install_failure_warning
+          escalate_warning = is_install_failure_warning,
+          available_packages_filters = available_packages_filters
         ),
         libpath = libpaths,
         stdout = log,
