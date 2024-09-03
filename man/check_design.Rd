@@ -76,7 +76,7 @@ and installation order are embedded.
   output = tempfile(paste(packageName(), Sys.Date(), sep = "-")),
   lib.loc = .libPaths(),
   repos = getOption("repos"),
-  restore = TRUE,
+  restore = options::opt("restore"),
   ...
 )}\if{html}{\out{</div>}}
 }

@@ -88,9 +88,14 @@ test_that("check_rev_deps works for a package without release version", {
   withr::with_options(list(pkgType = "source"), {
     expect_warning(design <- check_rev_deps(
       file.path(sources_new, "pkg.suggests"),
-      n = 2L, repos = repo))
+      n = 2L, repos = repo, env = c("NOT_CRAN" = "false")))
   })
 
+  expect_identical(
+    design$input$package[[1]]$env, 
+    c("NOT_CRAN" = "false", DEFAULT_R_CMD_CHECK_VARIABLES)
+  )
+  
   r <- results(design)
   expect_s3_class(r, "checked_results")
   expect_true(is.list(r))

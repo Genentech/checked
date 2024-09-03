@@ -21,6 +21,10 @@
 
 * Prettify output by stripping excessive new lines.
 
+* `checked` now depends on `options`
+
+* Expose `...` allowing customization of check subprocesses when creating checks df.
+
 # checked 0.2.3
 
 * Use custom `checked` `finisher`'s instead of the `processx` `finalizer`'s

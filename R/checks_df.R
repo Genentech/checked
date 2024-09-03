@@ -21,6 +21,8 @@ empty_checks_df <- data.frame(
 #' @param path path to the package source. Can be either a single source
 #'   code directory or a directory containing multiple package source code
 #'   directories.
+#' @param ... parameters passed to the task specs allowing to customize
+#'   subprocesses.
 #'
 #' @return The check schedule `data.frame` with the following columns:
 #'
@@ -61,7 +63,8 @@ NULL
 rev_dep_check_tasks_df <- function(
   path,
   repos = getOption("repos"),
-  versions = c("dev", "release")
+  versions = c("dev", "release"),
+  ...
 ) {
   stopifnot(
     "rev_dep_check_tasks_df requires path argument of length 1" =
@@ -113,7 +116,7 @@ rev_dep_check_tasks_df <- function(
 
   if ("dev" %in% versions) {
     df_dev$alias <- paste0(df_dev$alias, " (dev)")
-    df_dev$package <- task_specs_function(revdeps, repos, df_dev$alias, "new")
+    df_dev$package <- task_specs_function(revdeps, repos, df_dev$alias, "new", ...)
     df_dev$custom <- rep(list(custom_install_task_spec(
       alias = paste0(package, " (dev)"),
       package_spec = package_spec_source(name = package, path = path),
@@ -124,7 +127,7 @@ rev_dep_check_tasks_df <- function(
   if ("release" %in% versions) {
     package_v <- ap[package, "Version"]
     df_rel$alias <- paste0(df_rel$alias, " (v", package_v, ")")
-    df_rel$package <- task_specs_function(revdeps, repos, df_rel$alias, "old")
+    df_rel$package <- task_specs_function(revdeps, repos, df_rel$alias, "old", ...)
     df_rel$custom <- rep(list(custom_install_task_spec(
       alias = paste0(package, " (release)"),
       package_spec = package_spec(name = package, repos = repos),
@@ -147,22 +150,29 @@ rev_dep_check_tasks_df <- function(
   df
 }
 
-rev_dep_check_tasks_specs <- function(packages, repos, aliases, revdep) {
+rev_dep_check_tasks_specs <- function(packages, repos, aliases, revdep, ...) {
   list_of_task_spec(mapply(
-    function(p, a) {
+    function(
+      p,
+      a,
+      env = NULL,
+      args = NULL,
+      build_args = NULL
+    ) {
       revdep_check_task_spec(
         alias = a,
         package_spec = package_spec(name = p, repos = repos),
-        env = DEFAULT_R_CMD_CHECK_VARIABLES,
-        args = DEFAULT_CHECK_ARGS,
-        build_args = DEFAULT_BUILD_ARGS,
+        env = env,
+        args = args,
+        build_args = build_args,
         revdep = revdep
       )
     },
     packages,
     aliases,
     SIMPLIFY = FALSE,
-    USE.NAMES = FALSE
+    USE.NAMES = FALSE,
+    MoreArgs = list(...)
   ))
 }
 
@@ -170,22 +180,30 @@ rev_dep_check_tasks_specs_development <- function(
   packages,
   repos,
   aliases,
+  revdep,
   ...
 ) {
   list_of_task_spec(mapply(
-    function(p, a) {
+    function(
+      p,
+      a,
+      env = NULL,
+      args = NULL,
+      build_args = NULL
+    ) {
       check_task_spec(
         alias = a,
         package_spec = package_spec(name = p, repos = repos),
-        env = DEFAULT_R_CMD_CHECK_VARIABLES,
-        args = DEFAULT_CHECK_ARGS,
-        build_args = DEFAULT_BUILD_ARGS
+        env = env,
+        args = args,
+        build_args = build_args
       )
     },
     packages,
     aliases,
     SIMPLIFY = FALSE,
-    USE.NAMES = FALSE
+    USE.NAMES = FALSE,
+    MoreArgs = list(...)
   ))
 }
 
@@ -196,7 +214,7 @@ rev_dep_check_tasks_specs_development <- function(
 #'
 #' @family tasks
 #' @export
-source_check_tasks_df <- function(path) {
+source_check_tasks_df <- function(path, ...) {
   name <- names(path)
   path <- vcapply(path, check_path_is_pkg_source, USE.NAMES = FALSE)
   package <- vcapply(path, get_package_name)
@@ -230,21 +248,29 @@ source_check_tasks_df <- function(path) {
   df
 }
 
-source_check_tasks_specs <- function(packages, path, aliases) {
+source_check_tasks_specs <- function(packages, path, aliases, ...) {
   list_of_task_spec(mapply(
-    function(p, path, a) {
+    function(
+      p,
+      path,
+      a,
+      env = NULL,
+      args = NULL,
+      build_args = NULL) {
+      
       check_task_spec(
         alias = a,
         package_spec = package_spec_source(name = p, path = path, repos = NULL),
-        env = DEFAULT_R_CMD_CHECK_VARIABLES,
-        args = DEFAULT_CHECK_ARGS,
-        build_args = DEFAULT_BUILD_ARGS
+        env = env,
+        args = args,
+        build_args = build_args
       )
     },
     packages,
     path,
     aliases,
     SIMPLIFY = FALSE,
-    USE.NAMES = FALSE
+    USE.NAMES = FALSE,
+    MoreArgs = list(...)
   ))
 }

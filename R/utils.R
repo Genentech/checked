@@ -1,6 +1,19 @@
 #' @import cli
 NULL
 
+merge_default_configuration <- function(conf, default_conf) {
+  if (options::opt("add_default_configuration")) {
+    merged <- c(conf, default_conf)
+    if (!is.null(names(merged))) {
+      merged[!duplicated(names(merged))]
+    } else {
+      merged
+    }
+  } else {
+    conf
+  }
+}
+
 base_pkgs <- function() {
   c("R", utils::installed.packages(priority = "base")[, "Package"])
 }

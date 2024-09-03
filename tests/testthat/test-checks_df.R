@@ -26,6 +26,59 @@ test_that("rev_dep_check_tasks_df works with deafult params", {
   expect_no_error(print(df$custom))
 })
 
+test_that("task_df functions can specify subprocesses configuration", {
+  expect_silent(
+    df <- rev_dep_check_tasks_df(
+      test_path("testing_pkgs", "DALEXtra"),
+      repos = "https://cran.r-project.org/",
+      env = c("NOT_CRAN" = "false"),
+      args = c("--some-option", "--other-option"),
+      build_args = c("--yet-another-option")
+    )
+  )
+  
+  expect_identical(
+    df$package[[1]]$env, 
+    c("NOT_CRAN" = "false", DEFAULT_R_CMD_CHECK_VARIABLES)
+  )
+  expect_identical(
+    df$package[[1]]$args, 
+    c(c("--some-option", "--other-option"), DEFAULT_CHECK_ARGS)
+  )
+  expect_identical(
+    df$package[[1]]$build_args, 
+    c("--yet-another-option", DEFAULT_BUILD_ARGS)
+  )
+
+  withr::with_envvar(
+    c(R_CHECKED_ADD_DEFAULT_CONFIGURATION = "FALSE"), {
+      expect_silent(
+        df <- rev_dep_check_tasks_df(
+          test_path("testing_pkgs", "DALEXtra"),
+          repos = "https://cran.r-project.org/",
+          env = c("NOT_CRAN" = "false"),
+          args = c("--some-option", "--other-option"),
+          build_args = c("--yet-another-option")
+        )
+      )
+    }
+  )
+  
+  expect_identical(
+    df$package[[1]]$env, 
+    c("NOT_CRAN" = "false")
+  )
+  expect_identical(
+    df$package[[1]]$args, 
+    c("--some-option", "--other-option")
+  )
+  expect_identical(
+    df$package[[1]]$build_args, 
+    "--yet-another-option"
+  )
+  
+})
+
 test_that("rev_dep_check_tasks_df development_only = TRUE", {
   expect_silent(
     df <- rev_dep_check_tasks_df(
