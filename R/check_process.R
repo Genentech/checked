@@ -14,19 +14,19 @@ RE_CHECK <- paste0(
 )
 # nolint end, styler: on
 
-DEFAULT_R_CMD_CHECK_VARIABLES <- c( # nolint
+DEFAULT_R_CMD_CHECK_ENVVARS <- c( # nolint
   "_R_CHECK_FORCE_SUGGESTS_" = FALSE,
   "_R_CHECK_RD_XREFS_" = FALSE,
   "_R_CHECK_SYSTEM_CLOCK_" = FALSE,
   "_R_CHECK_SUGGESTS_ONLY_" = TRUE
 )
 
-DEFAULT_BUILD_ARGS <- c( # nolint
+DEFAULT_R_CMD_BUILD_ARGS <- c( # nolint
   "--no-build-vignettes",
   "--no-manual"
 )
 
-DEFAULT_CHECK_ARGS <- c( # nolint
+DEFAULT_R_CMD_CHECK_ARGS <- c( # nolint
   "--timings",
   "--ignore-vignettes",
   "--no-manual"
@@ -52,7 +52,9 @@ check_process <- R6::R6Class(
       private$throttle <- throttle()
       private$spinners <- list(
         check = silent_spinner("circleHalves"),
-        starting = silent_spinner(list(frames = c("\u2834", "\u2826", "\u2816", "\u2832")))
+        starting = silent_spinner(list(
+          frames = c("\u2834", "\u2826", "\u2816", "\u2832")
+        ))
       )
 
       super$initialize(...)

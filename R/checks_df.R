@@ -153,9 +153,9 @@ rev_dep_check_tasks_specs <- function(packages, repos, aliases, revdep) {
       revdep_check_task_spec(
         alias = a,
         package_spec = package_spec(name = p, repos = repos),
-        env = DEFAULT_R_CMD_CHECK_VARIABLES,
-        args = DEFAULT_CHECK_ARGS,
-        build_args = DEFAULT_BUILD_ARGS,
+        env = DEFAULT_R_CMD_CHECK_ENVVARS,
+        args = DEFAULT_R_CMD_CHECK_ARGS,
+        build_args = DEFAULT_R_CMD_BUILD_ARGS,
         revdep = revdep
       )
     },
@@ -177,9 +177,9 @@ rev_dep_check_tasks_specs_development <- function(
       check_task_spec(
         alias = a,
         package_spec = package_spec(name = p, repos = repos),
-        env = DEFAULT_R_CMD_CHECK_VARIABLES,
-        args = DEFAULT_CHECK_ARGS,
-        build_args = DEFAULT_BUILD_ARGS
+        env = DEFAULT_R_CMD_CHECK_ENVVARS,
+        args = DEFAULT_R_CMD_CHECK_ARGS,
+        build_args = DEFAULT_R_CMD_BUILD_ARGS
       )
     },
     packages,
@@ -223,6 +223,7 @@ source_check_tasks_df <- function(path) {
   df$package <- list_of_task_spec(
     source_check_tasks_specs(package, path, alias)
   )
+
   df$custom <- list_of_task_spec(
     rep(list(custom_install_task_spec()), times = NROW(df))
   )
@@ -236,9 +237,9 @@ source_check_tasks_specs <- function(packages, path, aliases) {
       check_task_spec(
         alias = a,
         package_spec = package_spec_source(name = p, path = path, repos = NULL),
-        env = DEFAULT_R_CMD_CHECK_VARIABLES,
-        args = DEFAULT_CHECK_ARGS,
-        build_args = DEFAULT_BUILD_ARGS
+        env = DEFAULT_R_CMD_CHECK_ENVVARS,
+        args = DEFAULT_R_CMD_CHECK_ARGS,
+        build_args = DEFAULT_R_CMD_BUILD_ARGS
       )
     },
     packages,

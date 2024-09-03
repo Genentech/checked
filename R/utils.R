@@ -19,7 +19,18 @@ replace_with_map <- function(x, value, replacement) {
   x
 }
 
-hash_alias <- function(x) {
+hash_alias <- function(x, n = 24) {
+  x <- charToRaw(x)
+  if (length(x) < n * 4) x <- rep_len(x, n * 4)
+  hash <- vapply(
+    suppressWarnings(split(x, seq_len(n))),
+    Reduce,
+    raw(1),
+    f = xor
+  )
+  paste(as.character(hash), collapse = "")
+
+  as.integer(charToRaw(x))
   paste0(c("hash", as.character(charToRaw(x))), collapse = "")
 }
 

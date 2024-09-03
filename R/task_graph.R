@@ -46,6 +46,8 @@ task_edges_df <- function(df, repos) {
   # Drop potential duplicates
   desc <- unique(desc)
 
+  browser()
+
   # Adding checks to db and custom packages as Depends link
   checks <- drlapply(df$package, function(x) {
     p <- df[df$alias == x$alias, ]
