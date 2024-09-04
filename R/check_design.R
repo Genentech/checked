@@ -15,8 +15,8 @@ new_check_design <- function(...) {
 #' @name new_check_design
 #' @export
 new_rev_dep_check_design <- function(x, ...) {
-  tasks <- rev_dep_check_tasks_df(x)
-  new_check_design(tasks, ...)
+  plan <- plan_rev_dep_checks(x)
+  new_check_design(plan, ...)
 }
 
 #' `R6` Checks Coordinator
@@ -28,14 +28,14 @@ new_rev_dep_check_design <- function(x, ...) {
 #' @examples
 #' \dontrun{
 #' library(checked)
-#' df <- source_check_tasks_df(c(
+#' plan <- plan_checks(c(
 #'   system.file("example_packages", "exampleBad", package = "checked"),
 #'   system.file("example_packages", "exampleGood", package = "checked")
 #' ))
 #'
-#' plan <- check_design$new(df, n = 10, repos = "https://cran.r-project.org/")
-#' while (!plan$is_done()) {
-#'   plan$start_next_task()
+#' checks <- check_design$new(plan, n = 10, repos = "https://cran.r-project.org/")
+#' while (!checks$is_done()) {
+#'   checks$start_next_task()
 #' }
 #' }
 #'

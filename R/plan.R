@@ -5,18 +5,11 @@ empty_checks_df <- data.frame(
   custom = character(0)
 )
 
-#' Check schedule data frame
+#' Check Plan
 #'
-#' Create data.frame which each row defines a package for which R CMD check
-#' should be run. Such data.frame is a prerequisite for generating
-#' [`check_design()`] which orchestrates all the processes
-#' including dependencies installation.
-#'
-#' @details
-#'
-#' `_tasks_df()` functions generate check task `data.frame` for
-#' all source packages specified by the `path`. Therefore it accepts it to be
-#' a vector of an arbitrary length.
+#' Plans are pre-specified sets of checks. Plans are simple `data.frame`s
+#' where each row defines a package for which `R CMD check`
+#' should be run.
 #'
 #' @param path path to the package source. Can be either a single source
 #'   code directory or a directory containing multiple package source code
@@ -33,20 +26,19 @@ empty_checks_df <- data.frame(
 #'   Defines custom package, for instance only available from local source, that
 #'   should be installed before checking the package.
 #'
-#' @family tasks
-#' @name checked-task-df
+#' @family plan
+#' @name plan
 NULL
 
-#' Build Tasks for Reverse Dependency Checks
-#"
-#' Generates checks schedule data.frame appropriate for running reverse
-#' dependency check for certain source package. In such case `path` parameter
-#' should point to the source of the development version of the package and
-#' `repos` should be a repository for which reverse dependencies should be
-#' identified.
+#' Plan Reverse Dependency Checks
 #'
-#' @inherit checked-task-df
-#' @inheritParams checked-task-df
+#' Generates a plan for running reverse dependency check for certain
+#' source package. In such case `path` should be proivded with a directory
+#' path to the development version of the package and `repos` should be a
+#' repository for which reverse dependencies should be identified.
+#'
+#' @inherit plan
+#' @inheritParams plan
 #' @param repos repository used to identify reverse dependencies.
 #' @param versions character vector indicating against which versions of the
 #'   package reverse dependency should be checked. `c("dev", "release")`
@@ -56,18 +48,13 @@ NULL
 #'   packages already in the repository and take the package as suggests
 #'   dependency.
 #'
-#' @family tasks
+#' @family plan
 #' @export
-rev_dep_check_tasks_df <- function(
+plan_rev_dep_checks <- function(
   path,
   repos = getOption("repos"),
   versions = c("dev", "release")
 ) {
-  stopifnot(
-    "rev_dep_check_tasks_df requires path argument of length 1" =
-      length(path) == 1
-  )
-
   versions <- match.arg(versions, c("dev", "release"), several.ok = TRUE)
   ap <- utils::available.packages(repos = repos)
   path <- check_path_is_pkg_source(path)
@@ -106,9 +93,9 @@ rev_dep_check_tasks_df <- function(
   }
 
   tasks_function <- if (all(c("dev", "release") %in% versions)) {
-    rev_dep_check_taskss
+    rev_dep_check_tasks
   } else {
-    rev_dep_check_taskss_development
+    rev_dep_check_tasks_development
   }
 
   if ("dev" %in% versions) {
@@ -147,7 +134,7 @@ rev_dep_check_tasks_df <- function(
   df
 }
 
-rev_dep_check_taskss <- function(packages, repos, aliases, revdep) {
+rev_dep_check_tasks <- function(packages, repos, aliases, revdep) {
   list_of_task(mapply(
     function(package, alias) {
       revdep_check_task(
@@ -166,7 +153,7 @@ rev_dep_check_taskss <- function(packages, repos, aliases, revdep) {
   ))
 }
 
-rev_dep_check_taskss_development <- function(
+rev_dep_check_tasks_development <- function(
   packages,
   repos,
   aliases,
@@ -189,17 +176,18 @@ rev_dep_check_taskss_development <- function(
   ))
 }
 
-#' Create a Task to Check a Package from Source
+#' Plan multiple R CMD checks from source package paths
 #'
-#' @inherit checked-task-df
-#' @inheritParams checked-task-df
+#' @inherit plan
+#' @inheritParams plan
 #'
-#' @family tasks
+#' @family plan
 #' @export
-source_check_tasks_df <- function(path) {
+plan_checks <- function(path) {
   name <- names(path)
   path <- vcapply(path, check_path_is_pkg_source, USE.NAMES = FALSE)
   package <- vcapply(path, get_package_name)
+
   alias <- if (is.null(name)) {
     unlist(lapply(unique(package), function(p) {
       idx <- package == p
@@ -213,20 +201,12 @@ source_check_tasks_df <- function(path) {
   } else {
     name
   }
+
   version <- vcapply(path, get_package_version)
 
-  df <- data.frame(
-    alias = alias,
-    version = version
-  )
-
-  df$package <- list_of_task(
-    source_check_tasks(package, path, alias)
-  )
-
-  df$custom <- list_of_task(
-    rep(list(custom_install_task()), times = NROW(df))
-  )
+  df <- data.frame(alias = alias, version = version)
+  df$package <- list_of_task(source_check_tasks(package, path, alias))
+  df$custom <- list_of_task(rep(list(custom_install_task()), times = NROW(df)))
 
   df
 }

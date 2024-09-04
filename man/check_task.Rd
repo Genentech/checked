@@ -35,12 +35,9 @@ Create a task to run \verb{R CMD check}
 }
 \seealso{
 Other tasks: 
-\code{\link{checked-task-df}},
 \code{\link{custom_install_task}()},
 \code{\link{install_task}()},
-\code{\link{rev_dep_check_tasks_df}()},
 \code{\link{revdep_check_task}()},
-\code{\link{source_check_tasks_df}()},
 \code{\link{task}()}
 }
 \concept{tasks}

@@ -10,14 +10,14 @@ manage installation, library setup and run \verb{R CMD check}s in sequence.
 \examples{
 \dontrun{
 library(checked)
-df <- source_check_tasks_df(c(
+plan <- plan_checks(c(
   system.file("example_packages", "exampleBad", package = "checked"),
   system.file("example_packages", "exampleGood", package = "checked")
 ))
 
-plan <- check_design$new(df, n = 10, repos = "https://cran.r-project.org/")
-while (!plan$is_done()) {
-  plan$start_next_task()
+checks <- check_design$new(plan, n = 10, repos = "https://cran.r-project.org/")
+while (!checks$is_done()) {
+  checks$start_next_task()
 }
 }
 

@@ -98,6 +98,7 @@ check_path.pkg_origin <- function(x, output, ...) {
   stop(sprintf("Can't determine origin of package '%s'", x$name))
 }
 
+#' @export
 check_path.pkg_origin_repo <- function(x, output, ...) {
   get_package_source(x$name, x$repos, destdir = output)
 }

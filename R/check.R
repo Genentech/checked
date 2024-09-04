@@ -63,18 +63,16 @@ check_rev_deps <- function(
     reverse_repos = repos,
     restore = TRUE,
     ...) {
-  checks <- rev_dep_check_tasks_df(path = path, repos = reverse_repos)
-
-  plan <- check_design$new(
-    checks,
+  checks <- check_design$new(
+    plan_rev_dep_checks(path = path, repos = reverse_repos),
     n = n,
     output = output,
     lib.loc = lib.loc,
     repos = repos,
   )
 
-  run(plan, ...)
-  plan
+  run(checks, ...)
+  checks
 }
 
 #' Run reverse dependency checks against a development version only
@@ -100,10 +98,8 @@ check_dev_rev_deps <- function(
     repos = getOption("repos"),
     restore = TRUE,
     ...) {
-  checks <- rev_dep_check_tasks_df(path = path, repos = repos, versions = "dev")
-
-  plan <- check_design$new(
-    checks,
+  checks <- check_design$new(
+    plan_rev_dep_checks(path = path, repos = repos, versions = "dev"),
     n = n,
     output = output,
     lib.loc = lib.loc,
@@ -111,8 +107,8 @@ check_dev_rev_deps <- function(
     restore = restore
   )
 
-  run(plan, ...)
-  plan
+  run(checks, ...)
+  checks
 }
 
 #' Check one or more package source directories
@@ -136,10 +132,8 @@ check_pkgs <- function(
     repos = getOption("repos"),
     restore = TRUE,
     ...) {
-  checks <- source_check_tasks_df(path)
-
-  plan <- check_design$new(
-    checks,
+  checks <- check_design$new(
+    plan_checks(path),
     n = n,
     output = output,
     lib.loc = lib.loc,
@@ -147,8 +141,8 @@ check_pkgs <- function(
     restore = restore
   )
 
-  run(plan, ...)
-  plan
+  run(checks, ...)
+  checks
 }
 
 #' Check all package source directories in current directory
@@ -173,7 +167,6 @@ check_dir <- function(
     ...) {
   dirs <- list.dirs(path, full.names = TRUE, recursive = FALSE)
   r_packages <- dirs[vlapply(dirs, path_is_pkg)]
-
   check_pkgs(
     r_packages,
     n = n,

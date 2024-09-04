@@ -30,11 +30,8 @@ Create a custom install task
 \seealso{
 Other tasks: 
 \code{\link{check_task}()},
-\code{\link{checked-task-df}},
 \code{\link{install_task}()},
-\code{\link{rev_dep_check_tasks_df}()},
 \code{\link{revdep_check_task}()},
-\code{\link{source_check_tasks_df}()},
 \code{\link{task}()}
 }
 \concept{tasks}
