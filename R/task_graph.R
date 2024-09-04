@@ -37,7 +37,7 @@ task_edges_df <- function(df, repos) {
   ))
 
   desc <- drlapply(df$custom, function(x) {
-    row <- get_package_spec_dependencies(x$package_spec)
+    row <- pkg_deps(x$package)
     hash <- custom_aliases_map[custom_aliases_map$value == x$alias, ]$hash
     row[, "Package"] <- hash
     row
@@ -49,7 +49,7 @@ task_edges_df <- function(df, repos) {
   # Adding checks to db and custom packages as Depends link
   checks <- drlapply(df$package, function(x) {
     p <- df[df$alias == x$alias, ]
-    row <- get_package_spec_dependencies(x$package_spec)
+    row <- pkg_deps(x$package)
     row[, "Package"] <- x$alias
     if (!is.null(p$custom[[1]]$alias)) {
       row_idx <- custom_aliases_map$value == p$custom[[1]]$alias
@@ -94,7 +94,7 @@ task_edges_df <- function(df, repos) {
   dependencies <- dependencies[!dependencies %in% base_pkgs()]
 
   edges <- drlapply(dependencies, function(p) {
-    edges_per_type <- drlapply(uulist(DEP), function(type) {
+    drlapply(uulist(DEP), function(type) {
       deps <- try(db[db[, "Package"] == p, type], silent = TRUE)
       if (inherits(deps, "try-error") || length(deps) == 0) {
         empty_edge
@@ -126,9 +126,9 @@ task_vertices_df <- function(df, edges, repos) {
     } else if (v %in% custom_pkgs_aliases) {
       df$custom[[utils::head(which(as.character(lapply(df$custom, `[[`, "alias")) == v), 1)]]
     } else {
-      install_task_spec(
+      install_task(
         alias = v,
-        package_spec = package_spec(name = v, repos = repos)
+        package = pkg_origin_repo(name = v, repos = repos)
       )
     }
   })
@@ -311,7 +311,7 @@ task_graph_package_status <- function(g, v) {
 }
 
 
-task_graph_task_spec <- function(g, v) {
+task_graph_task <- function(g, v) {
   igraph::vertex_attr(g, "spec", v)[[1]]
 }
 

@@ -14,9 +14,9 @@ The check schedule \code{data.frame} with the following columns:
 \item \code{alias}: The alias of the check to run. It also serves the purpose of
 providing a unique identifier and node name in the task graph.
 \item \code{version}: Version of the package to be checked.
-\item \code{package}: Object that inherits from \code{\link[=check_task_spec]{check_task_spec()}}.
+\item \code{package}: Object that inherits from \code{\link[=check_task]{check_task()}}.
 Defines how package to be checked can be acquired.
-\item \code{custom}:  Object that inherits from \code{\link[=custom_install_task_spec]{custom_install_task_spec()}}.
+\item \code{custom}:  Object that inherits from \code{\link[=custom_install_task]{custom_install_task()}}.
 Defines custom package, for instance only available from local source, that
 should be installed before checking the package.
 }
@@ -34,12 +34,12 @@ a vector of an arbitrary length.
 }
 \seealso{
 Other tasks: 
-\code{\link{check_task_spec}()},
-\code{\link{custom_install_task_spec}()},
-\code{\link{install_task_spec}()},
+\code{\link{check_task}()},
+\code{\link{custom_install_task}()},
+\code{\link{install_task}()},
 \code{\link{rev_dep_check_tasks_df}()},
-\code{\link{revdep_check_task_spec}()},
+\code{\link{revdep_check_task}()},
 \code{\link{source_check_tasks_df}()},
-\code{\link{task_spec}()}
+\code{\link{task}()}
 }
 \concept{tasks}

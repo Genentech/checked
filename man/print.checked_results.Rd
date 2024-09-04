@@ -2,19 +2,19 @@
 % Please edit documentation in R/results.R
 \name{print.checked_results}
 \alias{print.checked_results}
-\alias{print.checked_results_check_task_spec}
-\alias{print.checked_results_revdep_check_task_spec}
+\alias{print.checked_results_check_task}
+\alias{print.checked_results_revdep_check_task}
 \title{Print checked results}
 \usage{
 \method{print}{checked_results}(x, ...)
 
-\method{print}{checked_results_check_task_spec}(
+\method{print}{checked_results_check_task}(
   x,
   keep = Sys.getenv("CHECKED_RESULTS_KEEP", c("all", "issues", "potential_issues")[1]),
   ...
 )
 
-\method{print}{checked_results_revdep_check_task_spec}(x, ...)
+\method{print}{checked_results_revdep_check_task}(x, ...)
 }
 \arguments{
 \item{x}{an object to be printed.}

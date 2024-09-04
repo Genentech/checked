@@ -27,9 +27,9 @@ empty_checks_df <- data.frame(
 #' * `alias`: The alias of the check to run. It also serves the purpose of
 #'   providing a unique identifier and node name in the task graph.
 #' * `version`: Version of the package to be checked.
-#' * `package`: Object that inherits from [`check_task_spec()`].
+#' * `package`: Object that inherits from [`check_task()`].
 #'   Defines how package to be checked can be acquired.
-#' * `custom`:  Object that inherits from [`custom_install_task_spec()`].
+#' * `custom`:  Object that inherits from [`custom_install_task()`].
 #'   Defines custom package, for instance only available from local source, that
 #'   should be installed before checking the package.
 #'
@@ -105,18 +105,18 @@ rev_dep_check_tasks_df <- function(
     }
   }
 
-  task_specs_function <- if (all(c("dev", "release") %in% versions)) {
-    rev_dep_check_tasks_specs
+  tasks_function <- if (all(c("dev", "release") %in% versions)) {
+    rev_dep_check_taskss
   } else {
-    rev_dep_check_tasks_specs_development
+    rev_dep_check_taskss_development
   }
 
   if ("dev" %in% versions) {
     df_dev$alias <- paste0(df_dev$alias, " (dev)")
-    df_dev$package <- task_specs_function(revdeps, repos, df_dev$alias, "new")
-    df_dev$custom <- rep(list(custom_install_task_spec(
+    df_dev$package <- tasks_function(revdeps, repos, df_dev$alias, "new")
+    df_dev$custom <- rep(list(custom_install_task(
       alias = paste0(package, " (dev)"),
-      package_spec = package_spec_source(name = package, path = path),
+      package = pkg_origin_local(name = package, path = path),
       type = "source"
     )), times = NROW(df_dev))
   }
@@ -124,10 +124,10 @@ rev_dep_check_tasks_df <- function(
   if ("release" %in% versions) {
     package_v <- ap[package, "Version"]
     df_rel$alias <- paste0(df_rel$alias, " (v", package_v, ")")
-    df_rel$package <- task_specs_function(revdeps, repos, df_rel$alias, "old")
-    df_rel$custom <- rep(list(custom_install_task_spec(
+    df_rel$package <- tasks_function(revdeps, repos, df_rel$alias, "old")
+    df_rel$custom <- rep(list(custom_install_task(
       alias = paste0(package, " (release)"),
-      package_spec = package_spec(name = package, repos = repos),
+      package = pkg_origin_repo(name = package, repos = repos),
       # make sure to use the release version built against the same system
       type = "source"
     )), times = NROW(df_dev))
@@ -142,17 +142,17 @@ rev_dep_check_tasks_df <- function(
     df <- rbind(df_dev, df_rel)[idx, ]
   }
 
-  df$package <- list_of_task_spec(df$package)
-  df$custom <- list_of_task_spec(df$custom)
+  df$package <- list_of_task(df$package)
+  df$custom <- list_of_task(df$custom)
   df
 }
 
-rev_dep_check_tasks_specs <- function(packages, repos, aliases, revdep) {
-  list_of_task_spec(mapply(
-    function(p, a) {
-      revdep_check_task_spec(
-        alias = a,
-        package_spec = package_spec(name = p, repos = repos),
+rev_dep_check_taskss <- function(packages, repos, aliases, revdep) {
+  list_of_task(mapply(
+    function(package, alias) {
+      revdep_check_task(
+        alias = alias,
+        package = pkg_origin_repo(name = package, repos = repos),
         env = DEFAULT_R_CMD_CHECK_ENVVARS,
         args = DEFAULT_R_CMD_CHECK_ARGS,
         build_args = DEFAULT_R_CMD_BUILD_ARGS,
@@ -166,17 +166,17 @@ rev_dep_check_tasks_specs <- function(packages, repos, aliases, revdep) {
   ))
 }
 
-rev_dep_check_tasks_specs_development <- function(
+rev_dep_check_taskss_development <- function(
   packages,
   repos,
   aliases,
   ...
 ) {
-  list_of_task_spec(mapply(
-    function(p, a) {
-      check_task_spec(
-        alias = a,
-        package_spec = package_spec(name = p, repos = repos),
+  list_of_task(mapply(
+    function(package, alias) {
+      check_task(
+        alias = alias,
+        package = pkg_origin_repo(name = package, repos = repos),
         env = DEFAULT_R_CMD_CHECK_ENVVARS,
         args = DEFAULT_R_CMD_CHECK_ARGS,
         build_args = DEFAULT_R_CMD_BUILD_ARGS
@@ -220,23 +220,23 @@ source_check_tasks_df <- function(path) {
     version = version
   )
 
-  df$package <- list_of_task_spec(
-    source_check_tasks_specs(package, path, alias)
+  df$package <- list_of_task(
+    source_check_tasks(package, path, alias)
   )
 
-  df$custom <- list_of_task_spec(
-    rep(list(custom_install_task_spec()), times = NROW(df))
+  df$custom <- list_of_task(
+    rep(list(custom_install_task()), times = NROW(df))
   )
 
   df
 }
 
-source_check_tasks_specs <- function(packages, path, aliases) {
-  list_of_task_spec(mapply(
-    function(p, path, a) {
-      check_task_spec(
-        alias = a,
-        package_spec = package_spec_source(name = p, path = path, repos = NULL),
+source_check_tasks <- function(packages, path, aliases) {
+  list_of_task(mapply(
+    function(package, path, alias) {
+      check_task(
+        alias = alias,
+        package = pkg_origin_local(name = package, path = path),
         env = DEFAULT_R_CMD_CHECK_ENVVARS,
         args = DEFAULT_R_CMD_CHECK_ARGS,
         build_args = DEFAULT_R_CMD_BUILD_ARGS

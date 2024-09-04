@@ -69,8 +69,8 @@ results.check_design <- function(
 }
 
 #' @export
-results.list_revdep_check_task_spec <- function(x, output, ...) {
-  name <- vcapply(x, function(y) y$package_spec$name)
+results.list_revdep_check_task <- function(x, output, ...) {
+  name <- vcapply(x, function(y) y$package$name)
   revdep <- vcapply(x, `[[`, "revdep")
   count <- table(name, revdep)
   is_complete_pair <- vlapply(name, function(y) {
@@ -78,7 +78,6 @@ results.list_revdep_check_task_spec <- function(x, output, ...) {
   })
 
   names_complete <- sort(unique(name[is_complete_pair]))
-
 
   new <- lapply(names_complete, function(y) {
     x[[which(name == y & revdep == "new")]]
@@ -95,7 +94,7 @@ results.list_revdep_check_task_spec <- function(x, output, ...) {
 }
 
 #' @export
-results.revdep_check_task_spec <- function(x, y, output, ...) {
+results.revdep_check_task <- function(x, y, output, ...) {
   new <- rcmdcheck_from_json(file.path(path_check_output(output, x$alias), "result.json"))
   old <- rcmdcheck_from_json(file.path(path_check_output(output, y$alias), "result.json"))
 
@@ -140,7 +139,7 @@ results.revdep_check_task_spec <- function(x, y, output, ...) {
 }
 
 #' @export
-results.list_check_task_spec <- function(x, output, ...) {
+results.list_check_task <- function(x, output, ...) {
   alias <- vcapply(x, `[[`, "alias")
   structure(
     lapply(x, results, output = output),
@@ -149,8 +148,9 @@ results.list_check_task_spec <- function(x, output, ...) {
 }
 
 #' @export
-results.check_task_spec <- function(x, output, ...) {
-  x <- rcmdcheck_from_json(file.path(path_check_output(output, x$alias), "result.json"))
+results.check_task <- function(x, output, ...) {
+  json_path <- file.path(path_check_output(output, x$alias), "result.json")
+  x <- rcmdcheck_from_json(json_path)
 
   structure(
     lapply(CHECK_ISSUES_TYPES, function(i) {
@@ -248,12 +248,12 @@ summary.checked_results <- function(object, ...) {
 }
 
 #' @export
-summary.checked_results_revdep_check_task_spec <- function(object, ...) {
-  summary.checked_results_check_task_spec(object, ...)
+summary.checked_results_revdep_check_task <- function(object, ...) {
+  summary.checked_results_check_task(object, ...)
 }
 
 #' @export
-summary.checked_results_check_task_spec <- function(object, ...) {
+summary.checked_results_check_task <- function(object, ...) {
   results_to_df(object, ...)
 }
 
@@ -280,7 +280,7 @@ print.checked_results <- function(x, ...) {
 
 #' @name print.checked_results
 #' @export
-print.checked_results_check_task_spec <- function(
+print.checked_results_check_task <- function(
     x,
     keep = Sys.getenv("CHECKED_RESULTS_KEEP", c("all", "issues", "potential_issues")[1]),
     ...) {
@@ -300,8 +300,8 @@ print.checked_results_check_task_spec <- function(
 
 #' @name print.checked_results
 #' @export
-print.checked_results_revdep_check_task_spec <- function(x, ...) {
-  print.checked_results_check_task_spec(x, ...)
+print.checked_results_revdep_check_task <- function(x, ...) {
+  print.checked_results_check_task(x, ...)
 }
 
 get_issue_header <- function(x) {

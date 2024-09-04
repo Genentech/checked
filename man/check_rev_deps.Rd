@@ -12,7 +12,6 @@ check_rev_deps(
   repos = getOption("repos"),
   reverse_repos = repos,
   restore = TRUE,
-  reporter = reporter_default(),
   ...
 )
 }
@@ -39,9 +38,6 @@ sources to check and different when installing dependencies.}
 \item{restore}{\code{logical} indicating whether output directory should be
 unlinked before running checks. If \code{FALSE}, an attempt will me made to
 restore previous progress from the same \code{output}}
-
-\item{reporter}{A reporter to provide progress updates. Will default to the
-most expressive command-line reporter given your terminal capabilities.}
 
 \item{...}{Additional arguments passed to \code{\link[=run]{run()}}}
 }

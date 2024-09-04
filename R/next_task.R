@@ -37,18 +37,18 @@ task_get_install_lib <- function(g, node, output) {
 }
 
 start_task <- function(task, g, ...) {
-  UseMethod("start_task", task_graph_task_spec(g, task))
+  UseMethod("start_task", task_graph_task(g, task))
 }
 
 #' @export
-start_task.install_task_spec <- function(
+start_task.install_task <- function(
     task,
     g,
     output,
     lib.loc, # nolint object_name_linter
     ...) {
-  spec <- task_graph_task_spec(g, task)
-  install_parameters <- install_parameters(spec$package_spec)
+  spec <- task_graph_task(g, task)
+  install_parameters <- install_params(spec$package)
   libpaths <- c(task_get_lib_loc(g, task, output), lib.loc)
   install_packages_process$new(
     install_parameters$package,
@@ -64,14 +64,14 @@ start_task.install_task_spec <- function(
 }
 
 #' @export
-start_task.custom_install_task_spec <- function(
+start_task.custom_install_task <- function(
     task,
     g,
     output,
     lib.loc, # nolint object_name_linter
     ...) {
-  spec <- task_graph_task_spec(g, task)
-  install_parameters <- install_parameters(spec$package_spec)
+  spec <- task_graph_task(g, task)
+  install_parameters <- install_params(spec$package)
   libpaths <- c(task_get_lib_loc(g, task, output), lib.loc)
   install_packages_process$new(
     install_parameters$package,
@@ -87,21 +87,21 @@ start_task.custom_install_task_spec <- function(
 }
 
 #' @export
-start_task.check_task_spec <- function(
+start_task.check_task <- function(
     task,
     g,
     output,
     lib.loc, # nolint object_name_linter
     ...) {
-  spec <- task_graph_task_spec(g, task)
+  spec <- task_graph_task(g, task)
   libpaths <- c(task_get_lib_loc(g, task, output), lib.loc)
-  path <- check_path(spec$package_spec, output = path_sources())
+  path <- check_path(spec$package, output = path_sources())
 
   check_process$new(
     path = path,
     check_dir = path_check_output(output, spec$alias),
     libpath = libpaths,
-    repos = spec$package_spec$repos,
+    repos = spec$package$repos,
     args = spec$args,
     build_args = spec$build_args,
     env = spec$env
