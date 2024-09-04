@@ -19,13 +19,9 @@ replace_with_map <- function(x, value, replacement) {
   x
 }
 
-unique_alias <- local({
-  n <- 0
-  function(x) {
-    n <<- n + length(x)
-    sprintf("pkg-id-%08d", n - rev(seq_len(length(x))) + 1)
-  }
-})
+unique_alias <- function(x) {
+  paste0(c("pkg-id-", as.character(charToRaw(x))), collapse = "")
+}
 
 dir_create <- function(path) {
   if (!dir.exists(path)) {
