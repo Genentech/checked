@@ -1,6 +1,6 @@
 #' @import options
 options::define_options(
-  "tty refresh interval when reporting results in miliseconds",
+  "tty refresh interval when reporting results in milliseconds",
   tty_tick_interval = 100,
   
   "character vector indicating whether R error should be thrown when issues
