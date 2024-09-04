@@ -100,18 +100,23 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
       )
       
       if (dir.exists(output)) {
-        if (is.na(restore))
-          restore <- switch(
-            menu(
-              c("Yes", "No"),
-              title = "Do you want to restore previous results?"
-            ),
-            "1" = TRUE,
-            "2" = FALSE
-        )
-        
-        if (!restore) {
-          unlink(output, recursive = TRUE, force = TRUE)
+        if (is.na(restore)) {
+          restore <- if (interactive()) {
+            switch(
+              menu(
+                c("Yes", "No"),
+                title = "Do you want to restore previous results?"
+              ),
+              "1" = TRUE,
+              "2" = FALSE
+            )
+          } else {
+            FALSE
+          }
+
+          if (!restore) {
+            unlink(output, recursive = TRUE, force = TRUE)
+          }
         }
       }
       
