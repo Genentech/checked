@@ -15,7 +15,11 @@ task_spec <- function(alias = NULL, package_spec = NULL, env = NULL) {
     list(
       alias = alias,
       package_spec = package_spec,
-      env = merge_default_configuration(env, DEFAULT_R_CMD_CHECK_VARIABLES)
+      env = merge_default_configuration(
+        env, 
+        DEFAULT_CHECK_ENV_VARIABLES,
+        "default_check_env_variables"
+      )
     ),
     class = "task_spec"
   )
@@ -84,8 +88,14 @@ custom_install_task_spec <- function(...) {
 check_task_spec <- function(args = NULL, build_args = NULL, ...) {
   task_spec <- task_spec(...)
   check_spec <- list(
-    args = merge_default_configuration(args, DEFAULT_CHECK_ARGS),
-    build_args = merge_default_configuration(build_args, DEFAULT_BUILD_ARGS)
+    args = merge_default_configuration(
+      args, 
+      DEFAULT_CHECK_ARGS,
+      "default_check_args"),
+    build_args = merge_default_configuration(
+      build_args, 
+      DEFAULT_CHECK_BUILD_ARGS,
+      "default_check_build_args")
   )
 
   structure(

@@ -1,8 +1,8 @@
 #' @import cli
 NULL
 
-merge_default_configuration <- function(conf, default_conf) {
-  if (options::opt("add_default_configuration")) {
+merge_default_configuration <- function(conf, default_conf, option) {
+  if (options::opt(option)) {
     merged <- c(conf, default_conf)
     if (!is.null(names(merged))) {
       merged[!duplicated(names(merged))]

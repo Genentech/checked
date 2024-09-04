@@ -4,24 +4,28 @@
 \alias{options_params}
 \title{Checked Options}
 \arguments{
-\item{keep}{character vector indicating which packages should be included in the results.
-"all" means that all packages are kept. If "issues" then only packages
-with issues identified, whereas "potential_issues" stands for keeping
-packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, overwritable using option 'checked.keep' or environment variable 'R_CHECKED_KEEP')}
-
-\item{error_on}{character vector indicating whether R error should be thrown when issues
+\item{results_error_on}{character vector indicating whether R error should be thrown when issues
 are discovered when generating results. "never" means that no errors
 are thrown. If "issues" then errors are emitted only on issues, whereas
-"potential issues" stands for error on both issues and potential issues. (Defaults to \code{"never"}, overwritable using option 'checked.error_on' or environment variable 'R_CHECKED_ERROR_ON')}
+"potential issues" stands for error on both issues and potential issues. (Defaults to \code{"never"}, overwritable using option 'checked.results_error_on' or environment variable 'R_CHECKED_RESULTS_ERROR_ON')}
 
-\item{tty_tick_interval}{tty refresh interval when reporting results in miliseconds (Defaults to \code{100}, overwritable using option 'checked.tty_tick_interval' or environment variable 'R_CHECKED_TTY_TICK_INTERVAL')}
+\item{default_check_args}{\code{logical} indicating whether default R CMD check args should be appended. (Defaults to \code{TRUE}, overwritable using option 'checked.default_check_args' or environment variable 'R_CHECKED_DEFAULT_CHECK_ARGS')}
 
-\item{add_default_configuration}{\code{logical} indicating whether default R CMD check variables, build args or
-check args should be appended whenever custom user ones were provided. (Defaults to \code{TRUE}, overwritable using option 'checked.add_default_configuration' or environment variable 'R_CHECKED_ADD_DEFAULT_CONFIGURATION')}
+\item{default_check_env_variables}{\code{logical} indicating whether default R CMD check related enviromental
+variables should be appended. (Defaults to \code{TRUE}, overwritable using option 'checked.default_check_env_variables' or environment variable 'R_CHECKED_DEFAULT_CHECK_ENV_VARIABLES')}
+
+\item{results_keep}{character vector indicating which packages should be included in the results.
+"all" means that all packages are kept. If "issues" then only packages
+with issues identified, whereas "potential_issues" stands for keeping
+packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, overwritable using option 'checked.results_keep' or environment variable 'R_CHECKED_RESULTS_KEEP')}
+
+\item{tty_tick_interval}{tty refresh interval when reporting results in milliseconds (Defaults to \code{0.1}, overwritable using option 'checked.tty_tick_interval' or environment variable 'R_CHECKED_TTY_TICK_INTERVAL')}
 
 \item{restore}{\code{logical} indicating whether output directory should be unlinked before
 running checks. If \code{FALSE}, an attempt will me made to restore previous
 progress from the same \code{output} (Defaults to \code{NA}, overwritable using option 'checked.restore' or environment variable 'R_CHECKED_RESTORE')}
+
+\item{default_check_build_args}{\code{logical} indicating whether default R CMD check build args should be appended. (Defaults to \code{TRUE}, overwritable using option 'checked.default_check_build_args' or environment variable 'R_CHECKED_DEFAULT_CHECK_BUILD_ARGS')}
 }
 \description{
 Checked Options

@@ -7,7 +7,7 @@
 \usage{
 results(x, ...)
 
-\method{results}{check_design}(x, error_on = options::opt("error_on"), ...)
+\method{results}{check_design}(x, error_on = options::opt("results_error_on"), ...)
 }
 \arguments{
 \item{x}{\code{\link[checked]{check_design}} object.}
@@ -17,7 +17,7 @@ results(x, ...)
 \item{error_on}{character vector indicating whether R error should be thrown when issues
 are discovered when generating results. "never" means that no errors
 are thrown. If "issues" then errors are emitted only on issues, whereas
-"potential issues" stands for error on both issues and potential issues. (Defaults to \code{"never"}, overwritable using option 'checked.error_on' or environment variable 'R_CHECKED_ERROR_ON')}
+"potential issues" stands for error on both issues and potential issues. (Defaults to \code{"never"}, overwritable using option 'checked.results_error_on' or environment variable 'R_CHECKED_RESULTS_ERROR_ON')}
 }
 \description{
 Get R CMD check results

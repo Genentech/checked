@@ -5,7 +5,7 @@ CHECK_ISSUES_TYPES <- c("notes", "warnings", "errors")
 #' Get R CMD check results
 #'
 #' @param x \code{\link[checked]{check_design}} object.
-#' @inheritParams options_params
+#' @eval options::as_params("error_on" = "results_error_on")
 #' @param ... other parameters.
 #'
 #' @family results
@@ -18,7 +18,7 @@ results <- function(x, ...) {
 #' @rdname results
 results.check_design <- function(
     x,
-    error_on = options::opt("error_on"),
+    error_on = options::opt("results_error_on"),
     ...) {
   error_on <- match.arg(error_on, c("never", "issues", "potential_issues"))
   checks_nodes <- igraph::V(x$graph)[
@@ -256,7 +256,7 @@ summary.checked_results_check_task_spec <- function(object, ...) {
 #' Print checked results
 #'
 #' @param x an object to be printed.
-#' @inheritParams options_params
+#' @eval options::as_params("keep" = "results_keep")
 #' @param ... other parameters.
 #'
 #' @family results
@@ -274,7 +274,7 @@ print.checked_results <- function(x, ...) {
 #' @export
 print.checked_results_check_task_spec <- function(
     x,
-    keep = options::opt("keep"),
+    keep = options::opt("results_keep"),
     ...) {
       
   keep <- match.arg(keep, c("all", "issues", "potential_issues"))

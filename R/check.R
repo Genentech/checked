@@ -77,7 +77,7 @@ check_rev_deps <- function(
     repos = repos,
   )
 
-  run(plan, ...)
+  run(plan, reporter = reporter, ...)
   plan
 }
 
@@ -104,6 +104,7 @@ check_dev_rev_deps <- function(
     lib.loc = .libPaths(), # nolint object_name_linter
     repos = getOption("repos"),
     restore = options::opt("restore"),
+    reporter = reporter_default(),
     ...) {
   
   checks <- rev_dep_check_tasks_df(
@@ -122,7 +123,7 @@ check_dev_rev_deps <- function(
     restore = restore
   )
 
-  run(plan, ...)
+  run(plan, reporter = reporter, ...)
   plan
 }
 
@@ -147,6 +148,7 @@ check_pkgs <- function(
     lib.loc = .libPaths(), # nolint object_name_linter
     repos = getOption("repos"),
     restore = options::opt("restore"),
+    reporter = reporter_default(),
     ...) {
   
   checks <- source_check_tasks_df(path, ...)
@@ -160,7 +162,7 @@ check_pkgs <- function(
     restore = restore
   )
 
-  run(plan, ...)
+  run(plan, reporter = reporter, ...)
   plan
 }
 
@@ -184,6 +186,7 @@ check_dir <- function(
     lib.loc = .libPaths(), # nolint object_name_linter
     repos = getOption("repos"),
     restore = options::opt("restore"),
+    reporter = reporter_default(),
     ...) {
   dirs <- list.dirs(path, full.names = TRUE, recursive = FALSE)
   r_packages <- dirs[vlapply(dirs, path_is_pkg)]
@@ -195,6 +198,7 @@ check_dir <- function(
     lib.loc = lib.loc,
     repos = repos,
     restore = restore,
+    reporter = reporter,
     ...
   )
 }

@@ -239,7 +239,7 @@ source_check_tasks_df <- function(path, ...) {
   )
 
   df$package <- list_of_task_spec(
-    source_check_tasks_specs(package, path, alias)
+    source_check_tasks_specs(package, path, alias, ...)
   )
   df$custom <- list_of_task_spec(
     rep(list(custom_install_task_spec()), times = NROW(df))

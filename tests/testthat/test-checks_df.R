@@ -1,3 +1,14 @@
+examples_path <- system.file("example_packages", package = "checked")
+names <- c("DALEXtra_new", "rd2markdown_new", "exampleGood_new", "exampleOkay_new", "exampleBad_new")
+path <- path_broken <- c(
+  test_path("testing_pkgs", "DALEXtra"),
+  test_path("testing_pkgs", "rd2markdown"),
+  file.path(examples_path, "exampleGood"),
+  file.path(examples_path, "exampleOkay"),
+  file.path(examples_path, "exampleBad")
+)
+names(path_broken) <- names
+
 test_that("rev_dep_check_tasks_df works with deafult params", {
   expect_silent(
     df <- rev_dep_check_tasks_df(
@@ -39,29 +50,31 @@ test_that("task_df functions can specify subprocesses configuration", {
   
   expect_identical(
     df$package[[1]]$env, 
-    c("NOT_CRAN" = "false", DEFAULT_R_CMD_CHECK_VARIABLES)
+    c("NOT_CRAN" = "false", DEFAULT_CHECK_ENV_VARIABLES)
   )
   expect_identical(
     df$package[[1]]$args, 
-    c(c("--some-option", "--other-option"), DEFAULT_CHECK_ARGS)
+    c("--some-option", "--other-option", DEFAULT_CHECK_ARGS)
   )
   expect_identical(
     df$package[[1]]$build_args, 
-    c("--yet-another-option", DEFAULT_BUILD_ARGS)
+    c("--yet-another-option", DEFAULT_CHECK_BUILD_ARGS)
   )
 
   withr::with_envvar(
-    c(R_CHECKED_ADD_DEFAULT_CONFIGURATION = "FALSE"), {
-      expect_silent(
-        df <- rev_dep_check_tasks_df(
-          test_path("testing_pkgs", "DALEXtra"),
-          repos = "https://cran.r-project.org/",
-          env = c("NOT_CRAN" = "false"),
-          args = c("--some-option", "--other-option"),
-          build_args = c("--yet-another-option")
+    c(R_CHECKED_DEFAULT_CHECK_ENV_VARIABLES = "FALSE",
+      R_CHECKED_DEFAULT_CHECK_ARGS = "FALSE",
+      R_CHECKED_DEFAULT_CHECK_BUILD_ARGS = "FALSE"), {
+        expect_silent(
+          df <- rev_dep_check_tasks_df(
+            test_path("testing_pkgs", "DALEXtra"),
+            repos = "https://cran.r-project.org/",
+            env = c("NOT_CRAN" = "false"),
+            args = c("--some-option", "--other-option"),
+            build_args = c("--yet-another-option")
+          )
         )
-      )
-    }
+      }
   )
   
   expect_identical(
@@ -71,6 +84,32 @@ test_that("task_df functions can specify subprocesses configuration", {
   expect_identical(
     df$package[[1]]$args, 
     c("--some-option", "--other-option")
+  )
+  expect_identical(
+    df$package[[1]]$build_args, 
+    "--yet-another-option"
+  )
+  
+  withr::with_envvar(
+    c(R_CHECKED_DEFAULT_CHECK_BUILD_ARGS = "FALSE"), {
+        expect_silent(
+          df <- source_check_tasks_df(
+            path,
+            env = c("NOT_CRAN" = "false"),
+            args = c("--some-option", "--other-option"),
+            build_args = c("--yet-another-option")
+          )
+        )
+      }
+  )
+  
+  expect_identical(
+    df$package[[1]]$env, 
+    c("NOT_CRAN" = "false", DEFAULT_CHECK_ENV_VARIABLES)
+  )
+  expect_identical(
+    df$package[[1]]$args, 
+    c("--some-option", "--other-option", DEFAULT_CHECK_ARGS)
   )
   expect_identical(
     df$package[[1]]$build_args, 
@@ -104,17 +143,8 @@ test_that("rev_dep_check_tasks_df development_only = TRUE", {
 })
 
 test_that("source_check_tasks_df works as expected", {
-  examples_path <- system.file("example_packages", package = "checked")
   expect_silent(
-    df <- source_check_tasks_df(
-      c(
-        test_path("testing_pkgs", "DALEXtra"),
-        test_path("testing_pkgs", "rd2markdown"),
-        file.path(examples_path, "exampleGood"),
-        file.path(examples_path, "exampleOkay"),
-        file.path(examples_path, "exampleBad")
-      )
-    )
+    df <- source_check_tasks_df(path)
   )
   expect_s3_class(df, "data.frame")
   expect_equal(NROW(df), 5)
@@ -132,19 +162,8 @@ test_that("source_check_tasks_df works as expected", {
 })
 
 test_that("source_check_tasks_df aliases are properly handled", {
-  examples_path <- system.file("example_packages", package = "checked")
-  names <- c("DALEXtra_new", "rd2markdown_new", "exampleGood_new", "exampleOkay_new", "exampleBad_new")
-  path <- c(
-    test_path("testing_pkgs", "DALEXtra"),
-    test_path("testing_pkgs", "rd2markdown"),
-    file.path(examples_path, "exampleGood"),
-    file.path(examples_path, "exampleOkay"),
-    file.path(examples_path, "exampleBad")
-  )
-  names(path) <- names
-
   expect_silent(
-    df <- source_check_tasks_df(path)
+    df <- source_check_tasks_df(path_broken)
   )
 
   expect_true(all(endsWith(df$alias, "_new")))

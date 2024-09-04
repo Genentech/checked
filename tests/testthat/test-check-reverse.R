@@ -93,7 +93,7 @@ test_that("check_rev_deps works for a package without release version", {
 
   expect_identical(
     design$input$package[[1]]$env, 
-    c("NOT_CRAN" = "false", DEFAULT_R_CMD_CHECK_VARIABLES)
+    c("NOT_CRAN" = "false", DEFAULT_CHECK_ENV_VARIABLES)
   )
   
   r <- results(design)

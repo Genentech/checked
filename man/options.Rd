@@ -21,27 +21,27 @@ options::opt(x, default, env = "checked")
 
 \describe{
 \item{tty_tick_interval}{\describe{
-tty refresh interval when reporting results in miliseconds\item{default: }{\preformatted{100}}
+tty refresh interval when reporting results in milliseconds\item{default: }{\preformatted{0.1}}
 \item{option: }{checked.tty_tick_interval}
 \item{envvar: }{R_CHECKED_TTY_TICK_INTERVAL (evaluated if possible, raw string otherwise)}
 }}
 
-\item{error_on}{\describe{
+\item{results_error_on}{\describe{
 character vector indicating whether R error should be thrown when issues
 are discovered when generating results. "never" means that no errors
 are thrown. If "issues" then errors are emitted only on issues, whereas
 "potential issues" stands for error on both issues and potential issues.\item{default: }{\preformatted{"never"}}
-\item{option: }{checked.error_on}
-\item{envvar: }{R_CHECKED_ERROR_ON (evaluated if possible, raw string otherwise)}
+\item{option: }{checked.results_error_on}
+\item{envvar: }{R_CHECKED_RESULTS_ERROR_ON (evaluated if possible, raw string otherwise)}
 }}
 
-\item{keep}{\describe{
+\item{results_keep}{\describe{
 character vector indicating which packages should be included in the results.
 "all" means that all packages are kept. If "issues" then only packages
 with issues identified, whereas "potential_issues" stands for keeping
 packages with both "issues" and "potential_issues".\item{default: }{\preformatted{"all"}}
-\item{option: }{checked.keep}
-\item{envvar: }{R_CHECKED_KEEP (evaluated if possible, raw string otherwise)}
+\item{option: }{checked.results_keep}
+\item{envvar: }{R_CHECKED_RESULTS_KEEP (evaluated if possible, raw string otherwise)}
 }}
 
 \item{restore}{\describe{
@@ -52,11 +52,23 @@ progress from the same \code{output}\item{default: }{\preformatted{NA}}
 \item{envvar: }{R_CHECKED_RESTORE (evaluated if possible, raw string otherwise)}
 }}
 
-\item{add_default_configuration}{\describe{
-\code{logical} indicating whether default R CMD check variables, build args or
-check args should be appended whenever custom user ones were provided.\item{default: }{\preformatted{TRUE}}
-\item{option: }{checked.add_default_configuration}
-\item{envvar: }{R_CHECKED_ADD_DEFAULT_CONFIGURATION (evaluated if possible, raw string otherwise)}
+\item{default_check_env_variables}{\describe{
+\code{logical} indicating whether default R CMD check related enviromental
+variables should be appended.\item{default: }{\preformatted{TRUE}}
+\item{option: }{checked.default_check_env_variables}
+\item{envvar: }{R_CHECKED_DEFAULT_CHECK_ENV_VARIABLES (evaluated if possible, raw string otherwise)}
+}}
+
+\item{default_check_build_args}{\describe{
+\code{logical} indicating whether default R CMD check build args should be appended.\item{default: }{\preformatted{TRUE}}
+\item{option: }{checked.default_check_build_args}
+\item{envvar: }{R_CHECKED_DEFAULT_CHECK_BUILD_ARGS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{default_check_args}{\describe{
+\code{logical} indicating whether default R CMD check args should be appended.\item{default: }{\preformatted{TRUE}}
+\item{option: }{checked.default_check_args}
+\item{envvar: }{R_CHECKED_DEFAULT_CHECK_ARGS (evaluated if possible, raw string otherwise)}
 }}
 
 }

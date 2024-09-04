@@ -14,14 +14,14 @@ RE_CHECK <- paste0(
 )
 # nolint end, styler: on
 
-DEFAULT_R_CMD_CHECK_VARIABLES <- c( # nolint
+DEFAULT_CHECK_ENV_VARIABLES <- c( # nolint
   "_R_CHECK_FORCE_SUGGESTS_" = FALSE,
   "_R_CHECK_RD_XREFS_" = FALSE,
   "_R_CHECK_SYSTEM_CLOCK_" = FALSE,
   "_R_CHECK_SUGGESTS_ONLY_" = TRUE
 )
 
-DEFAULT_BUILD_ARGS <- c( # nolint
+DEFAULT_CHECK_BUILD_ARGS <- c( # nolint
   "--no-build-vignettes",
   "--no-manual"
 )

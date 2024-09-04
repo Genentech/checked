@@ -8,7 +8,7 @@
 \usage{
 \method{print}{checked_results}(x, ...)
 
-\method{print}{checked_results_check_task_spec}(x, keep = options::opt("keep"), ...)
+\method{print}{checked_results_check_task_spec}(x, keep = options::opt("results_keep"), ...)
 
 \method{print}{checked_results_revdep_check_task_spec}(x, ...)
 }
@@ -20,7 +20,7 @@
 \item{keep}{character vector indicating which packages should be included in the results.
 "all" means that all packages are kept. If "issues" then only packages
 with issues identified, whereas "potential_issues" stands for keeping
-packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, overwritable using option 'checked.keep' or environment variable 'R_CHECKED_KEEP')}
+packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, overwritable using option 'checked.results_keep' or environment variable 'R_CHECKED_RESULTS_KEEP')}
 }
 \description{
 Print checked results
