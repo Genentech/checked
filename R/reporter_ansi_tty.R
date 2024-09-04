@@ -109,7 +109,7 @@ report_initialize.reporter_ansi_tty <- function(
 report_status.reporter_ansi_tty <- function(reporter, design, envir) { # nolint
   v <- igraph::V(design$graph)
   v_checks <- v[v$type == "check"]
-  n_char_titles <- max(nchar(v_checks$name))
+  n_char_titles <- max(nchar(v_checks$name), 0)
   failed_tasks <- design$failed_tasks()
   failed_packages <- failed_tasks[vlapply(failed_tasks, function(x) x$type == "install")]
 

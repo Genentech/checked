@@ -58,11 +58,10 @@ check_rev_deps <- function(
     path,
     n = 2L,
     output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
-    lib.loc = .libPaths(), # nolint object_name_linter
+    lib.loc = .libPaths(), # nolint: object_name_linter.
     repos = getOption("repos"),
     reverse_repos = repos,
     restore = TRUE,
-    reporter = reporter_default(),
     ...) {
   checks <- rev_dep_check_tasks_df(path = path, repos = reverse_repos)
 

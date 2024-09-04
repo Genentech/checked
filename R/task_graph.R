@@ -20,7 +20,6 @@ task_graph_create <- function(df, repos = getOption("repos")) {
 }
 
 task_edges_df <- function(df, repos) {
-
   if (NROW(df) == 0) {
     return(empty_edge)
   }
@@ -31,10 +30,10 @@ task_edges_df <- function(df, repos) {
 
   # Add custom packages to db
   custom_aliases_idx <- which(vlapply(df$custom, function(x) !is.null(x$alias)))
-  custom_aliases <- vcapply(df$custom[custom_aliases_idx], `[[`, "alias")
+  custom_aliases <- unique(vcapply(df$custom[custom_aliases_idx], `[[`, "alias"))
   custom_aliases_map <- unique(data.frame(
     value = custom_aliases,
-    hash = vcapply(custom_aliases, hash_alias)
+    hash = vcapply(custom_aliases, unique_alias)
   ))
 
   desc <- drlapply(df$custom, function(x) {
@@ -43,10 +42,9 @@ task_edges_df <- function(df, repos) {
     row[, "Package"] <- hash
     row
   })
+
   # Drop potential duplicates
   desc <- unique(desc)
-
-  browser()
 
   # Adding checks to db and custom packages as Depends link
   checks <- drlapply(df$package, function(x) {

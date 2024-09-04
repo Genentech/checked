@@ -1,8 +1,9 @@
 create_temp_repo <- function(dir, repo_path) {
-  dir.create(ctburl <- utils::contrib.url(repo_path, type = "source"), recursive = TRUE)
+  contrib_url <- utils::contrib.url(repo_path, type = "source")
+  dir.create(contrib_url, recursive = TRUE)
   sources <- list.files(dir, pattern = "^.*\\.tar\\.gz$", full.names = TRUE)
-  vapply(sources, file.copy, FUN.VALUE = logical(1), to = ctburl)
-  tools::write_PACKAGES(ctburl, type = "source")
+  vapply(sources, file.copy, FUN.VALUE = logical(1), to = contrib_url)
+  tools::write_PACKAGES(contrib_url, type = "source")
 }
 
 sources_old <- test_path("testing_pkgs", "revdeps", "v1")
@@ -15,9 +16,14 @@ create_temp_repo(sources_old, repo_dir)
 test_that("check_rev_deps works for package with no revdeps", {
   # Ensure source installation to make sure test works also on mac and windows
   withr::with_options(list(pkgType = "source"), {
-    expect_no_error(design <- check_rev_deps(
-      file.path(sources_new, "pkg.none"),
-      n = 2L, repos = repo))
+    expect_no_error(
+      design <- check_rev_deps(
+        file.path(sources_new, "pkg.none"),
+        n = 2L,
+        repos = repo,
+        reporter = NULL
+      )
+    )
   })
 
   r <- results(design)
@@ -31,7 +37,10 @@ test_that("check_rev_deps works for package with one breaking change", {
   withr::with_options(list(pkgType = "source"), {
     design <- check_rev_deps(
       file.path(sources_new, "pkg.ok.error"),
-      n = 2L, repos = repo)
+      n = 2L,
+      repos = repo,
+      reporter = NULL
+    )
   })
 
   r <- results(design)
@@ -88,7 +97,10 @@ test_that("check_rev_deps works for a package without release version", {
   withr::with_options(list(pkgType = "source"), {
     expect_warning(design <- check_rev_deps(
       file.path(sources_new, "pkg.suggests"),
-      n = 2L, repos = repo))
+      n = 2L,
+      repos = repo,
+      reporter = NULL
+    ))
   })
 
   r <- results(design)

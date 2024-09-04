@@ -21,9 +21,9 @@ test_that("rev_dep_check_tasks_df works with deafult params", {
   expect_true(all(endsWith(df$alias[seq(2, NROW(df), by = 2)], "(v2.3.0)")))
 
   # Test displayes
-  expect_no_error(print(df))
-  expect_no_error(print(df$package))
-  expect_no_error(print(df$custom))
+  expect_no_error(expect_output(print(df)))
+  expect_no_error(expect_output(print(df$package)))
+  expect_no_error(expect_output(print(df$custom)))
 })
 
 test_that("rev_dep_check_tasks_df development_only = TRUE", {

@@ -1,10 +1,15 @@
 test_that("check_pkgs works as expected", {
   examples_path <- system.file("example_packages", package = "checked")
   # WIP
-  expect_no_error(check_pkgs(c(
-    file.path(examples_path, "exampleGood"),
-    file.path(examples_path, "exampleBad")
-  ), n = 2L, repos = "https://cran.r-project.org/"))
+  expect_no_error(check_pkgs(
+    c(
+      file.path(examples_path, "exampleGood"),
+      file.path(examples_path, "exampleBad")
+    ),
+    n = 2L,
+    repos = "https://cran.r-project.org/",
+    reporter = NULL
+  ))
 })
 
 test_that("check_pkgs works as expected", {
@@ -15,7 +20,8 @@ test_that("check_pkgs works as expected", {
       file.path(examples_path, "exampleGood"),
       file.path(examples_path, "exampleBad")
     ),
-    n = 2L, repos = "https://cran.r-project.org/",
-    reporter = checked:::reporter_ansi_tty()
+    n = 2L,
+    repos = "https://cran.r-project.org/",
+    reporter = NULL
   ))
 })
