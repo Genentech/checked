@@ -1,7 +1,7 @@
 #' Check Design Runner Reporters
 #'
 #' Reporters are used to configure how output is communicated while running
-#' a [`check_design`]. They range from glossy command-line tools intended for
+#' a [`checker`]. They range from glossy command-line tools intended for
 #' displaying progress in an interactive R session, to line-feed logs which
 #' may be better suited for automated execution, such as in continuous
 #' itegration.
@@ -63,7 +63,7 @@ reporter_default <- function() {
 #'   thin wrapper around an environment with a class name for dispatch. The
 #'   reporter is mutable and captures any necessary state that needs to be
 #'   tracked while reporting.
-#' @param design [`check_design`] The check design to report as it evaluates.
+#' @param design [`checker`] The check design to report as it evaluates.
 #' @param envir `environment` An environment to attach to, to leverage on-exit
 #'   hooks.
 #' @param sleep `numeric` An interval to pause between reporter steps.

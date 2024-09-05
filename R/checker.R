@@ -3,20 +3,20 @@
 #' Instantiate a check design from a path or directory.
 #'
 #' @param x A file path, passed to [`rev_dep_check_tasks_df()`]
-#' @param ... Additional arguments passed to [`new_check_design()`]
+#' @param ... Additional arguments passed to [`new_checker()`]
 #'
 #' @family checks
 #' @export
-new_check_design <- function(...) {
-  check_design$new(...)
+new_checker <- function(...) {
+  checker$new(...)
 }
 
 #' @family checks
-#' @name new_check_design
+#' @name new_checker
 #' @export
-new_rev_dep_check_design <- function(x, ...) {
+new_rev_dep_checker <- function(x, ...) {
   plan <- plan_rev_dep_checks(x)
-  new_check_design(plan, ...)
+  new_checker(plan, ...)
 }
 
 #' `R6` Checks Coordinator
@@ -33,16 +33,21 @@ new_rev_dep_check_design <- function(x, ...) {
 #'   system.file("example_packages", "exampleGood", package = "checked")
 #' ))
 #'
-#' checks <- check_design$new(plan, n = 10, repos = "https://cran.r-project.org/")
-#' while (!checks$is_done()) {
-#'   checks$start_next_task()
+#' orchestrator <- checker$new(
+#'   plan,
+#'   n = 10,
+#'   repos = "https://cran.r-project.org/"
+#' )
+#'
+#' while (!orchestrator$is_done()) {
+#'   orchestrator$start_next_task()
 #' }
 #' }
 #'
 #' @family checks
 #' @export
-check_design <- R6::R6Class( # nolint cyclocomp_linter
-  "check_design",
+checker <- R6::R6Class( # nolint: cyclocomp_linter.
+  "checker",
   public = list(
     #' @field graph (`igraph::igraph()`)\cr
     #' A dependency graph, storing information about which dependencies
@@ -50,9 +55,9 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
     #' Created with [`task_graph_create()`]
     graph = NULL,
 
-    #' @field input (`data.frame()`)\cr
+    #' @field plan (`data.frame()`)\cr
     #' Checks task `data.frame` which is the source of all the checks.
-    input = NULL,
+    plan = NULL,
 
     #' @field output (`character(1)`)\cr
     #' Output directory where raw results and temporary library will
@@ -65,7 +70,7 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
     #' Use checks data.frame to generate task graph in which all dependencies
     #' and installation order are embedded.
     #'
-    #' @param df `check_design` data.frame.
+    #' @param plan `plan` `data.frame`.
     #' @param n `integer` value indicating maximum number of subprocesses that
     #'    can be simultaneously spawned when executing tasks.
     #' @param output `character` value specifying path where the output should
@@ -79,36 +84,39 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
     #'   restore previous progress from the same `output`.
     #' @param ... Additional arguments unused
     #'
-    #' @return [check_design].
+    #' @return [checker].
     initialize = function(
-      df,
+      plan,
       n = 2L,
       output = tempfile(paste(packageName(), Sys.Date(), sep = "-")),
-      lib.loc = .libPaths(), # nolint object_name_linter
+      lib.loc = .libPaths(), # nolint: object_name_linter.
       repos = getOption("repos"),
       restore = TRUE,
       ...
     ) {
+      ap <- available.packages(repos = repos)
+      custom_alias <- uulist(drlapply(plan$custom, `[[`, "alias"))
+      all_alias_unique <- !any(duplicated(plan$alias))
+      all_alias_distinct <- !any(plan$alias %in% ap[, "Package"])
+      all_custom_distinct <- !any(custom_alias %in% plan$alias)
+
       # Make sure all aliases are unique
       stopifnot(
-        "Check task aliases has to be unique" =
-          !any(duplicated(df$alias)),
-        "Check task aliases cannot have the same name as any of the available packages" = # nolint
-          !any(df$alias %in% available.packages(repos = repos)[, "Package"]),
-        "Custom package aliases cannot be duplicates of check aliases" =
-          !any(uulist(drlapply(df$custom, `[[`, "alias")) %in% df$alias)
+        "Task aliases have to be unique" = all_alias_unique,
+        "Task aliases cannot have the same name as any available package" = all_alias_distinct, # nolint: line_length_linter.
+        "Custom package aliases cannot be duplicates of check aliases" = all_custom_distinct # nolint: line_length_linter.
       )
 
       if (!restore) unlink(output, recursive = TRUE, force = TRUE)
       dir_create(output)
 
-      self$input <- df
+      self$plan <- plan
       self$output <- output
       private$n <- n
       private$lib.loc <- lib.loc
       private$repos <- repos
 
-      g <- task_graph_create(df, repos)
+      g <- task_graph_create(plan, repos)
       self$graph <- task_graph_update_done(g, c(path_lib(output), lib.loc))
       private$restore_complete_checks()
     },
@@ -224,7 +232,7 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
       TRUE
     },
     restore_complete_checks = function() {
-      checks <- self$input$alias
+      checks <- self$plan$alias
       check_done <- vlapply(checks, function(check) {
         file.exists(file.path(
           path_check_output(self$output, check),
@@ -244,11 +252,11 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
 )
 
 #' @export
-print.check_design <- function(x, ...) {
+print.checker <- function(x, ...) {
   if (x$is_done()) {
     print(results(x, ...), ...)
   } else {
-    print(x$input, ...)
+    print(x$plan, ...)
   }
   invisible(x)
 }

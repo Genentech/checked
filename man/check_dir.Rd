@@ -46,10 +46,11 @@ regarding checks that run. Can be combined with
 }
 \seealso{
 Other checks: 
-\code{\link{check_design}},
 \code{\link{check_dev_rev_deps}()},
 \code{\link{check_pkgs}()},
 \code{\link{check_rev_deps}()},
-\code{\link{new_check_design}()}
+\code{\link{checker}},
+\code{\link{new_check_design}},
+\code{\link{new_checker}()}
 }
 \concept{checks}

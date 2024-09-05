@@ -25,7 +25,7 @@
 #' @param ... Additional arguments passed to [`run()`]
 #'
 #' @return
-#'   [`check_design()`] R6 class storing all the details
+#'   [`checker()`] R6 class storing all the details
 #'   regarding checks that run. Can be combined with
 #'   [`results`] and [`summary()`] methods to generate results.
 #'
@@ -63,7 +63,7 @@ check_rev_deps <- function(
     reverse_repos = repos,
     restore = TRUE,
     ...) {
-  checks <- check_design$new(
+  checks <- checker$new(
     plan_rev_dep_checks(path = path, repos = reverse_repos),
     n = n,
     output = output,
@@ -98,7 +98,7 @@ check_dev_rev_deps <- function(
     repos = getOption("repos"),
     restore = TRUE,
     ...) {
-  checks <- check_design$new(
+  checks <- checker$new(
     plan_rev_dep_checks(path = path, repos = repos, versions = "dev"),
     n = n,
     output = output,
@@ -132,7 +132,7 @@ check_pkgs <- function(
     repos = getOption("repos"),
     restore = TRUE,
     ...) {
-  checks <- check_design$new(
+  checks <- checker$new(
     plan_checks(path),
     n = n,
     output = output,

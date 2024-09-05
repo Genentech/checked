@@ -4,12 +4,13 @@ CHECK_ISSUES_TYPES <- c("notes", "warnings", "errors")
 #'
 #' Get R CMD check results
 #'
-#' @param x \code{\link[checked]{check_design}} object.
+#' @param x [`checker`] object.
 #' @param error_on character vector indicating whether R error should be thrown
-#' when issues are discovered when generating results. "never" means that no
-#' errors are thrown. If "issues" then errors are emitted only on issues, whereas
-#' "potential issues" stands for error on both issues and potential issues. Users
-#' can set the default value via env variable \code{CHECKED_RESULTS_ERROR_ON}.
+#'   when issues are discovered when generating results. "never" means that no
+#'   errors are thrown. If "issues" then errors are emitted only on issues,
+#'   whereas "potential issues" stands for error on both issues and potential
+#'   issues. Users can set the default value via env variable
+#'   `CHECKED_RESULTS_ERROR_ON`.
 #' @param ... other parameters.
 #'
 #' @family results
@@ -20,7 +21,7 @@ results <- function(x, ...) {
 
 #' @export
 #' @rdname results
-results.check_design <- function(
+results.checker <- function(
     x,
     error_on = Sys.getenv("CHECKED_RESULTS_ERROR_ON", c("never", "issues", "potential_issues")[1]),
     ...) {
@@ -238,7 +239,7 @@ count.potential_issues <- function(d, issues_type = "potential_issues", ...) {
 }
 
 #' @export
-summary.check_design <- function(object, ...) {
+summary.checker <- function(object, ...) {
   summary(results(object), ...)
 }
 

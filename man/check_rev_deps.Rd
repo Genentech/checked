@@ -62,10 +62,11 @@ identify changes in reverse dependency behaviors.
 }
 \seealso{
 Other checks: 
-\code{\link{check_design}},
 \code{\link{check_dev_rev_deps}()},
 \code{\link{check_dir}()},
 \code{\link{check_pkgs}()},
-\code{\link{new_check_design}()}
+\code{\link{checker}},
+\code{\link{new_check_design}},
+\code{\link{new_checker}()}
 }
 \concept{checks}

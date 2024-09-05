@@ -17,7 +17,7 @@ test_that("check_rev_deps works for package with no revdeps", {
   # Ensure source installation to make sure test works also on mac and windows
   withr::with_options(list(pkgType = "source"), {
     expect_no_error(
-      design <- check_rev_deps(
+      checks <- check_rev_deps(
         file.path(sources_new, "pkg.none"),
         n = 2L,
         repos = repo,
@@ -26,7 +26,7 @@ test_that("check_rev_deps works for package with no revdeps", {
     )
   })
 
-  r <- results(design)
+  r <- results(checks)
   expect_s3_class(r, "checked_results")
   expect_true(is.list(r))
   expect_length(r, 0L)

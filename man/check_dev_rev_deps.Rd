@@ -49,10 +49,11 @@ as a \code{Suggests} dependency.
 }
 \seealso{
 Other checks: 
-\code{\link{check_design}},
 \code{\link{check_dir}()},
 \code{\link{check_pkgs}()},
 \code{\link{check_rev_deps}()},
-\code{\link{new_check_design}()}
+\code{\link{checker}},
+\code{\link{new_check_design}},
+\code{\link{new_checker}()}
 }
 \concept{checks}

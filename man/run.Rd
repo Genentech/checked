@@ -4,17 +4,17 @@
 \alias{run}
 \title{Run a Series of \verb{R CMD check}s}
 \usage{
-run(design, ..., reporter = reporter_default())
+run(checker, ..., reporter = reporter_default())
 }
 \arguments{
-\item{design}{\code{character} or \code{check_design} If a \code{character} value is
-provided, it is first coerced into a \code{check_design} using
-\code{\link[=new_rev_dep_check_design]{new_rev_dep_check_design()}}.}
-
 \item{...}{Additional arguments passed to \code{\link[=new_rev_dep_check_design]{new_rev_dep_check_design()}}}
 
 \item{reporter}{A reporter to provide progress updates. Will default to the
 most expressive command-line reporter given your terminal capabilities.}
+
+\item{checks}{\code{character} or \code{check_design} If a \code{character} value is
+provided, it is first coerced into a \code{check_design} using
+\code{\link[=new_rev_dep_check_design]{new_rev_dep_check_design()}}.}
 }
 \description{
 \code{\link[=run]{run()}} provides a generic, and is the central interface for executing

@@ -47,10 +47,11 @@ in parallel for all source packages whose source code is found in the
 }
 \seealso{
 Other checks: 
-\code{\link{check_design}},
 \code{\link{check_dev_rev_deps}()},
 \code{\link{check_dir}()},
 \code{\link{check_rev_deps}()},
-\code{\link{new_check_design}()}
+\code{\link{checker}},
+\code{\link{new_check_design}},
+\code{\link{new_checker}()}
 }
 \concept{checks}
