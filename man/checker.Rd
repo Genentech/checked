@@ -33,7 +33,6 @@ Other checks:
 \code{\link{check_dir}()},
 \code{\link{check_pkgs}()},
 \code{\link{check_rev_deps}()},
-\code{\link{new_check_design}},
 \code{\link{new_checker}()}
 }
 \concept{checks}
@@ -113,7 +112,7 @@ restore previous progress from the same \code{output}.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-\link{check_design}.
+\link{checker}.
 }
 }
 \if{html}{\out{<hr>}}

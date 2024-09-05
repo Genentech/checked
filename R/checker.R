@@ -193,6 +193,7 @@ checker <- R6::R6Class( # nolint: cyclocomp_linter.
       finished <- (length(private$active) == 0) && self$is_done()
       return(-finished)
     },
+
     #' @description
     #' Check if checks are done
     #'
@@ -203,19 +204,20 @@ checker <- R6::R6Class( # nolint: cyclocomp_linter.
     }
   ),
   private = list(
-    # Values
-
     # maximum child process count
     n = 2L,
+
     # lib.loc of allowed packages,
     lib.loc = NULL,
+
     # repositories to fetch dependencies from
     repos = getOption("repos"),
+
     # active processes
     active = list(),
+
     # failed tasks
     failed = list(),
-    # Methods
 
     push_process = function(task, x) {
       task_graph_task_process(self$graph, task) <- x
@@ -231,6 +233,7 @@ checker <- R6::R6Class( # nolint: cyclocomp_linter.
       private$active[[name]] <- x
       TRUE
     },
+
     restore_complete_checks = function() {
       checks <- self$plan$alias
       check_done <- vlapply(checks, function(check) {
@@ -245,6 +248,7 @@ checker <- R6::R6Class( # nolint: cyclocomp_linter.
         STATUS$done
       )
     },
+
     pop_process = function(name) {
       private$active[[name]] <- NULL
     }

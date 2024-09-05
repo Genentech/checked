@@ -2,12 +2,15 @@
 % Please edit documentation in R/checker.R
 \name{new_checker}
 \alias{new_checker}
+\alias{new_rev_dep_checker}
 \title{Creating new Check Design Objects}
 \usage{
 new_checker(...)
+
+new_rev_dep_checker(x, ...)
 }
 \arguments{
-\item{...}{Additional arguments passed to \code{\link[=new_check_design]{new_check_design()}}}
+\item{...}{Additional arguments passed to \code{\link[=new_checker]{new_checker()}}}
 
 \item{x}{A file path, passed to \code{\link[=rev_dep_check_tasks_df]{rev_dep_check_tasks_df()}}}
 }
@@ -20,7 +23,13 @@ Other checks:
 \code{\link{check_dir}()},
 \code{\link{check_pkgs}()},
 \code{\link{check_rev_deps}()},
-\code{\link{checker}},
-\code{\link{new_check_design}}
+\code{\link{checker}}
+
+Other checks: 
+\code{\link{check_dev_rev_deps}()},
+\code{\link{check_dir}()},
+\code{\link{check_pkgs}()},
+\code{\link{check_rev_deps}()},
+\code{\link{checker}}
 }
 \concept{checks}

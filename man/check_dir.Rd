@@ -36,7 +36,7 @@ restore previous progress from the same \code{output}}
 \item{...}{Additional arguments passed to \code{\link[=run]{run()}}}
 }
 \value{
-\code{\link[=check_design]{check_design()}} R6 class storing all the details
+\code{\link[=checker]{checker()}} R6 class storing all the details
 regarding checks that run. Can be combined with
 \code{\link{results}} and \code{\link[=summary]{summary()}} methods to generate results.
 }
@@ -50,7 +50,6 @@ Other checks:
 \code{\link{check_pkgs}()},
 \code{\link{check_rev_deps}()},
 \code{\link{checker}},
-\code{\link{new_check_design}},
 \code{\link{new_checker}()}
 }
 \concept{checks}
