@@ -4,7 +4,7 @@
 \alias{install_task}
 \title{Create a task to install a package and dependencies}
 \usage{
-install_task(type = getOption("pkgType"), INSTALL_opts = NULL, ...)
+install_task(origin, type = getOption("pkgType"), INSTALL_opts = NULL, ...)
 }
 \arguments{
 \item{type}{character, indicating the type of package to download and

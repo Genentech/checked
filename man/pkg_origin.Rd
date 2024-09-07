@@ -7,23 +7,23 @@
 \alias{pkg_origin_archive}
 \title{Package specification}
 \usage{
-pkg_origin(name, ..., .class = c())
+pkg_origin(package, ..., .class = c())
 
-pkg_origin_repo(repos, ...)
+pkg_origin_repo(package, repos, ...)
 
 pkg_origin_local(path = NULL, ...)
 
 pkg_origin_archive(path = NULL, ...)
 }
 \arguments{
-\item{name}{name of the package.}
-
 \item{...}{parameters passed to downstream constructors}
 
 \item{repos}{repository where package with given name should identified.}
 
 \item{path}{path to the source of the package (either bundled or not). URLs
 are acceptable.}
+
+\item{name}{name of the package.}
 }
 \description{
 Create package specification list which consists of all the details required

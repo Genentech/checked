@@ -1,3 +1,54 @@
+filepath <- function(x) {
+  structure(x, class = "filepath")
+}
+
+#' @export
+format.filepath <- function(x, ..., pretty = FALSE) {
+  if (!pretty) {
+    return(as.character(x))
+  }
+
+  wp <- path_parts(getwd())
+  xp <- path_parts(normalizePath(x))
+  min_len <- min(length(wp), length(xp))
+  first_diff <- Position(identity, head(wp, min_len) != head(xp, min_len))
+
+  if (is.na(first_diff)) {
+    parts <- utils::tail(xp, -min_len)
+    if (length(parts) == 0) {
+      parts <- "."
+    }
+    return(format(do.call(file.path, as.list(parts))))
+  }
+
+  if (first_diff > min_len) {
+    parts <- utils::tail(xp, -first_diff + 1)
+    format(do.call(file.path, as.list(parts)))
+  } else if (first_diff <= min_len) {
+    parents <- rep_len("..", length(xp) - first_diff + 1)
+    parts <- c(parents, utils::tail(xp, -first_diff + 1))
+    format(do.call(file.path, as.list(parts)))
+  } else {
+    format(x)
+  }
+}
+
+#' Split a Filepath into Parts
+#'
+#' @param x A `character(1L)` or `filepath`
+#' @value A `character` vector of path parts
+#'
+#' @keywords internal
+path_parts <- function(x) {
+  parts <- character()
+  repeat {
+    parts[[length(parts) + 1L]] <- basename(x)
+    if (x == dirname(x)) break
+    x <- dirname(x)
+  }
+  rev(parts)
+}
+
 path_default <- function() {
   file.path(tempdir(), utils::packageName())
 }

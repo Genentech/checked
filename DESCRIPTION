@@ -36,8 +36,10 @@ Imports:
     cli,
     igraph,
     jsonlite,
+	memoise,
     R6,
     rcmdcheck,
+	rlang,
     utils (>= 3.6.2),
     tools
 Roxygen: list(markdown = TRUE)

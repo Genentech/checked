@@ -39,7 +39,6 @@ drmapply <- function(...) {
   do.call(rbind, mapply(..., USE.NAMES = FALSE, SIMPLIFY = FALSE))
 }
 
-uulist <- function(...) unique(as.character(unlist(...)))
 vcapply <- function(...) vapply(..., FUN.VALUE = character(1L))
 vlapply <- function(...) vapply(..., FUN.VALUE = logical(1L))
 viapply <- function(...) vapply(..., FUN.VALUE = integer(1L))

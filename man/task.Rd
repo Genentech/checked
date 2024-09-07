@@ -4,19 +4,20 @@
 \alias{task}
 \title{Task specification}
 \usage{
-task(alias = NULL, package = NULL, env = NULL)
+task(x, ...)
 }
 \arguments{
 \item{alias}{task alias which also serves as unique identifier of the task.}
 
 \item{package}{\code{\link[checked]{package}} object}
-
-\item{env}{environmental variables to be set in separate process running
-specific task.}
 }
 \description{
 Create task specification list which consists of all the details required
 to run specific task.
+}
+\details{
+Tasks can be nested, representing either a singular task, or a set of
+related tasks.
 }
 \seealso{
 Other tasks: 

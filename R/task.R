@@ -3,19 +3,16 @@
 #' Create task specification list which consists of all the details required
 #' to run specific task.
 #'
+#' Tasks can be nested, representing either a singular task, or a set of 
+#' related tasks.
+#'
 #' @param alias task alias which also serves as unique identifier of the task.
 #' @param package \code{\link[checked]{package}} object
-#' @param env environmental variables to be set in separate process running
-#' specific task.
 #'
 #' @family tasks
 #' @export
-task <- function(alias = NULL, package = NULL, env = NULL) {
-  structure(list(alias = alias, package = package, env = env), class = "task")
-}
-
-list_of_task <- function(x, ...) {
-  structure(x, class = c("list_of_task", "list"))
+task <- function(x, ...) {
+  structure(x, class = c("task", class(x)))
 }
 
 #' @family tasks
@@ -27,7 +24,12 @@ print.task <- function(x, ...) {
 #' @family tasks
 #' @export
 format.task <- function(x, ...) {
-  paste0("<task ", x$alias, ">")
+  if (is.list(x)) {
+    fmt_tasks <- paste0(vcapply(x, function(xi) format(xi)), collapse = ", ")
+    return(paste0("[", fmt_tasks, "]"))
+  }
+
+  NextMethod()
 }
 
 #' @family tasks
@@ -44,15 +46,26 @@ format.list_of_task <- function(x, ...) {
 #' @family tasks
 #' @export
 install_task <- function(
+  origin,
   type = getOption("pkgType"),
   INSTALL_opts = NULL, # nolint: object_name_linter.
   ...
 ) {
-  task <- task(...)
+  task <- task(list(origin = origin, ...))
   task$type <- type
   task$INSTALL_opts <- INSTALL_opts
   class(task) <- c("install_task", class(task))
   task
+}
+
+is_install_task <- function(x) {
+  inherits(x, "install_task")
+}
+
+#' @family tasks
+#' @export
+format.install_task <- function(x, ...) {
+  paste0("<install ", format(x$origin), ">")
 }
 
 #' Create a custom install task
@@ -74,12 +87,23 @@ custom_install_task <- function(...) {
 #'
 #' @family tasks
 #' @export
-check_task <- function(args = NULL, build_args = NULL, ...) {
-  task <- task(...)
+check_task <- function(build_args = NULL, args = NULL, env = NULL, ...) {
+  task <- task(list(...))
+  task$env <- env
   task$args <- args
   task$build_args <- build_args
   class(task) <- c("check_task", class(task))
   task
+}
+
+is_check_task <- function(x) {
+  inherits(x, "check_task")
+}
+
+#' @family tasks
+#' @export
+format.check_task <- function(x, ...) {
+  paste0("<check ", format(x$origin), ">")
 }
 
 #' Create a task to run reverse dependency checks
@@ -96,4 +120,66 @@ revdep_check_task <- function(revdep, ...) {
   task["revdep"] <- list(revdep)
   class(task) <- c("revdep_check_task", class(task))
   task
+}
+
+tasks <- function(x) {
+  structure(x, class = "tasks")
+}
+
+#' @export
+format.tasks <- function(x, ...) {
+  elems <- lapply(x, function(xi) format(xi, ...))
+  paste0("[", paste0(elems, collapse = ", "), "]")
+}
+
+as_desc <- function(x, ...) {
+  UseMethod("as_desc")
+}
+
+#' @export
+as_desc.list <- function(x, ...) {
+  descs <- list()
+  length(descs) <- length(x)
+  for (i in seq_along(x)) descs[[i]] <- as_desc(x[[i]])
+  descs <- bind_descs(descs)
+  descs <- sub_aliased_desc(descs)
+  descs
+}
+
+#' @export
+as_desc.install_task <- function(x, ...) {
+  as_desc(x$origin)
+}
+
+#' @export
+as_desc.check_task <- function(x, ...) {
+  as_desc(x$origin)
+}
+
+#' @export
+as_desc.character <- function(x) {
+  desc <- read.dcf(x)
+  read.dcf(x, fields = unique(c(colnames(desc), names(DEP))))
+}
+
+#' @export
+as_desc.pkg_origin_local <- function(x) {
+  desc <- as_desc(file.path(x$source, "DESCRIPTION"))
+
+  # generate a local alias to differentiate package from same package
+  # installed from other sources
+  local_alias <- substring(cli::hash_obj_sha256(task), 1, 12)
+
+  # update the Package field, replacing actual name with an alias
+  desc <- cbind(desc, Alias = x$package)
+  desc[, "Package"] <- local_alias
+  rownames(desc) <- local_alias
+
+  desc
+}
+
+#' @export
+as_desc.pkg_origin_repo <- function(x) {
+  ap <- available_packages(repos = x$repos)
+  ap[x$package, , drop = FALSE]
 }

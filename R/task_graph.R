@@ -10,8 +10,8 @@
 #' @keywords internal
 #' @importFrom igraph V
 task_graph_create <- function(df, repos = getOption("repos")) {
-  edges <- task_edges_df(df, repos)
-  vertices <- task_vertices_df(df, edges, repos)
+  edges <- task_graph_edges(df, repos)
+  vertices <- task_graph_vertices(df, edges, repos)
 
   g <- igraph::graph_from_data_frame(edges, vertices = vertices)
   igraph::V(g)$status <- STATUS$pending  # nolint object_name_linter
@@ -19,103 +19,89 @@ task_graph_create <- function(df, repos = getOption("repos")) {
   task_graph_sort(g)
 }
 
-task_edges_df <- function(df, repos) {
-  if (NROW(df) == 0) {
-    return(empty_edge)
-  }
+#' Build task graph edges
+#'
+#' Edges describe relationships between tasks. Often, this is a dependency
+#' between packages, requiring that some package be installed before a latter
+#' task can be executed.
+#'
+#' [`tools::package_dependencies()`] is used to calculate these relationships.
+#' However, the package data returned by [`utils::available.packages()`],
+#' that is used internally to determine dependencies does not know about
+#' local or remote packages, so those are first appended to this data set
+#' prior to calculating edges. The bulk of this function serves to join this
+#' data.
+#'
+#' @param plan a `plan` object, containing a list of related steps.
+#' @param repos `repos`, as expected by [`tools::package_dependencies()`] to
+#'   determine package relationships.
+#' @value A `data.frame` that can be used to build [`igraph`] edges.
+#'
+#' @keywords internal
+task_graph_edges <- function(plan, repos = getOption("repos")) {
+  if (NROW(plan) == 0) return(empty_edge)
 
-  db <- utils::available.packages(repos = repos)[, DB_COLNAMES]
+  # build supplementary database entries for package tasks
+  desc_db <- lapply(plan, function(x) as_desc(x))
+  desc_db <- unique(bind_descs(desc_db))
+  packages <- desc_db[, "Package"]
 
-  # For checks alias has to have different name than package name
+  # add task package origin descriptions into database
+  db <- available_packages(repos = repos)[, DB_COLNAMES]
+  db <- rbind(desc_db[, colnames(db)], db)
+  db <- db[!duplicated(db[, "Package"]), ]
 
-  # Add custom packages to db
-  custom_aliases_idx <- which(vlapply(df$custom, function(x) !is.null(x$alias)))
-  custom_aliases <- unique(vcapply(df$custom[custom_aliases_idx], `[[`, "alias"))
-  custom_aliases_map <- unique(data.frame(
-    value = custom_aliases,
-    hash = vcapply(custom_aliases, unique_alias)
-  ))
-
-  desc <- drlapply(df$custom, function(x) {
-    row <- pkg_deps(x$package)
-    hash <- custom_aliases_map[custom_aliases_map$value == x$alias, ]$hash
-    row[, "Package"] <- hash
-    row
-  })
-
-  # Drop potential duplicates
-  desc <- unique(desc)
-
-  # Adding checks to db and custom packages as Depends link
-  checks <- drlapply(df$package, function(x) {
-    p <- df[df$alias == x$alias, ]
-    row <- pkg_deps(x$package)
-    row[, "Package"] <- x$alias
-    if (!is.null(p$custom[[1]]$alias)) {
-      row_idx <- custom_aliases_map$value == p$custom[[1]]$alias
-      hash <- custom_aliases_map[row_idx, ]$hash
-      row[, "Depends"] <- ifelse(
-        is.na(row[, "Depends"]),
-        hash,
-        paste0(row[, "Depends"], ", ", hash)
-      )
-    }
-    row
-  })
-
-  db <- rbind(db, desc, checks)
-
-  # Get suggests end enhances dependencies first so we can derive hard
-  # dependencies for them as well
-  suggests_dependencies <- uulist(package_deps(
-    df$alias,
+  # only first-order suggested dependencies needed
+  soft_deps <- unique(as.character(unlist(package_deps(
+    packages,
     db = db,
     which = c("Suggests", "Enhances"),
     recursive = FALSE
-  ))
+  ))))
 
-  # Get recursively strong dependencies for all packages
-  core_dependencies <- package_deps(
-    c(df$alias, custom_aliases_map$hash, suggests_dependencies),
+  # for all packages and first-order suggests packages, get recursive hard deps
+  hard_deps <- unique(as.character(unlist(package_deps(
+    c(packages, soft_deps),
     db = db,
     which = "strong",
     recursive = TRUE
-  )
+  ))))
 
-  dependencies <- uulist(c(
-    # tools::package_dependencies do not include package itself.
-    # we add it at this stage
-    df$alias,
-    custom_aliases_map$hash,
-    suggests_dependencies,
-    core_dependencies
-  ))
-
-  dependencies <- dependencies[!dependencies %in% base_pkgs()]
-
-  edges <- drlapply(dependencies, function(p) {
-    drlapply(uulist(DEP), function(type) {
-      deps <- try(db[db[, "Package"] == p, type], silent = TRUE)
-      if (inherits(deps, "try-error") || length(deps) == 0) {
-        empty_edge
-      } else {
-        deps <- split_packages_names(deps)
-        deps <- deps[deps %in% dependencies]
-        data.frame(
-          dep = deps,
-          root = rep(p, times = length(deps)),
-          type = rep(type, times = length(deps))
-        )
-      }
-    })
-  })
-
-  edges$dep <- replace_with_map(edges$dep, custom_aliases_map$hash, custom_aliases_map$value)
-  edges$root <- replace_with_map(edges$root, custom_aliases_map$hash, custom_aliases_map$value)
-  edges
+  deps <- unique(c(packages, soft_deps, hard_deps))
+  deps <- deps[!deps %in% base_pkgs()]
+  in_db <- which(deps %in% db[, "Package"])
+  packages_edges(db[deps[in_db], ])
 }
 
-task_vertices_df <- function(df, edges, repos) {
+#' Produce Graph Edges from Packages Index
+#'
+#' @param ap `matrix`, as produced by [`utils::available.packages()`]
+#' @return `character` `matrix` of columns `package`, `dep` and `type` with
+#'   one row for each dependency relationship.
+#'
+packages_edges <- function(ap) {
+  deps_by_type <- lapply(names(DEP), function(deptype) {
+    is_na <- is.na(ap[, deptype])
+
+    # filter for available packages with at least one dep of deptype
+    deps <- ap[!is_na, deptype]
+    names(deps) <- ap[!is_na, "Package"]
+
+    # split deps of deptype
+    deps <- lapply(deps, .tools$.split_dependencies)
+
+    # and structure
+    data.frame(
+      package = rep(names(deps), times = viapply(deps, length)),
+      dep = unlist(lapply(deps, names), use.names = FALSE),
+      type = deptype
+    )
+  })
+
+  do.call(rbind, deps_by_type)
+}
+
+task_graph_vertices <- function(df, edges, repos) {
   vertices <- unique(c(edges$dep, edges$root))
   custom_pkgs_aliases <- uulist(lapply(df$custom, `[[`, "alias"))
   task_type <- ifelse(vertices %in% df$alias, "check", "install")

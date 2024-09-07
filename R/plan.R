@@ -55,9 +55,10 @@ plan_rev_dep_checks <- function(
   repos = getOption("repos"),
   versions = c("dev", "release")
 ) {
-  versions <- match.arg(versions, c("dev", "release"), several.ok = TRUE)
-  ap <- utils::available.packages(repos = repos)
+  version_types <- match.arg(versions, c("dev", "release"), several.ok = TRUE)
   path <- check_path_is_pkg_source(path)
+  ap <- available_packages(repos = repos)
+
   package <- get_package_name(path)
   revdeps <- tools::package_dependencies(
     package,
@@ -70,68 +71,69 @@ plan_rev_dep_checks <- function(
     return(empty_checks_df)
   }
 
-  version <- ap[revdeps, "Version"]
-  df_dev <- df_rel <- data.frame(
-    alias = revdeps,
-    version = version
-  )
-
-  if (!package %in% ap[, "Package"] && "release" %in% versions) {
-    warning(
-      sprintf(
-        "Package `%s` not found in repositories `%s`. Skipping 'release' in 'versions'",
-        package,
-        paste0(repos, collapse = ", ")
-      ),
-      immediate. = TRUE
+  if ("release" %in% version_types && !package %in% ap[, "Package"]) {
+    msg <- sprintf(
+      "Skipping 'release' checks. Package `%s` not found in repositories: \n",
+      package,
+      paste0(" * ", repos, collapse = "\n")
     )
-    if ("dev" %in% versions) {
-      versions <- "dev"
-    } else {
-      return(empty_checks_df)
-    }
+
+    warning(msg, immediate. = TRUE)
+    version_types <- setdiff(version_types, "release")
   }
 
-  tasks_function <- if (all(c("dev", "release") %in% versions)) {
-    rev_dep_check_tasks
-  } else {
-    rev_dep_check_tasks_development
+  if (length(version_types) == 0) {
+    return(empty_checks_df)
   }
 
-  if ("dev" %in% versions) {
-    df_dev$alias <- paste0(df_dev$alias, " (dev)")
-    df_dev$package <- tasks_function(revdeps, repos, df_dev$alias, "new")
-    df_dev$custom <- rep(list(custom_install_task(
-      alias = paste0(package, " (dev)"),
-      package = pkg_origin_local(name = package, path = path),
+  unlist(recursive = FALSE, lapply(
+    revdeps,
+    plan_single_rev_dep_check,
+    path = path,
+    package = package,
+    repos = repos
+  ))
+}
+
+plan_single_rev_dep_check <- function(
+  path,
+  package,
+  revdep,
+  repos
+) {
+  task_sets <- list()
+
+  # development version, testing revdeps against local source
+  task_sets[[1]] <- task(list(
+    install_task(
+      origin = pkg_origin_local(path = path),
       type = "source"
-    )), times = NROW(df_dev))
+    ),
+    check_task(
+      origin = pkg_origin_repo(package = revdep, repos = repos),
+      env = DEFAULT_R_CMD_CHECK_ENVVARS,
+      args = DEFAULT_R_CMD_CHECK_ARGS,
+      build_args = DEFAULT_R_CMD_BUILD_ARGS
+    )
+  ))
+
+  # release version, testing revdep against repo source
+  if (package %in% available_packages(repos = repos)[, "Package"]) {
+    task_sets[[length(task_sets) + 1]] <- task(list(
+      install_task(
+        origin = pkg_origin_repo(package = package, repos = repos),
+        type = "source"
+      ),
+      check_task(
+        origin = pkg_origin_repo(package = revdep, repos = repos),
+        env = DEFAULT_R_CMD_CHECK_ENVVARS,
+        args = DEFAULT_R_CMD_CHECK_ARGS,
+        build_args = DEFAULT_R_CMD_BUILD_ARGS
+      )
+    ))
   }
 
-  if ("release" %in% versions) {
-    package_v <- ap[package, "Version"]
-    df_rel$alias <- paste0(df_rel$alias, " (v", package_v, ")")
-    df_rel$package <- tasks_function(revdeps, repos, df_rel$alias, "old")
-    df_rel$custom <- rep(list(custom_install_task(
-      alias = paste0(package, " (release)"),
-      package = pkg_origin_repo(name = package, repos = repos),
-      # make sure to use the release version built against the same system
-      type = "source"
-    )), times = NROW(df_dev))
-  }
-
-  if (identical(versions, "dev")) {
-    df <- df_dev
-  } else if (identical(versions, "release")) {
-    df <- df_rel
-  } else {
-    idx <- rep(seq_len(nrow(df_rel)), each = 2) + c(0, nrow(df_rel))
-    df <- rbind(df_dev, df_rel)[idx, ]
-  }
-
-  df$package <- list_of_task(df$package)
-  df$custom <- list_of_task(df$custom)
-  df
+  task_sets
 }
 
 rev_dep_check_tasks <- function(packages, repos, aliases, revdep) {
@@ -153,12 +155,7 @@ rev_dep_check_tasks <- function(packages, repos, aliases, revdep) {
   ))
 }
 
-rev_dep_check_tasks_development <- function(
-  packages,
-  repos,
-  aliases,
-  ...
-) {
+rev_dep_check_tasks_development <- function(packages, repos, aliases, ...) {
   list_of_task(mapply(
     function(package, alias) {
       check_task(

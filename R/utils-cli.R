@@ -42,3 +42,8 @@ str_pad <- function(x, n) {
   x <- format(x)
   paste0(strrep(" ", n - nchar(x)), x)
 }
+
+emoji <- list(
+  dev = "\U0001F6A7",
+  release = "\U0001F680"
+)

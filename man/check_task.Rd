@@ -4,9 +4,15 @@
 \alias{check_task}
 \title{Create a task to run \verb{R CMD check}}
 \usage{
-check_task(args = NULL, build_args = NULL, ...)
+check_task(build_args = NULL, args = NULL, env = NULL, ...)
 }
 \arguments{
+\item{build_args}{Character vector of arguments to pass to \verb{R CMD build}.
+Pass each argument as a single element of this character vector (do not use
+spaces to delimit arguments like you would in the shell). For example,
+\code{build_args = c("--force", "--keep-empty-dirs")} is a correct usage and
+\code{build_args = "--force --keep-empty-dirs"} is incorrect.}
+
 \item{args}{Character vector of arguments to pass to \verb{R CMD check}. Pass each
 argument as a single element of this character vector (do not use spaces to
 delimit arguments like you would in the shell). For example, to skip
@@ -15,19 +21,13 @@ instead of the \code{--output} option you should use the \code{check_dir} argume
 because  \code{--output} cannot deal with spaces and other special characters on
 Windows.)}
 
-\item{build_args}{Character vector of arguments to pass to \verb{R CMD build}.
-Pass each argument as a single element of this character vector (do not use
-spaces to delimit arguments like you would in the shell). For example,
-\code{build_args = c("--force", "--keep-empty-dirs")} is a correct usage and
-\code{build_args = "--force --keep-empty-dirs"} is incorrect.}
+\item{env}{A named character vector, extra environment variables to
+set in the check process.}
 
 \item{...}{
   Arguments passed on to \code{\link[=task]{task}}
   \describe{
-    \item{\code{alias}}{task alias which also serves as unique identifier of the task.}
-    \item{\code{package}}{\code{\link[checked]{package}} object}
-    \item{\code{env}}{environmental variables to be set in separate process running
-specific task.}
+    \item{\code{}}{}
   }}
 }
 \description{

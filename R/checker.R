@@ -94,20 +94,10 @@ checker <- R6::R6Class( # nolint: cyclocomp_linter.
       restore = TRUE,
       ...
     ) {
-      ap <- available.packages(repos = repos)
-      custom_alias <- uulist(drlapply(plan$custom, `[[`, "alias"))
-      all_alias_unique <- !any(duplicated(plan$alias))
-      all_alias_distinct <- !any(plan$alias %in% ap[, "Package"])
-      all_custom_distinct <- !any(custom_alias %in% plan$alias)
+      if (!restore) {
+        unlink(output, recursive = TRUE, force = TRUE)
+      }
 
-      # Make sure all aliases are unique
-      stopifnot(
-        "Task aliases have to be unique" = all_alias_unique,
-        "Task aliases cannot have the same name as any available package" = all_alias_distinct, # nolint: line_length_linter.
-        "Custom package aliases cannot be duplicates of check aliases" = all_custom_distinct # nolint: line_length_linter.
-      )
-
-      if (!restore) unlink(output, recursive = TRUE, force = TRUE)
       dir_create(output)
 
       self$plan <- plan

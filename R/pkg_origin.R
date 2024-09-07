@@ -11,20 +11,65 @@
 #'
 #' @family specs
 #' @export
-pkg_origin <- function(name, ..., .class = c()) {
-  structure(list(name = name, ...), class = c(.class, "pkg_origin_source"))
+pkg_origin <- function(package, ..., .class = c()) {
+  structure(list(package = package, ...), class = c(.class, "pkg_origin"))
+}
+
+#' @export
+format.pkg_origin <- function(x, ...) {
+  paste(collapse = " ", c(
+    x$package,
+    if (!is.null(x$version)) {
+      switch(class(x$version)[[1]],
+        package_version = paste0("(v", format(x$version), ")"),
+        x$version
+      )
+    },
+    if (!is.null(x$source)) {
+      paste0("from ", if (is.null(names(x$source))) {
+        format(x$source, pretty = TRUE)
+      } else {
+        names(x$source)
+      })
+    }
+  ))
 }
 
 #' @export
 #' @rdname pkg_origin
-pkg_origin_repo <- function(repos, ...) {
-  pkg_origin(..., repos = repos, .class = "pkg_origin_repo")
+pkg_origin_repo <- function(package, repos, ...) {
+  ap_pkg <- available_packages(repos = repos)[package, ]
+
+  version <- package_version(ap_pkg["Version"])
+  source <- strip_src_contrib(ap_pkg["Repository"])
+  if (any(which <- startsWith(repos, source))) {
+    source <- repos[which][1]
+  }
+
+  pkg_origin(
+    package = package,
+    version = version,
+    source = source,
+    repos = repos,
+    ...,
+    .class = "pkg_origin_repo"
+  )
 }
 
 #' @export
 #' @rdname pkg_origin
 pkg_origin_local <- function(path = NULL, ...) {
-  pkg_origin(..., path = path, .class = "pkg_origin_local")
+  package <- get_package_name(path)
+  version <- package_version(get_package_version(path))
+  source <- filepath(normalizePath(path))
+
+  pkg_origin(
+    package = package,
+    version = version,
+    source = source,
+    ...,
+    .class = "pkg_origin_local"
+  )
 }
 
 #' @export
@@ -43,9 +88,9 @@ pkg_deps.default <- function(x) {
 }
 
 #' @export
-pkg_deps.pkg_origin_source <- function(x) {
-  db <- utils::available.packages(repos = x$repos)
-  row <- db[x$name, , drop = FALSE]
+pkg_deps.pkg_origin_local <- function(x) {
+  db <- available_packages(repos = x$repos)
+  row <- db[x$package, , drop = FALSE]
   row[, DB_COLNAMES, drop = FALSE]
 }
 
