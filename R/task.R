@@ -3,7 +3,7 @@
 #' Create task specification list which consists of all the details required
 #' to run specific task.
 #'
-#' Tasks can be nested, representing either a singular task, or a set of 
+#' Tasks can be nested, representing either a singular task, or a set of
 #' related tasks.
 #'
 #' @param alias task alias which also serves as unique identifier of the task.
@@ -11,8 +11,12 @@
 #'
 #' @family tasks
 #' @export
-task <- function(x, ...) {
-  structure(x, class = c("task", class(x)))
+task <- function(...) {
+  structure(list(...), class = "task")
+}
+
+hash_task <- function(x, n = 12) {
+  substring(cli::hash_obj_sha256(x), 1, n)
 }
 
 #' @family tasks
@@ -51,7 +55,7 @@ install_task <- function(
   INSTALL_opts = NULL, # nolint: object_name_linter.
   ...
 ) {
-  task <- task(list(origin = origin, ...))
+  task <- task(origin = origin, ...)
   task$type <- type
   task$INSTALL_opts <- INSTALL_opts
   class(task) <- c("install_task", class(task))
@@ -88,7 +92,7 @@ custom_install_task <- function(...) {
 #' @family tasks
 #' @export
 check_task <- function(build_args = NULL, args = NULL, env = NULL, ...) {
-  task <- task(list(...))
+  task <- task(...)
   task$env <- env
   task$args <- args
   task$build_args <- build_args
@@ -140,7 +144,11 @@ as_desc <- function(x, ...) {
 as_desc.list <- function(x, ...) {
   descs <- list()
   length(descs) <- length(x)
-  for (i in seq_along(x)) descs[[i]] <- as_desc(x[[i]])
+
+  for (i in seq_along(x)) {
+    descs[[i]] <- as_desc(x[[i]])
+  }
+
   descs <- bind_descs(descs)
   descs <- sub_aliased_desc(descs)
   descs
@@ -148,12 +156,12 @@ as_desc.list <- function(x, ...) {
 
 #' @export
 as_desc.install_task <- function(x, ...) {
-  as_desc(x$origin)
+  cbind(as_desc(x$origin), Task = hash_task(x))
 }
 
 #' @export
 as_desc.check_task <- function(x, ...) {
-  as_desc(x$origin)
+  cbind(as_desc(x$origin), Task = hash_task(x))
 }
 
 #' @export
@@ -166,14 +174,9 @@ as_desc.character <- function(x) {
 as_desc.pkg_origin_local <- function(x) {
   desc <- as_desc(file.path(x$source, "DESCRIPTION"))
 
-  # generate a local alias to differentiate package from same package
-  # installed from other sources
-  local_alias <- substring(cli::hash_obj_sha256(task), 1, 12)
-
   # update the Package field, replacing actual name with an alias
   desc <- cbind(desc, Alias = x$package)
-  desc[, "Package"] <- local_alias
-  rownames(desc) <- local_alias
+  rownames(desc) <- desc[, "Package"] <- hash_task(x)
 
   desc
 }
@@ -183,3 +186,19 @@ as_desc.pkg_origin_repo <- function(x) {
   ap <- available_packages(repos = x$repos)
   ap[x$package, , drop = FALSE]
 }
+
+flatten <- function(x) {
+  UseMethod("flatten")
+}
+
+#' @export
+flatten.default <- function(x) {
+  list(x)
+}
+
+#' @export
+flatten.list <- function(x) {
+  if (!inherits(x, "list")) return(x)
+  unlist(recursive = FALSE, lapply(x, function(xi) flatten(xi)))
+}
+

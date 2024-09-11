@@ -189,7 +189,8 @@ checker <- R6::R6Class( # nolint: cyclocomp_linter.
     #'
     #' Checks whether all the scheduled tasks were successfully executed.
     is_done = function() {
-      checks <- igraph::V(self$graph)[igraph::V(self$graph)$type == "check"]
+      is_check <- vlapply(igraph::V(self$graph)$task, inherits, "check_task")
+      checks <- igraph::V(self$graph)[is_check]
       all(checks$status == STATUS$done)
     }
   ),

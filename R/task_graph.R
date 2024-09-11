@@ -1,23 +1,23 @@
-#' Create Task Graph
-#'
-#' @param df data.frame listing
-#' @param repos repositories which will be used to identify dependencies chain
-#' to run R CMD checks
-#' @return A dependency graph with vertex attributes "root" (a logical value
-#'   indicating whether the package as one of the roots used to create the
-#'   graph), "status" (installation status) and "order" (installation order).
-#'
-#' @keywords internal
-#' @importFrom igraph V
-task_graph_create <- function(df, repos = getOption("repos")) {
-  edges <- task_graph_edges(df, repos)
-  vertices <- task_graph_vertices(df, edges, repos)
+# #' Create Task Graph
+# #'
+# #' @param df data.frame listing
+# #' @param repos repositories which will be used to identify dependencies chain
+# #' to run R CMD checks
+# #' @return A dependency graph with vertex attributes "root" (a logical value
+# #'   indicating whether the package as one of the roots used to create the
+# #'   graph), "status" (installation status) and "order" (installation order).
+# #'
+# #' @keywords internal
+# #' @importFrom igraph V
+# task_graph_create <- function(df, repos = getOption("repos")) {
+#   edges <- task_graph_edges(df, repos)
+#   vertices <- task_graph_vertices(df, edges, repos)
 
-  g <- igraph::graph_from_data_frame(edges, vertices = vertices)
-  igraph::V(g)$status <- STATUS$pending  # nolint object_name_linter
-  igraph::V(g)$process <- rep_len(list(), length(g))
-  task_graph_sort(g)
-}
+#   g <- igraph::graph_from_data_frame(edges, vertices = vertices)
+#   igraph::V(g)$status <- STATUS$pending  # nolint object_name_linter
+#   igraph::V(g)$process <- rep_len(list(), length(g))
+#   task_graph_sort(g)
+# }
 
 #' Build task graph edges
 #'
@@ -35,48 +35,83 @@ task_graph_create <- function(df, repos = getOption("repos")) {
 #' @param plan a `plan` object, containing a list of related steps.
 #' @param repos `repos`, as expected by [`tools::package_dependencies()`] to
 #'   determine package relationships.
-#' @value A `data.frame` that can be used to build [`igraph`] edges.
+#' @return A `data.frame` that can be used to build [`igraph`] edges.
 #'
 #' @keywords internal
-task_graph_edges <- function(plan, repos = getOption("repos")) {
+task_graph_create <- function(plan, repos = getOption("repos")) {
   if (NROW(plan) == 0) return(empty_edge)
 
+  # build task hashmap, allowing for graph analysis using description files
+  taskmap <- unique(flatten(plan))
+  names(taskmap) <- vcapply(taskmap, hash_task)
+
   # build supplementary database entries for package tasks
+  # tasks receive an additional "Task" column, containing a hash of the task
   desc_db <- lapply(plan, function(x) as_desc(x))
   desc_db <- unique(bind_descs(desc_db))
   packages <- desc_db[, "Package"]
 
   # add task package origin descriptions into database
   db <- available_packages(repos = repos)[, DB_COLNAMES]
+  db <- cbind(db, Task = NA_character_)
   db <- rbind(desc_db[, colnames(db)], db)
   db <- db[!duplicated(db[, "Package"]), ]
 
-  # only first-order suggested dependencies needed
-  soft_deps <- unique(as.character(unlist(package_deps(
+  # create dependencies graph
+  g <- package_graph(db, packages)
+
+  # populate install tasks for new dependencies, installing from repos
+  v_db_idx <- match(V(g)$name, db[, "Package"])
+  V(g)$task <- taskmap[db[v_db_idx, "Task"]]
+
+  no_task <- vlapply(V(g)$task, is.null)
+  is_base <- V(g)$name %in% base_pkgs()
+  is_known <- V(g)$name %in% db[, "Package"]
+  needs_install <- no_task & !is_base & is_known
+
+  V(g)$task[needs_install] <- lapply(
+    V(g)$name[needs_install],
+    function(package) {
+      install_task(origin = pkg_origin_repo(package = package, repos = repos))
+    }
+  )
+
+  # standardize graph fields
+  igraph::V(g)$status <- STATUS$pending  # nolint: object_name_linter.
+  igraph::V(g)$process <- rep_len(list(), length(g))
+
+  g
+}
+
+package_graph <- function(db, packages = db[, "Package"], dependencies = TRUE) {
+  dependencies <- as_pkg_dependencies(dependencies)
+
+  direct_deps <- unique(as.character(unlist(package_deps(
     packages,
     db = db,
-    which = c("Suggests", "Enhances"),
+    which = dependencies$direct,
     recursive = FALSE
   ))))
 
-  # for all packages and first-order suggests packages, get recursive hard deps
-  hard_deps <- unique(as.character(unlist(package_deps(
-    c(packages, soft_deps),
+  indirect_deps <- unique(as.character(unlist(package_deps(
+    c(packages, direct_deps),
     db = db,
-    which = "strong",
+    which = dependencies$indirect,
     recursive = TRUE
   ))))
 
-  deps <- unique(c(packages, soft_deps, hard_deps))
-  deps <- deps[!deps %in% base_pkgs()]
-  in_db <- which(deps %in% db[, "Package"])
-  packages_edges(db[deps[in_db], ])
+  deps <- unique(c(packages, direct_deps, indirect_deps))
+  deps <- deps[!deps %in% base_pkgs() & deps %in% db[, "Package"]]
+
+  edges <- packages_edges(db[deps, ])
+  vertices <- data.frame(name = unique(c(edges$package, edges$dep)))
+  igraph::graph_from_data_frame(edges, vertices = vertices)
 }
 
 #' Produce Graph Edges from Packages Index
 #'
 #' @param ap `matrix`, as produced by [`utils::available.packages()`]
-#' @return `character` `matrix` of columns `package`, `dep` and `type` with
+#' @return `data.frame` with columns `package`, `dep` and `type` and
 #'   one row for each dependency relationship.
 #'
 packages_edges <- function(ap) {
@@ -101,7 +136,7 @@ packages_edges <- function(ap) {
   do.call(rbind, deps_by_type)
 }
 
-task_graph_vertices <- function(df, edges, repos) {
+task_graph_vertices <- function(plan, df, edges, repos) {
   vertices <- unique(c(edges$dep, edges$root))
   custom_pkgs_aliases <- uulist(lapply(df$custom, `[[`, "alias"))
   task_type <- ifelse(vertices %in% df$alias, "check", "install")
@@ -161,7 +196,7 @@ task_graph_neighborhoods <- function(g, nodes) {
 #' @return The [igraph::graph] `g`, with vertices sorted in preferred
 #'   installation order.
 #'
-#' @importFrom igraph vertex_attr neighborhood subgraph.edges permute topo_sort E V E<- V<-
+#' @importFrom igraph vertex_attr neighborhood subgraph.edges permute topo_sort E V E<- V<-  # nolint
 #' @keywords internal
 task_graph_sort <- function(g) {
   roots <- which(igraph::vertex_attr(g, "type") == "check")
@@ -313,14 +348,13 @@ task_graph_set_task_process <- function(g, v, process) {
   igraph::set_vertex_attr(g, "process", v, list(process))
 }
 
-task_graph_update_done <- function(g, lib.loc) {
+task_graph_update_done <- function(g, lib.loc) { # nolint: object_name_linter.
   v <- igraph::V(g)[igraph::V(g)$type == "install"]
   which_done <- which(vlapply(v$name, is_package_done, lib.loc = lib.loc))
   task_graph_set_package_status(g, v[which_done], STATUS$done)
 }
 
-is_package_done <- function(pkg, lib.loc) {  # nolint object_name_linter
+is_package_done <- function(pkg, lib.loc) { # nolint object_name_linter
   path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
   length(path) > 0
 }
-

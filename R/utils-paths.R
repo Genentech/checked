@@ -36,7 +36,7 @@ format.filepath <- function(x, ..., pretty = FALSE) {
 #' Split a Filepath into Parts
 #'
 #' @param x A `character(1L)` or `filepath`
-#' @value A `character` vector of path parts
+#' @return A `character` vector of path parts
 #'
 #' @keywords internal
 path_parts <- function(x) {

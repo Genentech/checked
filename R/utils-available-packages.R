@@ -1,7 +1,7 @@
 #' Available Packages
 #'
 #' Functionally Equivalent to [`utils::available.packages()`], assuming
-#' `utils`'s cache doesn't expire in the middle of a top-level callback.
+#' `utils`'s cache doesn't expire in the middle of a top-level call evaluation.
 #' Modifications were made so that the results for queries with unique
 #' arguments are only called once for each top-level expression.
 #'
@@ -16,26 +16,30 @@
 #'
 #'     system.time({ for (i in 1:10) available_packages() })
 #'     #>    user  system elapsed
-#'     #>   0.003   0.000   0.003
+#'     #>   0.325   0.002   0.328
+#'
+#' @note This _could_ be removed by propagating the `available.packages()`
+#'   database matrix through all the calls that need to use it, though this
+#'   would be a sizable refactor.
 #'
 #' @keywords internal
 available_packages <- local({
-  callback_name <- paste0(packageName(), "-last-top-level-time")
-  callback_time <- NULL
+  callback_name <- paste0(packageName(), "-top-level-ap")
+  callback_index <- 0L
 
-  callback <- function(...) {
-    last_top_level_callback <<- Sys.time()
+  increment_index <- function(...) {
+    callback_index <<- callback_index + 1L
     FALSE
   }
 
   maybe_add_callback <- function() {
     if (!callback_name %in% getTaskCallbackNames()) {
-      addTaskCallback(name = callback_name, callback)
+      addTaskCallback(name = callback_name, increment_index)
     }
   }
 
   memoise::memoise(
-    hash = function(x) rlang::hash(list(x, callback_time)),
+    hash = function(x) rlang::hash(list(x, callback_index)),
     function(...) {
       maybe_add_callback()
       utils::available.packages(...)

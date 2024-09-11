@@ -2,22 +2,30 @@
 % Please edit documentation in R/task_graph.R
 \name{task_graph_create}
 \alias{task_graph_create}
-\title{Create Task Graph}
+\title{Build task graph edges}
 \usage{
-task_graph_create(df, repos = getOption("repos"))
+task_graph_create(plan, repos = getOption("repos"))
 }
 \arguments{
-\item{df}{data.frame listing}
+\item{plan}{a \code{plan} object, containing a list of related steps.}
 
-\item{repos}{repositories which will be used to identify dependencies chain
-to run R CMD checks}
+\item{repos}{\code{repos}, as expected by \code{\link[tools:package_dependencies]{tools::package_dependencies()}} to
+determine package relationships.}
 }
 \value{
-A dependency graph with vertex attributes "root" (a logical value
-indicating whether the package as one of the roots used to create the
-graph), "status" (installation status) and "order" (installation order).
+A \code{data.frame} that can be used to build \code{\link{igraph}} edges.
 }
 \description{
-Create Task Graph
+Edges describe relationships between tasks. Often, this is a dependency
+between packages, requiring that some package be installed before a latter
+task can be executed.
+}
+\details{
+\code{\link[tools:package_dependencies]{tools::package_dependencies()}} is used to calculate these relationships.
+However, the package data returned by \code{\link[utils:available.packages]{utils::available.packages()}},
+that is used internally to determine dependencies does not know about
+local or remote packages, so those are first appended to this data set
+prior to calculating edges. The bulk of this function serves to join this
+data.
 }
 \keyword{internal}

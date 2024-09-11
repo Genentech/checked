@@ -11,8 +11,8 @@ Authors@R:
         comment = c(ORCID = "0000-0002-3120-1601")
       ),
       person(
-        "Doug", "Kelkhoff", , 
-        "doug.kelkhoff@gmail.com", 
+        "Doug", "Kelkhoff",
+        email = "doug.kelkhoff@gmail.com", 
         role = c("aut"),
         comment = c(ORCID = "0009-0003-7845-4061")
       ),
@@ -31,15 +31,17 @@ URL:
 BugReports: https://github.com/Genentech/checked/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
+Depends:
+    R (>= 3.6.2)
 Imports:
     callr,
     cli,
     igraph,
     jsonlite,
-	memoise,
+    memoise,
     R6,
     rcmdcheck,
-	rlang,
+    rlang,
     utils (>= 3.6.2),
     tools
 Roxygen: list(markdown = TRUE)

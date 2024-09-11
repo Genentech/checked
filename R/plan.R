@@ -104,7 +104,7 @@ plan_single_rev_dep_check <- function(
   task_sets <- list()
 
   # development version, testing revdeps against local source
-  task_sets[[1]] <- task(list(
+  task_sets[[1]] <- list(
     install_task(
       origin = pkg_origin_local(path = path),
       type = "source"
@@ -115,11 +115,11 @@ plan_single_rev_dep_check <- function(
       args = DEFAULT_R_CMD_CHECK_ARGS,
       build_args = DEFAULT_R_CMD_BUILD_ARGS
     )
-  ))
+  )
 
   # release version, testing revdep against repo source
   if (package %in% available_packages(repos = repos)[, "Package"]) {
-    task_sets[[length(task_sets) + 1]] <- task(list(
+    task_sets[[length(task_sets) + 1]] <- list(
       install_task(
         origin = pkg_origin_repo(package = package, repos = repos),
         type = "source"
@@ -130,7 +130,7 @@ plan_single_rev_dep_check <- function(
         args = DEFAULT_R_CMD_CHECK_ARGS,
         build_args = DEFAULT_R_CMD_BUILD_ARGS
       )
-    ))
+    )
   }
 
   task_sets

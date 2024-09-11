@@ -9,6 +9,9 @@ path_parts(x)
 \arguments{
 \item{x}{A \code{character(1L)} or \code{filepath}}
 }
+\value{
+A \code{character} vector of path parts
+}
 \description{
 Split a Filepath into Parts
 }
