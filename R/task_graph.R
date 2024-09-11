@@ -43,7 +43,7 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
 
   # build task hashmap, allowing for graph analysis using description files
   taskmap <- unique(flatten(plan))
-  names(taskmap) <- vcapply(taskmap, hash_task)
+  names(taskmap) <- vcapply(taskmap, task_hash)
 
   # build supplementary database entries for package tasks
   # tasks receive an additional "Task" column, containing a hash of the task
@@ -55,7 +55,9 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
   db <- available_packages(repos = repos)[, DB_COLNAMES]
   db <- cbind(db, Task = NA_character_)
   db <- rbind(desc_db[, colnames(db)], db)
-  db <- db[!duplicated(db[, "Package"]), ]
+  db <- db[!duplicated(db[, c("Package", DB_COLNAMES)]), ]
+
+  browser()
 
   # create dependencies graph
   g <- package_graph(db, packages)
@@ -72,12 +74,15 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
   V(g)$task[needs_install] <- lapply(
     V(g)$name[needs_install],
     function(package) {
-      install_task(origin = pkg_origin_repo(package = package, repos = repos))
+      install_task(
+        origin = pkg_origin_repo(package = package, repos = repos),
+        lib = lib_loc_default()
+      )
     }
   )
 
   # standardize graph fields
-  igraph::V(g)$status <- STATUS$pending  # nolint: object_name_linter.
+  igraph::V(g)$status <- STATUS$pending
   igraph::V(g)$process <- rep_len(list(), length(g))
 
   g
@@ -177,7 +182,7 @@ task_graph_neighborhoods <- function(g, nodes) {
     g,
     order = length(g),
     nodes = nodes,
-    mode = "in"
+    mode = "out"
   )
 }
 
@@ -196,7 +201,8 @@ task_graph_neighborhoods <- function(g, nodes) {
 #' @return The [igraph::graph] `g`, with vertices sorted in preferred
 #'   installation order.
 #'
-#' @importFrom igraph vertex_attr neighborhood subgraph.edges permute topo_sort E V E<- V<-  # nolint
+#' @importFrom igraph vertex_attr neighborhood subgraph.edges permute topo_sort
+#' @importFrom igraph E V E<- V<-
 #' @keywords internal
 task_graph_sort <- function(g) {
   roots <- which(igraph::vertex_attr(g, "type") == "check")
@@ -220,8 +226,8 @@ task_graph_sort <- function(g) {
   priority_topo[match(topo$name, igraph::V(g)$name)] <- rev(seq_along(topo))
 
   # combine priorities, prioritize first by total, footprint then topology
-  priorities <- rbind(priority_footprint, priority_topo)
-  order <- rank(length(igraph::V(g))^seq(nrow(priorities) - 1, 0) %*% priorities)
+  priority <- rbind(priority_footprint, priority_topo)
+  order <- rank(length(igraph::V(g))^seq(nrow(priority) - 1, 0) %*% priority)
   g <- igraph::permute(g, order)
 
   g
@@ -256,10 +262,11 @@ task_graph_sort <- function(g) {
 #' @importFrom igraph incident_edges tail_of
 #' @keywords internal
 task_graph_which_satisfied <- function(
-    g,
-    v = igraph::V(g),
-    dependencies = TRUE,
-    status = STATUS$pending) {
+  g,
+  v = igraph::V(g),
+  dependencies = TRUE,
+  status = STATUS$pending
+) {
   if (is.character(status)) status <- STATUS[[status]]
   dependencies <- check_dependencies(dependencies)
   if (length(status) > 0) {
@@ -281,13 +288,14 @@ task_graph_which_satisfied_strong <- function(..., dependencies = "strong") { # 
 }
 
 task_graph_which_check_satisfied <- function(
-    g,
-    ...,
-    dependencies = "all",
-    status = STATUS$pending) {
+  g,
+  ...,
+  dependencies = "all",
+  status = STATUS$pending
+) {
   task_graph_which_satisfied(
     g,
-    igraph::V(g)[igraph::V(g)$type == "check"],
+    igraph::V(g)[vlapply(igraph::V(g)$task, inherits, "check_task")],
     ...,
     dependencies = dependencies,
     status = status
@@ -295,13 +303,14 @@ task_graph_which_check_satisfied <- function(
 }
 
 task_graph_which_install_satisfied <- function(
-    g,
-    ...,
-    dependencies = "strong",
-    status = STATUS$pending) {
+  g,
+  ...,
+  dependencies = "strong",
+  status = STATUS$pending
+) {
   task_graph_which_satisfied(
     g,
-    igraph::V(g)[igraph::V(g)$type == "install"],
+    igraph::V(g)[vlapply(igraph::V(g)$task, inherits, "install_task")],
     ...,
     dependencies = dependencies,
     status = status
@@ -348,13 +357,13 @@ task_graph_set_task_process <- function(g, v, process) {
   igraph::set_vertex_attr(g, "process", v, list(process))
 }
 
-task_graph_update_done <- function(g, lib.loc) { # nolint: object_name_linter.
+task_graph_update_done <- function(g, lib.loc) {
   v <- igraph::V(g)[igraph::V(g)$type == "install"]
   which_done <- which(vlapply(v$name, is_package_done, lib.loc = lib.loc))
   task_graph_set_package_status(g, v[which_done], STATUS$done)
 }
 
-is_package_done <- function(pkg, lib.loc) { # nolint object_name_linter
+is_package_done <- function(pkg, lib.loc) {
   path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
   length(path) > 0
 }

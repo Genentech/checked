@@ -10,7 +10,7 @@ next_task_to_run <- function(g) {
 #' @importFrom igraph .env
 task_get_lib_loc <- function(g, node, output) {
   nhood <- task_graph_neighborhoods(g, node)[[1]]
-  name <- names(node) %||% node # nolint
+  name <- names(node) %||% node # nolint (used via non-standard-evaluation)
   nhood <- nhood[names(nhood) != .env$name]
 
   # Custom packages are possible only for the check type nodes which are
@@ -25,6 +25,22 @@ task_get_lib_loc <- function(g, node, output) {
   unique(paths[order(attributes$custom, decreasing = TRUE)])
 }
 
+task_graph_libpaths <- function(g, node = NULL, lib.loc = .libPaths()) {
+  vs <- if (is.null(node)) {
+    igraph::V(g)
+  } else {
+    task_graph_neighborhoods(g, node)[[1]]
+  }
+
+  # iterate over tasks and derive a library location
+  task_lib <- lapply(
+    vs$task,
+    function(x, ...) lib(x, ...), lib.loc = lib.loc
+  )
+
+  unique(unlist(task_lib))
+}
+
 task_get_install_lib <- function(g, node, output) {
   attributes <- igraph::vertex.attributes(g, index = node)
   if (attributes$type == "check") {
@@ -36,20 +52,27 @@ task_get_install_lib <- function(g, node, output) {
   }
 }
 
-start_task <- function(task, g, ...) {
-  UseMethod("start_task", task_graph_task(g, task))
+start_task <- function(node, g, ...) {
+  UseMethod("start_task")
+}
+
+#' @export
+start_task.igraph.vs <- function(node, g, ...) {
+  stopifnot(length(node) == 1L)
+  UseMethod("start_task", node$task[[1]])
 }
 
 #' @export
 start_task.install_task <- function(
-    task,
-    g,
-    output,
-    lib.loc, # nolint object_name_linter
-    ...) {
+  node,
+  g,
+  output,
+  lib.loc,
+  ...
+) {
   spec <- task_graph_task(g, task)
   install_parameters <- install_params(spec$package)
-  libpaths <- c(task_get_lib_loc(g, task, output), lib.loc)
+  libpaths <- c(task_graph_libpaths(g, node, output), lib.loc)
   install_packages_process$new(
     install_parameters$package,
     lib = path_lib(output),
@@ -65,14 +88,15 @@ start_task.install_task <- function(
 
 #' @export
 start_task.custom_install_task <- function(
-    task,
-    g,
-    output,
-    lib.loc, # nolint object_name_linter
-    ...) {
+  node,
+  g,
+  output,
+  lib.loc,
+  ...
+) {
   spec <- task_graph_task(g, task)
   install_parameters <- install_params(spec$package)
-  libpaths <- c(task_get_lib_loc(g, task, output), lib.loc)
+  libpaths <- c(task_get_lib_loc(g, node, output), lib.loc)
   install_packages_process$new(
     install_parameters$package,
     lib = path_custom_lib(output, spec$alias),
@@ -88,18 +112,21 @@ start_task.custom_install_task <- function(
 
 #' @export
 start_task.check_task <- function(
-    task,
-    g,
-    output,
-    lib.loc, # nolint object_name_linter
-    ...) {
-  spec <- task_graph_task(g, task)
-  libpaths <- c(task_get_lib_loc(g, task, output), lib.loc)
-  path <- check_path(spec$package, output = path_sources())
+  node,
+  g,
+  output,
+  lib.loc,
+  ...
+) {
+  task <- node$task[[1]]
+
+  libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc)
+  browser()
+  path <- check_path(node$package, output = path_sources())
 
   check_process$new(
     path = path,
-    check_dir = path_check_output(output, spec$alias),
+    check_dir = path_check_output(output, friendly_name(task)),
     libpath = libpaths,
     repos = spec$package$repos,
     args = spec$args,

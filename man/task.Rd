@@ -4,7 +4,7 @@
 \alias{task}
 \title{Task specification}
 \usage{
-task(x, ...)
+task(...)
 }
 \arguments{
 \item{alias}{task alias which also serves as unique identifier of the task.}

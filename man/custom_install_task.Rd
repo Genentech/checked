@@ -10,6 +10,8 @@ custom_install_task(...)
 \item{...}{
   Arguments passed on to \code{\link[=install_task]{install_task}}
   \describe{
+    \item{\code{lib}}{Any object that can be passed to \code{\link[=lib]{lib()}} to generate a library
+path.}
     \item{\code{type}}{character, indicating the type of package to download and
     install.  Will be \code{"source"} except on Windows and some macOS
     builds: see the section on \sQuote{Binary packages} for those.

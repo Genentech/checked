@@ -15,8 +15,14 @@ task <- function(...) {
   structure(list(...), class = "task")
 }
 
-hash_task <- function(x, n = 12) {
+task_hash <- function(x, n = 12) {
   substring(cli::hash_obj_sha256(x), 1, n)
+}
+
+#' @family tasks
+#' @export
+lib.task <- function(x, ...) {
+  stop("Don't know how to determine a library path for generic task")
 }
 
 #' @family tasks
@@ -29,22 +35,32 @@ print.task <- function(x, ...) {
 #' @export
 format.task <- function(x, ...) {
   if (is.list(x)) {
-    fmt_tasks <- paste0(vcapply(x, function(xi) format(xi)), collapse = ", ")
-    return(paste0("[", fmt_tasks, "]"))
+    fmt_tasks <- lapply(x, function(xi) format(xi, ...))
+    return(paste0("[", paste0(fmt_tasks, collapse = ", "), "]"))
   }
 
   NextMethod()
 }
 
+friendly_name <- function(x) {
+  UseMethod("friendly_name")
+}
+
 #' @family tasks
 #' @export
-format.list_of_task <- function(x, ...) {
-  vcapply(x, format)
+friendly_name.default <- function(x) {
+  stop(
+    "Dont' know how to name object with class(es) `", 
+    deparse(class(x)),
+    "`"
+  )
 }
 
 #' Create a task to install a package and dependencies
 #'
 #' @param ... Additional parameters passed to [`task()`]
+#' @param lib Any object that can be passed to [`lib()`] to generate a library
+#'   path.
 #' @inheritParams utils::install.packages
 #'
 #' @family tasks
@@ -52,24 +68,35 @@ format.list_of_task <- function(x, ...) {
 install_task <- function(
   origin,
   type = getOption("pkgType"),
-  INSTALL_opts = NULL, # nolint: object_name_linter.
+  INSTALL_opts = NULL,
+  lib = lib_loc_default(),
   ...
 ) {
   task <- task(origin = origin, ...)
   task$type <- type
   task$INSTALL_opts <- INSTALL_opts
+  task$lib <- lib
   class(task) <- c("install_task", class(task))
   task
 }
 
-is_install_task <- function(x) {
-  inherits(x, "install_task")
+#' @export
+lib.install_task <- function(x, ...) {
+  lib(x$lib, name = task_hash(x), ...)
 }
 
-#' @family tasks
 #' @export
 format.install_task <- function(x, ...) {
-  paste0("<install ", format(x$origin), ">")
+  paste0("<", friendly_name(x), ">")
+}
+
+#' @export
+friendly_name.install_task <- function(x, ...) {
+  paste0("install ", format(x$origin))
+}
+
+is_install_task <- function(x) {
+  inherits(x, "install_task")
 }
 
 #' Create a custom install task
@@ -100,14 +127,24 @@ check_task <- function(build_args = NULL, args = NULL, env = NULL, ...) {
   task
 }
 
+#' @export
+lib.check_task <- function(x, ...) {
+  character(0L)  # no additional libraries needed for checkign
+}
+
+#' @export
+format.check_task <- function(x, ...) {
+  paste0("<", friendly_name(x), ">")
+}
+
 is_check_task <- function(x) {
   inherits(x, "check_task")
 }
 
 #' @family tasks
 #' @export
-format.check_task <- function(x, ...) {
-  paste0("<check ", format(x$origin), ">")
+friendly_name.check_task <- function(x, ...) {
+  paste0("check ", format(x$origin))
 }
 
 #' Create a task to run reverse dependency checks
@@ -156,12 +193,12 @@ as_desc.list <- function(x, ...) {
 
 #' @export
 as_desc.install_task <- function(x, ...) {
-  cbind(as_desc(x$origin), Task = hash_task(x))
+  cbind(as_desc(x$origin), Task = task_hash(x))
 }
 
 #' @export
 as_desc.check_task <- function(x, ...) {
-  cbind(as_desc(x$origin), Task = hash_task(x))
+  cbind(as_desc(x$origin), Task = task_hash(x))
 }
 
 #' @export
@@ -176,7 +213,7 @@ as_desc.pkg_origin_local <- function(x) {
 
   # update the Package field, replacing actual name with an alias
   desc <- cbind(desc, Alias = x$package)
-  rownames(desc) <- desc[, "Package"] <- hash_task(x)
+  rownames(desc) <- desc[, "Package"] <- task_hash(x)
 
   desc
 }

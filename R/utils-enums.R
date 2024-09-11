@@ -27,7 +27,7 @@ Ops.factor <- function(e1, e2) {
 
 #' Check execution status categories
 #' @keywords internal
-STATUS <- enum( # nolint
+STATUS <- enum(
   "pending",
   "in progress",
   "done"
@@ -35,7 +35,7 @@ STATUS <- enum( # nolint
 
 #' Dependencies categories
 #' @keywords internal
-DEP <- enum( # nolint
+DEP <- enum(
   "Imports",
   "Depends",
   "LinkingTo",
@@ -45,11 +45,11 @@ DEP <- enum( # nolint
 
 #' Strong dependencies categories
 #' @keywords internal
-DEP_STRONG <- unlist(DEP[1:3]) # nolint
+DEP_STRONG <- unlist(DEP[1:3])
 
 #' Available packages database dependencies columns
 #' @keywords internal
-DB_COLNAMES <- c( # nolint
+DB_COLNAMES <- c(
   "Package",
   "Depends",
   "Imports",

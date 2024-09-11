@@ -46,7 +46,7 @@ new_rev_dep_checker <- function(x, ...) {
 #'
 #' @family checks
 #' @export
-checker <- R6::R6Class( # nolint: cyclocomp_linter.
+checker <- R6::R6Class(
   "checker",
   public = list(
     #' @field graph (`igraph::igraph()`)\cr
@@ -89,7 +89,7 @@ checker <- R6::R6Class( # nolint: cyclocomp_linter.
       plan,
       n = 2L,
       output = tempfile(paste(packageName(), Sys.Date(), sep = "-")),
-      lib.loc = .libPaths(), # nolint: object_name_linter.
+      lib.loc = .libPaths(),
       repos = getOption("repos"),
       restore = TRUE,
       ...
@@ -170,7 +170,7 @@ checker <- R6::R6Class( # nolint: cyclocomp_linter.
       next_task <- next_task_to_run(self$graph)
       if (length(next_task) > 0) {
         process <- start_task(
-          task = next_task,
+          node = next_task,
           g = self$graph,
           output = self$output,
           lib.loc = private$lib.loc

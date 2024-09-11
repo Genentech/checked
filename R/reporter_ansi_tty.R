@@ -77,9 +77,10 @@ report_sleep.reporter_ansi_tty <- function(
 
 #' @export
 report_initialize.reporter_ansi_tty <- function(
-    reporter,
-    design,
-    envir = parent.frame()) {
+  reporter,
+  design,
+  envir = parent.frame()
+) {
   # named factor vector, names as task aliases and value of last reported status
   reporter$header <- TRUE
   reporter$status <- STATUS$done[c()]
@@ -106,12 +107,15 @@ report_initialize.reporter_ansi_tty <- function(
 
 #' @importFrom igraph V
 #' @export
-report_status.reporter_ansi_tty <- function(reporter, design, envir) { # nolint
+report_status.reporter_ansi_tty <- function(reporter, design, envir) {
   v <- igraph::V(design$graph)
   v_checks <- v[v$type == "check"]
   n_char_titles <- max(nchar(v_checks$name), 0)
   failed_tasks <- design$failed_tasks()
-  failed_packages <- failed_tasks[vlapply(failed_tasks, function(x) x$type == "install")]
+  failed_packages <- failed_tasks[vlapply(
+    failed_tasks,
+    function(x) x$type == "install"
+  )]
 
   # add newly started task status
   new_idx <- which(v_checks$status > STATUS$pending)
@@ -149,15 +153,18 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) { # nolint
       )
     })))
 
-    reporter$failures_buffer <- vcapply(seq_along(failures_buffer), function(i) {
-      paste0(
-        ansi_move_line_rel(i),
-        ansi_line_erase(),
-        failures_buffer[i],
-        ansi_move_line_rel(-i),
-        sep = ""
-      )
-    })
+    reporter$failures_buffer <- vcapply(
+      seq_along(failures_buffer),
+      function(i) {
+        paste0(
+          ansi_move_line_rel(i),
+          ansi_line_erase(),
+          failures_buffer[i],
+          ansi_move_line_rel(-i),
+          sep = ""
+        )
+      }
+    )
 
     # For performance store these value in the environment to redraw warnings
     # buffer only when necessary
@@ -192,7 +199,12 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) { # nolint
 
   cat(paste0(buffer, reporter$failures_buffer))
 
-  is_inst <- vlapply(design$active_processes(), inherits, "install_package_process") # nolint
+  is_inst <- vlapply(
+    design$active_processes(),
+    inherits,
+    "install_package_process"
+  )
+
   inst_pkgs <- names(design$active_processes()[is_inst])
   if (length(inst_pkgs)) {
     inst_msg <- paste0("installing ", paste0(inst_pkgs, collapse = ", "))
@@ -201,17 +213,16 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) { # nolint
   }
 
   n_finished <- sum(v$status[v$type == "check"] >= STATUS$done)
+  print(unique(v$status))
   cli::cli_progress_update(
     set = n_finished,
-    extra = list(
-      message = inst_msg
-    ),
+    extra = list(message = inst_msg),
     .envir = reporter
   )
 }
 
 #' @export
-report_finalize.reporter_ansi_tty <- function(reporter, design) { # nolint
+report_finalize.reporter_ansi_tty <- function(reporter, design) {
   report_status(reporter, design) # report completions of final processes
   cli::ansi_show_cursor()
 }

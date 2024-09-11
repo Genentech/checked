@@ -4,7 +4,13 @@
 \alias{install_task}
 \title{Create a task to install a package and dependencies}
 \usage{
-install_task(origin, type = getOption("pkgType"), INSTALL_opts = NULL, ...)
+install_task(
+  origin,
+  type = getOption("pkgType"),
+  INSTALL_opts = NULL,
+  lib = lib_loc_default(),
+  ...
+)
 }
 \arguments{
 \item{type}{character, indicating the type of package to download and
@@ -20,6 +26,9 @@ install_task(origin, type = getOption("pkgType"), INSTALL_opts = NULL, ...)
     Can also be a named list of character vectors to be used as
     additional options, with names the respective package names.
   }
+
+\item{lib}{Any object that can be passed to \code{\link[=lib]{lib()}} to generate a library
+path.}
 
 \item{...}{Additional parameters passed to \code{\link[=task]{task()}}}
 }

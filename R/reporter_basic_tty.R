@@ -1,9 +1,9 @@
 #' @export
 report_initialize.reporter_basic_tty <- function(
-    # nolint
-    reporter,
-    design,
-    envir = parent.frame()) {
+  reporter,
+  design,
+  envir = parent.frame()
+) {
   # start with initialized-as-completed tasks
   v <- igraph::V(design$graph)
   which_done <- v$status == STATUS$done
@@ -18,7 +18,7 @@ report_initialize.reporter_basic_tty <- function(
 }
 
 #' @export
-report_status.reporter_basic_tty <- function(reporter, design, envir) { # nolint
+report_status.reporter_basic_tty <- function(reporter, design, envir) {
   cli_theme()
   for (i in seq_along(igraph::V(design$graph))) {
     node <- igraph::V(design$graph)[[i]]
@@ -30,7 +30,7 @@ report_status.reporter_basic_tty <- function(reporter, design, envir) { # nolint
 
     # report stating of new checks
     if (!identical(node$status, reporter$statuses[[node$name]])) {
-      status <- switch(as.character(node$status), # nolint
+      status <- switch(as.character(node$status), # nolint (used via glue)
         "pending" = "queued",
         "in progress" = cli::cli_fmt(cli::cli_text("started")),
         "done" = {
@@ -68,7 +68,7 @@ report_status.reporter_basic_tty <- function(reporter, design, envir) { # nolint
         }
       )
 
-      time <- Sys.time() - reporter$time_start # nolint
+      time <- Sys.time() - reporter$time_start # nolint (used via glue)
       prefix <- cli::col_cyan("[{format_time(time)}][{node$type}] ")
       cli::cli_text(prefix, "{.pkg {node$name}} {status}")
       reporter$statuses[[node$name]] <- node$status
@@ -77,9 +77,9 @@ report_status.reporter_basic_tty <- function(reporter, design, envir) { # nolint
 }
 
 #' @export
-report_finalize.reporter_basic_tty <- function(reporter, design) { # nolint
+report_finalize.reporter_basic_tty <- function(reporter, design) {
   cli_theme()
   report_status(reporter, design) # report completions of final processes
-  time <- format_time(Sys.time() - reporter$time_start) # nolint
+  time <- format_time(Sys.time() - reporter$time_start) # nolint (used via glue)
   cli::cli_text("Finished in {.time_taken {time}}")
 }

@@ -55,14 +55,15 @@ NULL
 #' @family checks
 #' @export
 check_rev_deps <- function(
-    path,
-    n = 2L,
-    output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
-    lib.loc = .libPaths(), # nolint: object_name_linter.
-    repos = getOption("repos"),
-    reverse_repos = repos,
-    restore = TRUE,
-    ...) {
+  path,
+  n = 2L,
+  output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
+  lib.loc = .libPaths(),
+  repos = getOption("repos"),
+  reverse_repos = repos,
+  restore = TRUE,
+  ...
+) {
   checks <- checker$new(
     plan_rev_dep_checks(path = path, repos = reverse_repos),
     n = n,
@@ -91,13 +92,14 @@ check_rev_deps <- function(
 #' @family checks
 #' @export
 check_dev_rev_deps <- function(
-    path,
-    n = 2L,
-    output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
-    lib.loc = .libPaths(), # nolint object_name_linter
-    repos = getOption("repos"),
-    restore = TRUE,
-    ...) {
+  path,
+  n = 2L,
+  output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
+  lib.loc = .libPaths(),
+  repos = getOption("repos"),
+  restore = TRUE,
+  ...
+) {
   checks <- checker$new(
     plan_rev_dep_checks(path = path, repos = repos, versions = "dev"),
     n = n,
@@ -125,13 +127,14 @@ check_dev_rev_deps <- function(
 #' @family checks
 #' @export
 check_pkgs <- function(
-    path,
-    n = 2L,
-    output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
-    lib.loc = .libPaths(), # nolint object_name_linter
-    repos = getOption("repos"),
-    restore = TRUE,
-    ...) {
+  path,
+  n = 2L,
+  output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
+  lib.loc = .libPaths(),
+  repos = getOption("repos"),
+  restore = TRUE,
+  ...
+) {
   checks <- checker$new(
     plan_checks(path),
     n = n,
@@ -158,13 +161,14 @@ check_pkgs <- function(
 #' @family checks
 #' @export
 check_dir <- function(
-    path,
-    n = 2L,
-    output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
-    lib.loc = .libPaths(), # nolint object_name_linter
-    repos = getOption("repos"),
-    restore = TRUE,
-    ...) {
+  path,
+  n = 2L,
+  output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
+  lib.loc = .libPaths(),
+  repos = getOption("repos"),
+  restore = TRUE,
+  ...
+) {
   dirs <- list.dirs(path, full.names = TRUE, recursive = FALSE)
   r_packages <- dirs[vlapply(dirs, path_is_pkg)]
   check_pkgs(

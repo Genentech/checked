@@ -105,8 +105,10 @@ plan_single_rev_dep_check <- function(
 
   # development version, testing revdeps against local source
   task_sets[[1]] <- list(
+    # isolate installation of development version
     install_task(
       origin = pkg_origin_local(path = path),
+      lib = lib_loc_isolated(),
       type = "source"
     ),
     check_task(
