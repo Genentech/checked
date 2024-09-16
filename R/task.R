@@ -8,15 +8,13 @@
 #'
 #' @param alias task alias which also serves as unique identifier of the task.
 #' @param package \code{\link[checked]{package}} object
+#' @param tasks Optional additional tasks that are pre-requisites for running
+#'   this task.
 #'
 #' @family tasks
 #' @export
 task <- function(...) {
   structure(list(...), class = "task")
-}
-
-task_hash <- function(x, n = 12) {
-  substring(cli::hash_obj_sha256(x), 1, n)
 }
 
 #' @family tasks
@@ -31,29 +29,48 @@ print.task <- function(x, ...) {
   cat(format(x, ...), "\n")
 }
 
-#' @family tasks
 #' @export
-format.task <- function(x, ...) {
-  if (is.list(x)) {
-    fmt_tasks <- lapply(x, function(xi) format(xi, ...))
-    return(paste0("[", paste0(fmt_tasks, collapse = ", "), "]"))
-  }
+format.task <- function(x, ..., indent = 0L) {
+  paste(collapse = "\n", c(
+    paste0(strrep(" ", indent * 2), "<", friendly_name(x), ">"),
+    vcapply(x$tasks, function(xi) format(xi, ..., indent = indent + 1))
+  ))
+}
 
-  NextMethod()
+#' @export
+friendly_name.task <- function(x) {
+  "task"
 }
 
 friendly_name <- function(x) {
   UseMethod("friendly_name")
 }
 
-#' @family tasks
 #' @export
 friendly_name.default <- function(x) {
   stop(
-    "Dont' know how to name object with class(es) `", 
+    "Dont' know how to name object with class(es) `",
     deparse(class(x)),
     "`"
   )
+}
+
+#' @family tasks
+#' @export
+subtasks <- function(name, tasks, ...) {
+  task <- task(name = name, tasks = tasks, ...)
+  class(task) <- c("subtasks_task", class(task))
+  task
+}
+
+#' Attach Subtasks to an Existing Task
+#'
+#' @family tasks
+#' @export
+with_subtasks <- function(task, tasks) {
+  task$tasks <- tasks
+  class(task) <- c("subtasks_task", class(task))
+  task
 }
 
 #' Create a task to install a package and dependencies
@@ -82,12 +99,7 @@ install_task <- function(
 
 #' @export
 lib.install_task <- function(x, ...) {
-  lib(x$lib, name = task_hash(x), ...)
-}
-
-#' @export
-format.install_task <- function(x, ...) {
-  paste0("<", friendly_name(x), ">")
+  lib(x$lib, name = hash(x), ...)
 }
 
 #' @export
@@ -132,11 +144,6 @@ lib.check_task <- function(x, ...) {
   character(0L)  # no additional libraries needed for checkign
 }
 
-#' @export
-format.check_task <- function(x, ...) {
-  paste0("<", friendly_name(x), ">")
-}
-
 is_check_task <- function(x) {
   inherits(x, "check_task")
 }
@@ -145,6 +152,10 @@ is_check_task <- function(x) {
 #' @export
 friendly_name.check_task <- function(x, ...) {
   paste0("check ", format(x$origin))
+}
+
+friendly_name.subtasks_task <- function(x, ...) {
+  if (!is.null(x$name)) x$name else NextMethod()
 }
 
 #' Create a task to run reverse dependency checks
@@ -163,42 +174,54 @@ revdep_check_task <- function(revdep, ...) {
   task
 }
 
-tasks <- function(x) {
-  structure(x, class = "tasks")
-}
-
-#' @export
-format.tasks <- function(x, ...) {
-  elems <- lapply(x, function(xi) format(xi, ...))
-  paste0("[", paste0(elems, collapse = ", "), "]")
-}
-
+# TODO:
+#   Convert plan to graph
+#
+#   This can probably be avoided if we were to build a task graph from
+#   the start. Plans may be better represented as declarative graphs, which
+#   are then hydrated into imparative graphs. Then the hierarchical
+#   relationships are already encoded in the graph and need not be
+#   rediscovered by building a dependency graph post-hoc.
+#
 as_desc <- function(x, ...) {
   UseMethod("as_desc")
 }
 
 #' @export
-as_desc.list <- function(x, ...) {
-  descs <- list()
-  length(descs) <- length(x)
+as_desc.default <- function(x, ...) {
+  NULL
+}
 
-  for (i in seq_along(x)) {
-    descs[[i]] <- as_desc(x[[i]])
+#' @export
+as_desc.subtasks_task <- function(x, ...) {
+  descs <- list()
+  length(descs) <- length(x$tasks)
+
+  for (i in seq_along(x$tasks)) {
+    descs[[i]] <- as_desc(x$tasks[[i]], ...)
   }
 
   descs <- bind_descs(descs)
-  descs <- sub_aliased_desc(descs)
+
+  # if this subtask is also a task of itself, add to descriptions collection
+  # after substituting aliased package names in dependencies
+  task_desc <- NextMethod()
+  if (!is.null(task_desc)) {
+    descs <- bind_descs(list(task_desc, descs))
+    descs <- sub_desc_aliases(descs)
+  }
+
   descs
 }
 
 #' @export
 as_desc.install_task <- function(x, ...) {
-  cbind(as_desc(x$origin), Task = task_hash(x))
+  cbind(as_desc(x$origin), Task = hash(x))
 }
 
 #' @export
 as_desc.check_task <- function(x, ...) {
-  cbind(as_desc(x$origin), Task = task_hash(x))
+  cbind(as_desc(x$origin), Task = hash(x))
 }
 
 #' @export
@@ -213,7 +236,7 @@ as_desc.pkg_origin_local <- function(x) {
 
   # update the Package field, replacing actual name with an alias
   desc <- cbind(desc, Alias = x$package)
-  rownames(desc) <- desc[, "Package"] <- task_hash(x)
+  rownames(desc) <- desc[, "Package"] <- hash(x)
 
   desc
 }
@@ -234,8 +257,9 @@ flatten.default <- function(x) {
 }
 
 #' @export
-flatten.list <- function(x) {
-  if (!inherits(x, "list")) return(x)
-  unlist(recursive = FALSE, lapply(x, function(xi) flatten(xi)))
+flatten.subtasks_task <- function(x) {
+  unlist(recursive = FALSE, c(
+    list(list(x)),
+    lapply(x$tasks, function(xi) flatten(xi))
+  ))
 }
-

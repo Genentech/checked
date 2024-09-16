@@ -43,12 +43,11 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
 
   # build task hashmap, allowing for graph analysis using description files
   taskmap <- unique(flatten(plan))
-  names(taskmap) <- vcapply(taskmap, task_hash)
+  names(taskmap) <- vcapply(taskmap, hash)
 
   # build supplementary database entries for package tasks
   # tasks receive an additional "Task" column, containing a hash of the task
-  desc_db <- lapply(plan, function(x) as_desc(x))
-  desc_db <- unique(bind_descs(desc_db))
+  desc_db <- unique(as_desc(plan))
   packages <- desc_db[, "Package"]
 
   # add task package origin descriptions into database
@@ -56,8 +55,6 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
   db <- cbind(db, Task = NA_character_)
   db <- rbind(desc_db[, colnames(db)], db)
   db <- db[!duplicated(db[, c("Package", DB_COLNAMES)]), ]
-
-  browser()
 
   # create dependencies graph
   g <- package_graph(db, packages)

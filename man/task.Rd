@@ -10,6 +10,9 @@ task(...)
 \item{alias}{task alias which also serves as unique identifier of the task.}
 
 \item{package}{\code{\link[checked]{package}} object}
+
+\item{tasks}{Optional additional tasks that are pre-requisites for running
+this task.}
 }
 \description{
 Create task specification list which consists of all the details required
@@ -24,6 +27,7 @@ Other tasks:
 \code{\link{check_task}()},
 \code{\link{custom_install_task}()},
 \code{\link{install_task}()},
-\code{\link{revdep_check_task}()}
+\code{\link{revdep_check_task}()},
+\code{\link{with_subtasks}()}
 }
 \concept{tasks}

@@ -26,7 +26,7 @@ lib_loc_isolated <- function() {
 #' @param lib.loc A set of library locations, used as defaults for objects
 #'   that may make use of them.
 #'
-lib <- function(x, ..., lib.loc = c()) { # nolint: object_name_linter.
+lib <- function(x, ..., lib.loc = c()) {
   UseMethod("lib")
 }
 

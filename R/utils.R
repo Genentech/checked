@@ -1,6 +1,10 @@
 #' @import cli
 NULL
 
+hash <- function(x, n = 12) {
+  substring(cli::hash_obj_sha256(x), 1, n)
+}
+
 base_pkgs <- function() {
   c("R", utils::installed.packages(priority = "base")[, "Package"])
 }

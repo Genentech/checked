@@ -64,8 +64,11 @@ get_desc_field <- function(path, field) {
   read.dcf(desc)[, field]
 }
 
-sub_aliased_desc <- function(desc) {
-  if (!"Alias" %in% colnames(desc)) return(desc)
+sub_desc_aliases <- function(
+  desc, 
+  aliases = if ("Alias" %in% colnames(desc)) desc[, "Alias"]
+) {
+  if (is.null(aliases)) return(desc)
 
   # create mapping from package name to aliased name
   has_alias <- !is.na(desc[, "Alias"])
