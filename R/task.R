@@ -17,6 +17,11 @@ task <- function(...) {
   structure(list(...), class = "task")
 }
 
+make_unique_task <- function(task, seed = runif(1)) {
+  task$id <- hash(seed)
+  task
+}
+
 #' @family tasks
 #' @export
 lib.task <- function(x, ...) {
@@ -156,6 +161,40 @@ friendly_name.check_task <- function(x, ...) {
 
 friendly_name.subtasks_task <- function(x, ...) {
   if (!is.null(x$name)) x$name else NextMethod()
+}
+
+#' Specify a library install
+#'
+#' A declarative task that specifies a set of packages that should be installed
+#' to a given location. This task is typically used during planning of checks,
+#' but does not spawn a process. It is used primarily for organizing the
+#' library precedence for check tasks.
+#'
+library_task <- function(packages, loc = lib_loc_default(), ...) {
+  task <- task(...)
+  task$packages <- packages
+  task$loc <- loc
+  class(task) <- c("library_task", class(task))
+  task
+}
+
+#' @export
+friendly_name.library_task <- function(x, ...) {
+  fmt_pkgs <- if (is.null(x$packages)) {
+    "all other packages"
+  } else if (length(x$packages) <= 3) {
+    paste0(
+      "package(s) ",
+      paste0(collapse = ", ", vcapply(
+        x$packages,
+        function(pkg) format(pkg, short = TRUE)
+      ))
+    )
+  } else {
+    paste0(length(x$packages), " packages")
+  }
+
+  paste(format(x$loc), "with", fmt_pkgs)
 }
 
 #' Create a task to run reverse dependency checks

@@ -86,61 +86,61 @@ plan_rev_dep_checks <- function(
     return(empty_checks_df)
   }
 
-  subtasks(paste(package, "rev dep checks"), tasks = lapply(
-    revdeps,
-    plan_single_rev_dep_check,
-    path = path,
-    package = package,
-    repos = repos
+  g <- merge_subgraphs(c(
+    lapply(
+      revdeps,
+      plan_rev_dep_dev_check,
+      path = path,
+      repos = repos
+    ),
+    lapply(
+      revdeps[revdeps %in% ap[, "Package"]],
+      plan_rev_dep_release_check,
+      repos = repos
+    )
   ))
+
+  class(g) <- c("task_graph", class(g))
+  g
 }
 
-plan_single_rev_dep_check <- function(
-  path,
-  package,
-  revdep,
-  repos
-) {
-  subtasks(
-    paste(revdep, "checks"),
-    tasks = Filter(Negate(is.null), list(
-      # development version, testing revdeps against local source
-      with_subtasks(
-        check_task(
-          origin = pkg_origin_repo(package = revdep, repos = repos),
-          env = DEFAULT_R_CMD_CHECK_ENVVARS,
-          args = DEFAULT_R_CMD_CHECK_ARGS,
-          build_args = DEFAULT_R_CMD_BUILD_ARGS
-        ),
-        list(
-          # isolate installation of development version
-          install_task(
-            origin = pkg_origin_local(path = path),
-            lib = lib_loc_isolated(),
-            type = "source"
-          )
-        )
-      ),
+plan_rev_dep_dev_check <- function(path, revdep, repos) {
+  check_revdep <- make_unique_task(seed = "dev", check_task(
+    origin = pkg_origin_repo(package = revdep, repos = repos),
+    env = DEFAULT_R_CMD_CHECK_ENVVARS,
+    args = DEFAULT_R_CMD_CHECK_ARGS,
+    build_args = DEFAULT_R_CMD_BUILD_ARGS
+  ))
 
-      # release version, testing revdep against repo source
-      if (package %in% available_packages(repos = repos)[, "Package"]) {
-        with_subtasks(
-          check_task(
-            origin = pkg_origin_repo(package = revdep, repos = repos),
-            env = DEFAULT_R_CMD_CHECK_ENVVARS,
-            args = DEFAULT_R_CMD_CHECK_ARGS,
-            build_args = DEFAULT_R_CMD_BUILD_ARGS
-          ),
-          list(
-            install_task(
-              origin = pkg_origin_repo(package = package, repos = repos),
-              type = "source"
-            )
-          )
-        )
-      }
-    ))
+  install_dev <- library_task(
+    packages = list(pkg_origin_local(path = path)),
+    loc = lib_loc_isolated()
   )
+
+  install_deps <- library_task(
+    packages = NULL
+  )
+
+  tasks <- list(check_revdep, install_dev, install_deps)
+  names(tasks) <- lapply(tasks, hash)
+  sequence_graph(name = names(tasks), task = tasks)
+}
+
+plan_rev_dep_release_check <- function(revdep, repos) {
+  check_revdep <- make_unique_task(seed = "release", check_task(
+    origin = pkg_origin_repo(package = revdep, repos = repos),
+    env = DEFAULT_R_CMD_CHECK_ENVVARS,
+    args = DEFAULT_R_CMD_CHECK_ARGS,
+    build_args = DEFAULT_R_CMD_BUILD_ARGS
+  ))
+
+  install_deps <- library_task(
+    packages = NULL
+  )
+
+  tasks <- list(check_revdep, install_deps)
+  names(tasks) <- lapply(tasks, hash)
+  sequence_graph(name = names(tasks), task = tasks)
 }
 
 rev_dep_check_tasks <- function(packages, repos, aliases, revdep) {

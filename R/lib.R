@@ -12,6 +12,11 @@ lib_loc <- function(x = list(), .class = c()) {
   structure(x, class = c(.class, "lib_loc"))
 }
 
+#' @export
+format.lib_loc <- function(x, ...) {
+  "library"
+}
+
 lib_loc_default <- function() {
   lib_loc(.class = "lib_loc_default")
 }

@@ -16,21 +16,24 @@ pkg_origin <- function(package, ..., .class = c()) {
 }
 
 #' @export
-format.pkg_origin <- function(x, ...) {
+format.pkg_origin <- function(x, ..., short = FALSE) {
   paste(collapse = " ", c(
-    x$package,
-    if (!is.null(x$version)) {
+    if (!short) x$package,
+    if (!short && !is.null(x$version)) {
       switch(class(x$version)[[1]],
         package_version = paste0("(v", format(x$version), ")"),
         x$version
       )
     },
     if (!is.null(x$source)) {
-      paste0("from ", if (is.null(names(x$source))) {
-        format(x$source, pretty = TRUE)
-      } else {
-        names(x$source)
-      })
+      paste0(
+        if (!short) "from ",
+        if (is.null(names(x$source))) {
+          format(x$source, pretty = TRUE)
+        } else {
+          names(x$source)
+        }
+      )
     }
   ))
 }

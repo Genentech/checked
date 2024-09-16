@@ -49,3 +49,25 @@ as_pkg_dependencies <- function(x) {
   if (!is.list(x)) x <- list(x)
   do.call(into_deptype_list, x)
 }
+
+pkg_dependencies <- function(
+  packages,
+  dependencies = TRUE,
+  repos = getOption("repos")
+) {
+  dependencies <- as_pkg_dependencies(dependencies)
+  unique(unlist(c(
+    tools::package_dependencies(
+      packages = packages,
+      db = available_packages(repos = repos),
+      recursive = FALSE,
+      which = dependencies$direct
+    ),
+    tools::package_dependencies(
+      packages = packages,
+      db = available_packages(repos = repos),
+      recursive = TRUE,
+      which = dependencies$indirect
+    )
+  )))
+}

@@ -364,3 +364,55 @@ is_package_done <- function(pkg, lib.loc) {
   path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
   length(path) > 0
 }
+
+#' @export
+plot.task_graph <- function(x, ...) {
+  color_by_task_type <- c(
+    "check_task" = "lightblue",
+    "library_task" = "lightgreen",
+    "install_task" = "cornflowerblue",
+    "red"
+  )
+
+  shape_by_task_type <- c(
+    "library_task" = "square",
+    "circle"
+  )
+
+  size_by_task_type <- c(
+    "install_task" = 5,
+    15
+  )
+
+  task_type <- vcapply(igraph::V(x)$task, function(task) class(task)[[1]])
+  label <- vcapply(igraph::V(x)$task, function(task) friendly_name(task))
+
+  color <- color_by_task_type[match(
+    task_type,
+    names(color_by_task_type),
+    nomatch = length(color_by_task_type)
+  )]
+
+  shape <- shape_by_task_type[match(
+    task_type,
+    names(shape_by_task_type),
+    nomatch = length(shape_by_task_type)
+  )]
+
+  size <- size_by_task_type[match(
+    task_type,
+    names(size_by_task_type),
+    nomatch = length(size_by_task_type)
+  )]
+
+  igraph::plot.igraph(
+    x,
+    vertex.label.family = "sans",
+    vertex.label.color = "gray4",
+    vertex.label.dist = 2.5,
+    vertex.label = label,
+    vertex.color = color,
+    vertex.shape = shape,
+    vertex.size = size
+  )
+}
