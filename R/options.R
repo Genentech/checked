@@ -43,10 +43,13 @@ options::define_options(
 )
 
 #' @eval options::as_roxygen_docs()
+#' 
+#' @family documentation
 NULL
 
 #' Checked Options
 #' @eval options::as_params()
 #' @name options_params
 #'
+#' @family documentation
 NULL

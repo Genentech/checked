@@ -76,4 +76,8 @@ named \code{character} vector of environment variables to use during R CMD check
 
 \seealso{
 options getOption Sys.setenv Sys.getenv
+
+Other documentation: 
+\code{\link{options_params}}
 }
+\concept{documentation}

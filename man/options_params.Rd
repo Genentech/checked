@@ -29,3 +29,8 @@ progress from the same \code{output} (Defaults to \code{NA}, overwritable using 
 \description{
 Checked Options
 }
+\seealso{
+Other documentation: 
+\code{\link{options}()}
+}
+\concept{documentation}
