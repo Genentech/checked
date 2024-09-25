@@ -155,9 +155,9 @@ rev_dep_check_tasks_specs <- function(packages, repos, aliases, revdep, ...) {
     function(
       p,
       a,
-      env = NULL,
-      args = NULL,
-      build_args = NULL
+      env = options::opt("check_envvars"),
+      args = options::opt("check_args"),
+      build_args = options::opt("check_build_args")
     ) {
       revdep_check_task_spec(
         alias = a,
@@ -187,9 +187,9 @@ rev_dep_check_tasks_specs_development <- function(
     function(
       p,
       a,
-      env = NULL,
-      args = NULL,
-      build_args = NULL
+      env = options::opt("check_envvars"),
+      args = options::opt("check_args"),
+      build_args = options::opt("check_build_args")
     ) {
       check_task_spec(
         alias = a,
@@ -254,9 +254,9 @@ source_check_tasks_specs <- function(packages, path, aliases, ...) {
       p,
       path,
       a,
-      env = NULL,
-      args = NULL,
-      build_args = NULL) {
+      env = options::opt("check_envvars"),
+      args = options::opt("check_args"),
+      build_args = options::opt("check_build_args")) {
       
       check_task_spec(
         alias = a,

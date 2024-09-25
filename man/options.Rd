@@ -52,23 +52,23 @@ progress from the same \code{output}\item{default: }{\preformatted{NA}}
 \item{envvar: }{R_CHECKED_RESTORE (evaluated if possible, raw string otherwise)}
 }}
 
-\item{default_check_env_variables}{\describe{
-\code{logical} indicating whether default R CMD check related enviromental
-variables should be appended.\item{default: }{\preformatted{TRUE}}
-\item{option: }{checked.default_check_env_variables}
-\item{envvar: }{R_CHECKED_DEFAULT_CHECK_ENV_VARIABLES (evaluated if possible, raw string otherwise)}
+\item{check_envvars}{\describe{
+named \code{character} vector of environment variables to use during R CMD check.\item{default: }{\preformatted{c(`_R_CHECK_FORCE_SUGGESTS_` = FALSE, `_R_CHECK_RD_XREFS_` = FALSE, 
+    `_R_CHECK_SYSTEM_CLOCK_` = FALSE, `_R_CHECK_SUGGESTS_ONLY_` = TRUE)}}
+\item{option: }{checked.check_envvars}
+\item{envvar: }{R_CHECKED_CHECK_ENVVARS (evaluated if possible, raw string otherwise)}
 }}
 
-\item{default_check_build_args}{\describe{
-\code{logical} indicating whether default R CMD check build args should be appended.\item{default: }{\preformatted{TRUE}}
-\item{option: }{checked.default_check_build_args}
-\item{envvar: }{R_CHECKED_DEFAULT_CHECK_BUILD_ARGS (evaluated if possible, raw string otherwise)}
+\item{check_build_args}{\describe{
+\code{character} vector of args passed to the R CMD build.\item{default: }{\preformatted{c("--no-build-vignettes", "--no-manual")}}
+\item{option: }{checked.check_build_args}
+\item{envvar: }{R_CHECKED_CHECK_BUILD_ARGS (evaluated if possible, raw string otherwise)}
 }}
 
-\item{default_check_args}{\describe{
-\code{logical} indicating whether default R CMD check args should be appended.\item{default: }{\preformatted{TRUE}}
-\item{option: }{checked.default_check_args}
-\item{envvar: }{R_CHECKED_DEFAULT_CHECK_ARGS (evaluated if possible, raw string otherwise)}
+\item{check_args}{\describe{
+\code{character} vector of args passed to the R CMD check.\item{default: }{\preformatted{c("--timings", "--ignore-vignettes", "--no-manual")}}
+\item{option: }{checked.check_args}
+\item{envvar: }{R_CHECKED_CHECK_ARGS (evaluated if possible, raw string otherwise)}
 }}
 
 }

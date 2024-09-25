@@ -42,39 +42,33 @@ test_that("task_df functions can specify subprocesses configuration", {
     df <- rev_dep_check_tasks_df(
       test_path("testing_pkgs", "DALEXtra"),
       repos = "https://cran.r-project.org/",
-      env = c("NOT_CRAN" = "false"),
-      args = c("--some-option", "--other-option"),
-      build_args = c("--yet-another-option")
+      env = c("NOT_CRAN" = "false", options::opt("check_envvars")),
+      args = c("--some-option", "--other-option", options::opt("check_args")),
+      build_args = c("--yet-another-option", options::opt("check_build_args"))
     )
   )
   
   expect_identical(
     df$package[[1]]$env, 
-    c("NOT_CRAN" = "false", DEFAULT_CHECK_ENV_VARIABLES)
+    c("NOT_CRAN" = "false", options::opt("check_envvars"))
   )
   expect_identical(
     df$package[[1]]$args, 
-    c("--some-option", "--other-option", DEFAULT_CHECK_ARGS)
+    c("--some-option", "--other-option", options::opt("check_args"))
   )
   expect_identical(
     df$package[[1]]$build_args, 
-    c("--yet-another-option", DEFAULT_CHECK_BUILD_ARGS)
+    c("--yet-another-option", options::opt("check_build_args"))
   )
 
-  withr::with_envvar(
-    c(R_CHECKED_DEFAULT_CHECK_ENV_VARIABLES = "FALSE",
-      R_CHECKED_DEFAULT_CHECK_ARGS = "FALSE",
-      R_CHECKED_DEFAULT_CHECK_BUILD_ARGS = "FALSE"), {
-        expect_silent(
-          df <- rev_dep_check_tasks_df(
-            test_path("testing_pkgs", "DALEXtra"),
-            repos = "https://cran.r-project.org/",
-            env = c("NOT_CRAN" = "false"),
-            args = c("--some-option", "--other-option"),
-            build_args = c("--yet-another-option")
-          )
-        )
-      }
+  expect_silent(
+    df <- rev_dep_check_tasks_df(
+      test_path("testing_pkgs", "DALEXtra"),
+      repos = "https://cran.r-project.org/",
+      env = c("NOT_CRAN" = "false"),
+      args = c("--some-option", "--other-option"),
+      build_args = c("--yet-another-option")
+    )
   )
   
   expect_identical(
@@ -91,13 +85,12 @@ test_that("task_df functions can specify subprocesses configuration", {
   )
   
   withr::with_envvar(
-    c(R_CHECKED_DEFAULT_CHECK_BUILD_ARGS = "FALSE"), {
+    c(R_CHECKED_CHECK_ARGS = "c('--some-option', '--other-option')",
+      R_CHECKED_CHECK_BUILD_ARGS = "c('--yet-another-option')"), {
         expect_silent(
           df <- source_check_tasks_df(
             path,
-            env = c("NOT_CRAN" = "false"),
-            args = c("--some-option", "--other-option"),
-            build_args = c("--yet-another-option")
+            build_args = c("--another-option", options::opt("check_build_args"))
           )
         )
       }
@@ -105,15 +98,15 @@ test_that("task_df functions can specify subprocesses configuration", {
   
   expect_identical(
     df$package[[1]]$env, 
-    c("NOT_CRAN" = "false", DEFAULT_CHECK_ENV_VARIABLES)
+    options::opt("check_envvars")
   )
   expect_identical(
     df$package[[1]]$args, 
-    c("--some-option", "--other-option", DEFAULT_CHECK_ARGS)
+    c("--some-option", "--other-option")
   )
   expect_identical(
     df$package[[1]]$build_args, 
-    "--yet-another-option"
+    c("--another-option", "--yet-another-option")
   )
   
 })

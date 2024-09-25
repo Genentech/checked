@@ -5,11 +5,11 @@ test_that("check_pkgs works as expected", {
     file.path(examples_path, "exampleGood"),
     file.path(examples_path, "exampleBad")
   ), n = 2L, repos = "https://cran.r-project.org/",
-  env = c(NOT_CRAN = "false")))
+  env = c(NOT_CRAN = "false", options::opt("check_envvars"))))
   
   expect_identical(
     design$input$package[[1]]$env, 
-    c("NOT_CRAN" = "false", DEFAULT_CHECK_ENV_VARIABLES)
+    c(NOT_CRAN = "false", options::opt("check_envvars"))
   )
 })
 

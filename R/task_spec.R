@@ -10,16 +10,15 @@
 #'
 #' @family tasks
 #' @export
-task_spec <- function(alias = NULL, package_spec = NULL, env = NULL) {
+task_spec <- function(
+    alias = NULL,
+    package_spec = NULL,
+    env = options::opt("check_envvars")) {
   structure(
     list(
       alias = alias,
       package_spec = package_spec,
-      env = merge_default_configuration(
-        env, 
-        DEFAULT_CHECK_ENV_VARIABLES,
-        "default_check_env_variables"
-      )
+      env = env
     ),
     class = "task_spec"
   )
@@ -85,17 +84,15 @@ custom_install_task_spec <- function(...) {
 #'
 #' @family tasks
 #' @export
-check_task_spec <- function(args = NULL, build_args = NULL, ...) {
+check_task_spec <- function(
+    args = options::opt("check_args"),
+    build_args = options::opt("check_build_args"),
+    ...) {
+  
   task_spec <- task_spec(...)
   check_spec <- list(
-    args = merge_default_configuration(
-      args, 
-      DEFAULT_CHECK_ARGS,
-      "default_check_args"),
-    build_args = merge_default_configuration(
-      build_args, 
-      DEFAULT_CHECK_BUILD_ARGS,
-      "default_check_build_args")
+    args = args,
+    build_args = build_args
   )
 
   structure(

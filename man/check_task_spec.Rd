@@ -4,7 +4,11 @@
 \alias{check_task_spec}
 \title{Create a task to run \verb{R CMD check}}
 \usage{
-check_task_spec(args = NULL, build_args = NULL, ...)
+check_task_spec(
+  args = options::opt("check_args"),
+  build_args = options::opt("check_build_args"),
+  ...
+)
 }
 \arguments{
 \item{args}{Character vector of arguments to pass to \verb{R CMD check}. Pass each

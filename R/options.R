@@ -20,15 +20,26 @@ options::define_options(
    progress from the same `output`",
   restore = NA,
   
-  "`logical` indicating whether default R CMD check related enviromental
-   variables should be appended.",
-  default_check_env_variables = TRUE,
+  "named `character` vector of environment variables to use during R CMD check.",
+  check_envvars = c(
+    "_R_CHECK_FORCE_SUGGESTS_" = FALSE,
+    "_R_CHECK_RD_XREFS_" = FALSE,
+    "_R_CHECK_SYSTEM_CLOCK_" = FALSE,
+    "_R_CHECK_SUGGESTS_ONLY_" = TRUE
+  ),
 
-  "`logical` indicating whether default R CMD check build args should be appended.",
-  default_check_build_args = TRUE,
+  "`character` vector of args passed to the R CMD build.",
+  check_build_args = c(
+    "--no-build-vignettes",
+    "--no-manual"
+  ),
 
-  "`logical` indicating whether default R CMD check args should be appended.",
-  default_check_args = TRUE
+  "`character` vector of args passed to the R CMD check.",
+  check_args = c(
+    "--timings",
+    "--ignore-vignettes",
+    "--no-manual"
+  )
 )
 
 #' @eval options::as_roxygen_docs()
