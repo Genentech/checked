@@ -21,6 +21,9 @@
 
 * Prettify output by stripping excessive new lines.
 
+* Force garbage collection before scheduling task, to make sure any already
+  finished processes are removed from the memory.
+
 # checked 0.2.3
 
 * Use custom `checked` `finisher`'s instead of the `processx` `finalizer`'s
