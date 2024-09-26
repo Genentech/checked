@@ -161,6 +161,8 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
 
       if (self$is_done()) {
         return(-1L)
+      } else {
+        gc(FALSE, FALSE, TRUE)
       }
 
       # if all available processes are in use, terminate early
