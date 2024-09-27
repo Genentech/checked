@@ -1,13 +1,11 @@
 examples_path <- system.file("example_packages", package = "checked")
-names <- c("DALEXtra_new", "rd2markdown_new", "exampleGood_new", "exampleOkay_new", "exampleBad_new")
-path <- path_broken <- c(
+path <- c(
   test_path("testing_pkgs", "DALEXtra"),
   test_path("testing_pkgs", "rd2markdown"),
   file.path(examples_path, "exampleGood"),
   file.path(examples_path, "exampleOkay"),
   file.path(examples_path, "exampleBad")
 )
-names(path_broken) <- names
 
 test_that("rev_dep_check_tasks_df works with deafult params", {
   expect_silent(
@@ -155,12 +153,16 @@ test_that("source_check_tasks_df works as expected", {
 })
 
 test_that("source_check_tasks_df aliases are properly handled", {
+  broken_names <- c("DALEXtra_new", "rd2markdown_new", "exampleGood_new", "exampleOkay_new", "exampleBad_new")
+  path_broken <- path
+  names(path_broken) <- broken_names
+  
   expect_silent(
     df <- source_check_tasks_df(path_broken)
   )
 
   expect_true(all(endsWith(df$alias, "_new")))
-  expect_equal(df$alias, names)
+  expect_equal(df$alias, broken_names)
 
   expect_silent(
     df <- source_check_tasks_df(c(

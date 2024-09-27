@@ -25,6 +25,9 @@
 
 * Expose `...` allowing customization of check subprocesses when creating checks df.
 
+* Force garbage collection before scheduling task, to make sure any already
+  finished processes are removed from the memory.
+
 # checked 0.2.3
 
 * Use custom `checked` `finisher`'s instead of the `processx` `finalizer`'s

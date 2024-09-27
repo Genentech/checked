@@ -99,26 +99,7 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
           !any(uulist(drlapply(df$custom, `[[`, "alias")) %in% df$alias)
       )
       
-      if (dir.exists(output)) {
-        if (is.na(restore)) {
-          restore <- if (interactive()) {
-            switch(
-              menu(
-                c("Yes", "No"),
-                title = "Do you want to restore previous results?"
-              ),
-              "1" = TRUE,
-              "2" = FALSE
-            )
-          } else {
-            FALSE
-          }
-
-          if (!restore) {
-            unlink(output, recursive = TRUE, force = TRUE)
-          }
-        }
-      }
+      check_past_output(output, restore, ask = interactive())
       
       dir_create(output)
       
@@ -182,6 +163,9 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
       if (self$is_done()) {
         return(-1L)
       }
+      
+      # force garbage collection to free memory from terminated processes
+      gc(verbose = FALSE, reset = FALSE, full = TRUE)
 
       # if all available processes are in use, terminate early
       n_active <- length(private$active)
@@ -271,4 +255,31 @@ print.check_design <- function(x, ...) {
     print(x$input, ...)
   }
   invisible(x)
+}
+
+check_past_output <- function(output, restore, ask = interactive()) {
+  if (dir.exists(output)) {
+    if (is.na(restore)) {
+      restore <- if (ask) {
+        switch(
+          restore_menu(),
+          "1" = TRUE,
+          "2" = FALSE
+        )
+      } else {
+        FALSE
+      }
+    }
+    
+    if (!restore) {
+      unlink(output, recursive = TRUE, force = TRUE)
+    }
+  }
+}
+
+restore_menu <- function() {
+  menu(
+    c("Yes", "No"),
+    title = "Do you want to restore previous results?"
+  )
 }
