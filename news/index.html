@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">checked</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.3.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.3.9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,7 @@
 <li><p>Add tests for the reverse dependency check use case.</p></li>
 <li><p>Make <code>install_packages_process</code> capture session’s <code>available_packages_filters</code> and reuse them when installing packages to ensure consistency with the main session filtering.</p></li>
 <li><p>Prettify output by stripping excessive new lines.</p></li>
+<li><p>Force garbage collection before scheduling task, to make sure any already finished processes are removed from the memory.</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.3" id="checked-023">checked 0.2.3<a class="anchor" aria-label="anchor" href="#checked-023"></a></h2>
@@ -90,7 +91,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

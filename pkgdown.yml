@@ -1,8 +1,8 @@
 pandoc: 3.1.11
-pkgdown: 2.1.0
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles: {}
-last_built: 2024-08-30T17:53Z
+last_built: 2024-09-27T13:04Z
 urls:
   reference: https://Genentech.github.io/checked/reference
   article: https://Genentech.github.io/checked/articles
