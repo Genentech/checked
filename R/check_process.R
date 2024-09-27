@@ -14,24 +14,6 @@ RE_CHECK <- paste0(
 )
 # nolint end, styler: on
 
-DEFAULT_CHECK_ENV_VARIABLES <- c( # nolint
-  "_R_CHECK_FORCE_SUGGESTS_" = FALSE,
-  "_R_CHECK_RD_XREFS_" = FALSE,
-  "_R_CHECK_SYSTEM_CLOCK_" = FALSE,
-  "_R_CHECK_SUGGESTS_ONLY_" = TRUE
-)
-
-DEFAULT_CHECK_BUILD_ARGS <- c( # nolint
-  "--no-build-vignettes",
-  "--no-manual"
-)
-
-DEFAULT_CHECK_ARGS <- c( # nolint
-  "--timings",
-  "--ignore-vignettes",
-  "--no-manual"
-)
-
 #' @importFrom R6 R6Class
 #' @importFrom rcmdcheck rcmdcheck_process
 check_process <- R6::R6Class(
