@@ -161,11 +161,10 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
 
       if (self$is_done()) {
         return(-1L)
-      } else {
-        # Force garbage collection to make sure memory used by any processes 
-        # that have already finished is freed. 
-        gc(verbose = FALSE, reset = FALSE, full = TRUE)
       }
+      
+      # force garbage collection to free memory from terminated processes
+      gc(verbose = FALSE, reset = FALSE, full = TRUE)
 
       # if all available processes are in use, terminate early
       n_active <- length(private$active)
