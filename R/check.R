@@ -19,10 +19,7 @@
 #'   to pull sources for reverse dependencies. In some cases, for instance using
 #'   binaries on Linux, we want to use different repositories when pulling
 #'   sources to check and different when installing dependencies.
-#' @param restore `logical` indicating whether output directory should be
-#'   unlinked before running checks. If `FALSE`, an attempt will me made to
-#'   restore previous progress from the same `output`
-#' @param ... Additional arguments passed to [`run()`]
+#' @param ... Additional arguments passed to [`checked-task-df`] and [`run()`]
 #'
 #' @return
 #'   [`check_design()`] R6 class storing all the details
@@ -48,6 +45,7 @@ NULL
 #' identify changes in reverse dependency behaviors.
 #'
 #' @inheritParams check_functions
+#' @inheritParams options_params
 #' @inheritParams run
 #'
 #' @inherit check_functions return
@@ -61,10 +59,15 @@ check_rev_deps <- function(
     lib.loc = .libPaths(), # nolint object_name_linter
     repos = getOption("repos"),
     reverse_repos = repos,
-    restore = TRUE,
+    restore = options::opt("restore"),
     reporter = reporter_default(),
     ...) {
-  checks <- rev_dep_check_tasks_df(path = path, repos = reverse_repos)
+  
+  checks <- rev_dep_check_tasks_df(
+    path = path,
+    repos = reverse_repos,
+    ...
+  )
 
   plan <- check_design$new(
     checks,
@@ -74,7 +77,7 @@ check_rev_deps <- function(
     repos = repos,
   )
 
-  run(plan, ...)
+  run(plan, reporter = reporter, ...)
   plan
 }
 
@@ -87,6 +90,7 @@ check_rev_deps <- function(
 #' as a `Suggests` dependency.
 #'
 #' @inheritParams check_functions
+#' @inheritParams options_params
 #' @inheritParams run
 #'
 #' @inherit check_functions return
@@ -99,9 +103,16 @@ check_dev_rev_deps <- function(
     output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
     lib.loc = .libPaths(), # nolint object_name_linter
     repos = getOption("repos"),
-    restore = TRUE,
+    restore = options::opt("restore"),
+    reporter = reporter_default(),
     ...) {
-  checks <- rev_dep_check_tasks_df(path = path, repos = repos, versions = "dev")
+  
+  checks <- rev_dep_check_tasks_df(
+    path = path,
+    repos = repos,
+    versions = "dev",
+    ...
+  )
 
   plan <- check_design$new(
     checks,
@@ -112,7 +123,7 @@ check_dev_rev_deps <- function(
     restore = restore
   )
 
-  run(plan, ...)
+  run(plan, reporter = reporter, ...)
   plan
 }
 
@@ -123,6 +134,7 @@ check_dev_rev_deps <- function(
 #' `path` directory
 #'
 #' @inheritParams check_functions
+#' @inheritParams options_params
 #' @inheritParams run
 #'
 #' @inherit check_functions return
@@ -135,9 +147,11 @@ check_pkgs <- function(
     output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
     lib.loc = .libPaths(), # nolint object_name_linter
     repos = getOption("repos"),
-    restore = TRUE,
+    restore = options::opt("restore"),
+    reporter = reporter_default(),
     ...) {
-  checks <- source_check_tasks_df(path)
+  
+  checks <- source_check_tasks_df(path, ...)
 
   plan <- check_design$new(
     checks,
@@ -148,7 +162,7 @@ check_pkgs <- function(
     restore = restore
   )
 
-  run(plan, ...)
+  run(plan, reporter = reporter, ...)
   plan
 }
 
@@ -158,6 +172,7 @@ check_pkgs <- function(
 #' (non-recursively) and passes them to the [`check_pkgs()`]
 #'
 #' @inheritParams check_functions
+#' @inheritParams options_params
 #' @inheritParams run
 #'
 #' @inherit check_functions return
@@ -170,7 +185,8 @@ check_dir <- function(
     output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
     lib.loc = .libPaths(), # nolint object_name_linter
     repos = getOption("repos"),
-    restore = TRUE,
+    restore = options::opt("restore"),
+    reporter = reporter_default(),
     ...) {
   dirs <- list.dirs(path, full.names = TRUE, recursive = FALSE)
   r_packages <- dirs[vlapply(dirs, path_is_pkg)]
@@ -182,6 +198,7 @@ check_dir <- function(
     lib.loc = lib.loc,
     repos = repos,
     restore = restore,
+    reporter = reporter,
     ...
   )
 }

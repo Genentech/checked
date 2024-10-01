@@ -4,7 +4,11 @@
 \alias{task_spec}
 \title{Task specification}
 \usage{
-task_spec(alias = NULL, package_spec = NULL, env = NULL)
+task_spec(
+  alias = NULL,
+  package_spec = NULL,
+  env = options::opt("check_envvars")
+)
 }
 \arguments{
 \item{alias}{task alias which also serves as unique identifier of the task.}

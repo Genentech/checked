@@ -21,6 +21,10 @@
 
 * Prettify output by stripping excessive new lines.
 
+* `checked` now depends on `options`
+
+* Expose `...` allowing customization of check subprocesses when creating checks df.
+
 * Force garbage collection before scheduling task, to make sure any already
   finished processes are removed from the memory.
 

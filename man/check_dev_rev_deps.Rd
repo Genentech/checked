@@ -10,7 +10,8 @@ check_dev_rev_deps(
   output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
   lib.loc = .libPaths(),
   repos = getOption("repos"),
-  restore = TRUE,
+  restore = options::opt("restore"),
+  reporter = reporter_default(),
   ...
 )
 }
@@ -29,11 +30,14 @@ checking packages, defaults to entire \code{\link[=.libPaths]{.libPaths()}}.}
 \item{repos}{\code{character} vector of repositories which will be used when
 generating task graph and later pulling dependencies.}
 
-\item{restore}{\code{logical} indicating whether output directory should be
-unlinked before running checks. If \code{FALSE}, an attempt will me made to
-restore previous progress from the same \code{output}}
+\item{restore}{\code{logical} indicating whether output directory should be unlinked before
+running checks. If \code{FALSE}, an attempt will me made to restore previous
+progress from the same \code{output} (Defaults to \code{NA}, overwritable using option 'checked.restore' or environment variable 'R_CHECKED_RESTORE')}
 
-\item{...}{Additional arguments passed to \code{\link[=run]{run()}}}
+\item{reporter}{A reporter to provide progress updates. Will default to the
+most expressive command-line reporter given your terminal capabilities.}
+
+\item{...}{Additional arguments passed to \code{\link{checked-task-df}} and \code{\link[=run]{run()}}}
 }
 \value{
 \code{\link[=check_design]{check_design()}} R6 class storing all the details

@@ -86,7 +86,7 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
       output = tempfile(paste(packageName(), Sys.Date(), sep = "-")),
       lib.loc = .libPaths(), # nolint object_name_linter
       repos = getOption("repos"),
-      restore = TRUE,
+      restore = options::opt("restore"),
       ...
     ) {
       # Make sure all aliases are unique
@@ -98,10 +98,11 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
         "Custom package aliases cannot be duplicates of check aliases" =
           !any(uulist(drlapply(df$custom, `[[`, "alias")) %in% df$alias)
       )
-
-      if (!restore) unlink(output, recursive = TRUE, force = TRUE)
+      
+      check_past_output(output, restore, ask = interactive())
+      
       dir_create(output)
-
+      
       self$input <- df
       self$output <- output
       private$n <- n
@@ -254,4 +255,31 @@ print.check_design <- function(x, ...) {
     print(x$input, ...)
   }
   invisible(x)
+}
+
+check_past_output <- function(output, restore, ask = interactive()) {
+  if (dir.exists(output)) {
+    if (is.na(restore)) {
+      restore <- if (ask) {
+        switch(
+          restore_menu(),
+          "1" = TRUE,
+          "2" = FALSE
+        )
+      } else {
+        FALSE
+      }
+    }
+    
+    if (!restore) {
+      unlink(output, recursive = TRUE, force = TRUE)
+    }
+  }
+}
+
+restore_menu <- function() {
+  utils::menu(
+    c("Yes", "No"),
+    title = "Do you want to restore previous results?"
+  )
 }

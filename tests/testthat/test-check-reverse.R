@@ -88,9 +88,14 @@ test_that("check_rev_deps works for a package without release version", {
   withr::with_options(list(pkgType = "source"), {
     expect_warning(design <- check_rev_deps(
       file.path(sources_new, "pkg.suggests"),
-      n = 2L, repos = repo))
+      n = 2L, repos = repo, env = c("NOT_CRAN" = "false", options::opt("check_envvars"))))
   })
 
+  expect_identical(
+    design$input$package[[1]]$env, 
+    c("NOT_CRAN" = "false", options::opt("check_envvars"))
+  )
+  
   r <- results(design)
   expect_s3_class(r, "checked_results")
   expect_true(is.list(r))
@@ -116,4 +121,47 @@ test_that("check_rev_deps works for a package without release version", {
   )
   expect_length(r$check_task_spec$`pkg.none (dev)`$errors$potential_issues$new, 0L)
   expect_length(r$check_task_spec$`pkg.none (dev)`$errors$potential_issues$old, 0L)
+})
+
+test_that("check_dev_rev_deps works as expected", {
+  withr::with_options(list(pkgType = "source"), {
+    design <- check_dev_rev_deps(
+      file.path(sources_new, "pkg.ok.error"),
+      n = 2L, repos = repo)
+  })
+
+  r <- results(design)
+  expect_s3_class(r, "checked_results")
+  expect_true(is.list(r))
+  expect_named(r)
+  expect_length(r, 1L)
+  expect_length(r$check_task_spec, 2L)
+
+  # rev.both.error
+  expect_length(r$check_task_spec$`rev.both.error (dev)`$notes$issues, 0L)
+  expect_length(r$check_task_spec$`rev.both.error (dev)`$warnings$issues, 1L)
+  expect_true(
+    grepl("Namespace in Imports field not imported from",
+          r$check_task_spec$`rev.both.error (dev)`$warnings$issues),
+    grepl("Missing or unexported object",
+          r$check_task_spec$`rev.both.error (dev)`$warnings$issues)
+  )
+
+  expect_length(r$check_task_spec$`rev.both.error (dev)`$errors$issues, 1L)
+  expect_true(
+    grepl("Running the tests in",
+          r$check_task_spec$`rev.both.error (dev)`$errors$issues),
+    grepl("is not an exported object from",
+          r$check_task_spec$`rev.both.error (dev)`$errors$issues)
+  )
+
+  # rev.both.ok
+  expect_length(r$check_task_spec$`rev.both.ok (dev)`$notes$issues, 1L)
+  expect_true(
+    grepl("Namespace in Imports field not imported from",
+          r$check_task_spec$`rev.both.ok (dev)`$notes$issues)
+  )
+
+  expect_length(r$check_task_spec$`rev.both.ok (dev)`$warnings$issues, 0L)
+  expect_length(r$check_task_spec$`rev.both.ok (dev)`$errors$issues, 0L)
 })

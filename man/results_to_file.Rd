@@ -11,11 +11,10 @@ results_to_file(results, file, keep = "all", ...)
 
 \item{file}{A connection or character path.}
 
-\item{keep}{character vector indicating which packages should be included
-in the results. "all" means that all packages are kept. If "issues" then
-only packages with issues identified, whereas "potential_issues" stands for
-keeping packages with both "issues" and "potential_issues". Users can set
-the default value via env variable \code{CHECKED_RESULTS_KEEP}.}
+\item{keep}{character vector indicating which packages should be included in the results.
+"all" means that all packages are kept. If "issues" then only packages
+with issues identified, whereas "potential_issues" stands for keeping
+packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, overwritable using option 'checked.results_keep' or environment variable 'R_CHECKED_RESULTS_KEEP')}
 
 \item{...}{other parameters.}
 }

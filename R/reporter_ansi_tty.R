@@ -71,7 +71,7 @@ format_status_line_ansi.default <- function(
 report_sleep.reporter_ansi_tty <- function(
     reporter,
     design,
-    sleep = default_tty_tick_interval()) {
+    sleep = options::opt("tty_tick_interval")) {
   Sys.sleep(sleep)
 }
 

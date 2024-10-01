@@ -7,6 +7,9 @@
 \item{path}{path to the package source. Can be either a single source
 code directory or a directory containing multiple package source code
 directories.}
+
+\item{...}{parameters passed to the task specs allowing to customize
+subprocesses.}
 }
 \value{
 The check schedule \code{data.frame} with the following columns:

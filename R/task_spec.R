@@ -10,7 +10,10 @@
 #'
 #' @family tasks
 #' @export
-task_spec <- function(alias = NULL, package_spec = NULL, env = NULL) {
+task_spec <- function(
+    alias = NULL,
+    package_spec = NULL,
+    env = options::opt("check_envvars")) {
   structure(
     list(
       alias = alias,
@@ -81,7 +84,11 @@ custom_install_task_spec <- function(...) {
 #'
 #' @family tasks
 #' @export
-check_task_spec <- function(args = NULL, build_args = NULL, ...) {
+check_task_spec <- function(
+    args = options::opt("check_args"),
+    build_args = options::opt("check_build_args"),
+    ...) {
+  
   task_spec <- task_spec(...)
   check_spec <- list(
     args = args,

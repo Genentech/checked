@@ -23,11 +23,7 @@ to pull sources for reverse dependencies. In some cases, for instance using
 binaries on Linux, we want to use different repositories when pulling
 sources to check and different when installing dependencies.}
 
-\item{restore}{\code{logical} indicating whether output directory should be
-unlinked before running checks. If \code{FALSE}, an attempt will me made to
-restore previous progress from the same \code{output}}
-
-\item{...}{Additional arguments passed to \code{\link[=run]{run()}}}
+\item{...}{Additional arguments passed to \code{\link{checked-task-df}} and \code{\link[=run]{run()}}}
 }
 \value{
 \code{\link[=check_design]{check_design()}} R6 class storing all the details

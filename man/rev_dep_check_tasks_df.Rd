@@ -12,7 +12,8 @@ identified.}
 rev_dep_check_tasks_df(
   path,
   repos = getOption("repos"),
-  versions = c("dev", "release")
+  versions = c("dev", "release"),
+  ...
 )
 }
 \arguments{
@@ -29,6 +30,9 @@ checks only against development version of the package which is applicable
 mostly when checking whether adding new package would break tests of
 packages already in the repository and take the package as suggests
 dependency.}
+
+\item{...}{parameters passed to the task specs allowing to customize
+subprocesses.}
 }
 \value{
 The check schedule \code{data.frame} with the following columns:

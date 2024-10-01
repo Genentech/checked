@@ -5,11 +5,7 @@ CHECK_ISSUES_TYPES <- c("notes", "warnings", "errors")
 #' Get R CMD check results
 #'
 #' @param x \code{\link[checked]{check_design}} object.
-#' @param error_on character vector indicating whether R error should be thrown
-#' when issues are discovered when generating results. "never" means that no
-#' errors are thrown. If "issues" then errors are emitted only on issues, whereas
-#' "potential issues" stands for error on both issues and potential issues. Users
-#' can set the default value via env variable \code{CHECKED_RESULTS_ERROR_ON}.
+#' @eval options::as_params("error_on" = "results_error_on")
 #' @param ... other parameters.
 #'
 #' @family results
@@ -22,7 +18,7 @@ results <- function(x, ...) {
 #' @rdname results
 results.check_design <- function(
     x,
-    error_on = Sys.getenv("CHECKED_RESULTS_ERROR_ON", c("never", "issues", "potential_issues")[1]),
+    error_on = options::opt("results_error_on"),
     ...) {
   error_on <- match.arg(error_on, c("never", "issues", "potential_issues"))
   checks_nodes <- igraph::V(x$graph)[
@@ -260,11 +256,7 @@ summary.checked_results_check_task_spec <- function(object, ...) {
 #' Print checked results
 #'
 #' @param x an object to be printed.
-#' @param keep character vector indicating which packages should be included
-#' in the results. "all" means that all packages are kept. If "issues" then
-#' only packages with issues identified, whereas "potential_issues" stands for
-#' keeping packages with both "issues" and "potential_issues". Users can set
-#' the default value via env variable \code{CHECKED_RESULTS_KEEP}.
+#' @eval options::as_params("keep" = "results_keep")
 #' @param ... other parameters.
 #'
 #' @family results
@@ -282,8 +274,9 @@ print.checked_results <- function(x, ...) {
 #' @export
 print.checked_results_check_task_spec <- function(
     x,
-    keep = Sys.getenv("CHECKED_RESULTS_KEEP", c("all", "issues", "potential_issues")[1]),
+    keep = options::opt("results_keep"),
     ...) {
+      
   keep <- match.arg(keep, c("all", "issues", "potential_issues"))
   if (keep != "all") {
     df <- results_to_df(x, issues_type = keep)
