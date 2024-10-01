@@ -48,12 +48,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">results</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'check_design'</span></span>
-<span><span class="fu">results</span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,</span>
-<span>  error_on <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CHECKED_RESULTS_ERROR_ON"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"issues"</span>,</span>
-<span>    <span class="st">"potential_issues"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">results</span><span class="op">(</span><span class="va">x</span>, error_on <span class="op">=</span> <span class="fu">options</span><span class="fu">::</span><span class="fu"><a href="https://dgkf.github.io/options/reference/opt.html" class="external-link">opt</a></span><span class="op">(</span><span class="st">"results_error_on"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -69,11 +64,10 @@
 
 
 <dt id="arg-error-on">error_on<a class="anchor" aria-label="anchor" href="#arg-error-on"></a></dt>
-<dd><p>character vector indicating whether R error should be thrown
-when issues are discovered when generating results. "never" means that no
-errors are thrown. If "issues" then errors are emitted only on issues, whereas
-"potential issues" stands for error on both issues and potential issues. Users
-can set the default value via env variable <code>CHECKED_RESULTS_ERROR_ON</code>.</p></dd>
+<dd><p>character vector indicating whether R error should be thrown when issues
+are discovered when generating results. "never" means that no errors
+are thrown. If "issues" then errors are emitted only on issues, whereas
+"potential issues" stands for error on both issues and potential issues. (Defaults to <code>"never"</code>, overwritable using option 'checked.results_error_on' or environment variable 'R_CHECKED_RESULTS_ERROR_ON')</p></dd>
 
 </dl></div>
     <div class="section level2">

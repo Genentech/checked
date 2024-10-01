@@ -64,11 +64,10 @@ to text, <code><a href="print.checked_results.html">print.checked_results</a></c
 
 
 <dt id="arg-keep">keep<a class="anchor" aria-label="anchor" href="#arg-keep"></a></dt>
-<dd><p>character vector indicating which packages should be included
-in the results. "all" means that all packages are kept. If "issues" then
-only packages with issues identified, whereas "potential_issues" stands for
-keeping packages with both "issues" and "potential_issues". Users can set
-the default value via env variable <code>CHECKED_RESULTS_KEEP</code>.</p></dd>
+<dd><p>character vector indicating which packages should be included in the results.
+"all" means that all packages are kept. If "issues" then only packages
+with issues identified, whereas "potential_issues" stands for keeping
+packages with both "issues" and "potential_issues". (Defaults to <code>"all"</code>, overwritable using option 'checked.results_keep' or environment variable 'R_CHECKED_RESULTS_KEEP')</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

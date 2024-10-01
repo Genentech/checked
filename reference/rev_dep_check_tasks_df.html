@@ -57,7 +57,8 @@ including dependencies installation.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rev_dep_check_tasks_df</span><span class="op">(</span></span>
 <span>  <span class="va">path</span>,</span>
 <span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span>,</span>
-<span>  versions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dev"</span>, <span class="st">"release"</span><span class="op">)</span></span>
+<span>  versions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dev"</span>, <span class="st">"release"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -83,6 +84,11 @@ checks only against development version of the package which is applicable
 mostly when checking whether adding new package would break tests of
 packages already in the repository and take the package as suggests
 dependency.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>parameters passed to the task specs allowing to customize
+subprocesses.</p></dd>
 
 </dl></div>
     <div class="section level2">

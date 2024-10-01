@@ -63,7 +63,8 @@ as a <code>Suggests</code> dependency.</p>
 <span>  output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/packageName.html" class="external-link">packageName</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"-"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  lib.loc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/libPaths.html" class="external-link">.libPaths</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span>,</span>
-<span>  restore <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  restore <span class="op">=</span> <span class="fu">options</span><span class="fu">::</span><span class="fu"><a href="https://dgkf.github.io/options/reference/opt.html" class="external-link">opt</a></span><span class="op">(</span><span class="st">"restore"</span><span class="op">)</span>,</span>
+<span>  reporter <span class="op">=</span> <span class="fu"><a href="reporters.html">reporter_default</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -97,13 +98,18 @@ generating task graph and later pulling dependencies.</p></dd>
 
 
 <dt id="arg-restore">restore<a class="anchor" aria-label="anchor" href="#arg-restore"></a></dt>
-<dd><p><code>logical</code> indicating whether output directory should be
-unlinked before running checks. If <code>FALSE</code>, an attempt will me made to
-restore previous progress from the same <code>output</code></p></dd>
+<dd><p><code>logical</code> indicating whether output directory should be unlinked before
+running checks. If <code>FALSE</code>, an attempt will me made to restore previous
+progress from the same <code>output</code> (Defaults to <code>NA</code>, overwritable using option 'checked.restore' or environment variable 'R_CHECKED_RESTORE')</p></dd>
+
+
+<dt id="arg-reporter">reporter<a class="anchor" aria-label="anchor" href="#arg-reporter"></a></dt>
+<dd><p>A reporter to provide progress updates. Will default to the
+most expressive command-line reporter given your terminal capabilities.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Additional arguments passed to <code><a href="run.html">run()</a></code></p></dd>
+<dd><p>Additional arguments passed to <code><a href="checked-task-df.html">checked-task-df</a></code> and <code><a href="run.html">run()</a></code></p></dd>
 
 </dl></div>
     <div class="section level2">
