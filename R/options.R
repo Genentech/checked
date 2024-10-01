@@ -33,12 +33,20 @@ options::define_options(
     "--no-build-vignettes",
     "--no-manual"
   ),
+  envvar_fn = structure(
+    function(raw, ...) trimws(strsplit(raw, " ")[[1]]),
+    desc = "space-separated R CMD build flags"
+  ),
 
   "`character` vector of args passed to the R CMD check.",
   check_args = c(
     "--timings",
     "--ignore-vignettes",
     "--no-manual"
+  ),
+  envvar_fn = structure(
+    function(raw, ...) trimws(strsplit(raw, " ")[[1]]),
+    desc = "space-separated R CMD check flags"
   )
 )
 

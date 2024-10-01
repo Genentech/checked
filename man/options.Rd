@@ -62,13 +62,13 @@ named \code{character} vector of environment variables to use during R CMD check
 \item{check_build_args}{\describe{
 \code{character} vector of args passed to the R CMD build.\item{default: }{\preformatted{c("--no-build-vignettes", "--no-manual")}}
 \item{option: }{checked.check_build_args}
-\item{envvar: }{R_CHECKED_CHECK_BUILD_ARGS (evaluated if possible, raw string otherwise)}
+\item{envvar: }{R_CHECKED_CHECK_BUILD_ARGS (space-separated R CMD build flags)}
 }}
 
 \item{check_args}{\describe{
 \code{character} vector of args passed to the R CMD check.\item{default: }{\preformatted{c("--timings", "--ignore-vignettes", "--no-manual")}}
 \item{option: }{checked.check_args}
-\item{envvar: }{R_CHECKED_CHECK_ARGS (evaluated if possible, raw string otherwise)}
+\item{envvar: }{R_CHECKED_CHECK_ARGS (space-separated R CMD check flags)}
 }}
 
 }

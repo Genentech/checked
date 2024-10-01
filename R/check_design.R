@@ -278,7 +278,7 @@ check_past_output <- function(output, restore, ask = interactive()) {
 }
 
 restore_menu <- function() {
-  menu(
+  utils::menu(
     c("Yes", "No"),
     title = "Do you want to restore previous results?"
   )

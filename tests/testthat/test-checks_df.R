@@ -83,8 +83,8 @@ test_that("task_df functions can specify subprocesses configuration", {
   )
   
   withr::with_envvar(
-    c(R_CHECKED_CHECK_ARGS = "c('--some-option', '--other-option')",
-      R_CHECKED_CHECK_BUILD_ARGS = "c('--yet-another-option')"), {
+    c(R_CHECKED_CHECK_ARGS = "--some-option --other-option --another-option",
+      R_CHECKED_CHECK_BUILD_ARGS = "--yet-another-option"), {
         expect_silent(
           df <- source_check_tasks_df(
             path,
@@ -100,7 +100,7 @@ test_that("task_df functions can specify subprocesses configuration", {
   )
   expect_identical(
     df$package[[1]]$args, 
-    c("--some-option", "--other-option")
+    c("--some-option", "--other-option", "--another-option")
   )
   expect_identical(
     df$package[[1]]$build_args, 
