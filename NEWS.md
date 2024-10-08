@@ -1,4 +1,4 @@
-# checked 0.2.3 (dev)
+# checked 0.2.4
 
 * Fix check processes hanging forever in some system configurations.
 
