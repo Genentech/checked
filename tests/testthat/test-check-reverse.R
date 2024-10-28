@@ -1,3 +1,7 @@
+# CRAN does not like out subprocesses tests resulting in false positive tests 
+# results
+testthat::skip_on_cran()
+
 create_temp_repo <- function(dir, repo_path) {
   dir.create(ctburl <- utils::contrib.url(repo_path, type = "source"), recursive = TRUE)
   sources <- list.files(dir, pattern = "^.*\\.tar\\.gz$", full.names = TRUE)

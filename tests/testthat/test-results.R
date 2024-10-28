@@ -1,3 +1,7 @@
+# CRAN does not like out subprocesses tests resulting in false positive tests 
+# results
+testthat::skip_on_cran()
+
 test_that("results_to_file works as expected", {
   examples_path <- system.file("example_packages", package = "checked")
   # WIP
