@@ -57,6 +57,8 @@ NULL
 #'   mostly when checking whether adding new package would break tests of
 #'   packages already in the repository and take the package as suggests
 #'   dependency.
+#' @param lib.loc vector of libraries used to check whether reverse dependency
+#'   check can return accurate results.
 #'
 #' @family tasks
 #' @export
@@ -64,6 +66,7 @@ rev_dep_check_tasks_df <- function(
   path,
   repos = getOption("repos"),
   versions = c("dev", "release"),
+  lib.loc = .libPaths(),
   ...
 ) {
   stopifnot(
@@ -92,26 +95,38 @@ rev_dep_check_tasks_df <- function(
     version = version
   )
 
-  if (!package %in% ap[, "Package"] && "release" %in% versions) {
-    warning(
-      sprintf(
-        "Package `%s` not found in repositories `%s`. Skipping 'release' in 'versions'",
-        package,
-        paste0(repos, collapse = ", ")
-      ),
-      immediate. = TRUE
-    )
-    if ("dev" %in% versions) {
-      versions <- "dev"
+  reverse_suggests <- if (!package %in% ap[, "Package"] && "release" %in% versions) {
+    if (is_package_installed(package, lib.loc)) {
+      stop(
+        sprintf(
+          "Package `%s` not found in repositories `%s` and identified in lib.loc.
+           checked cannot provide accurate reverse dependency check results. 
+           Remove the package from lib.loc and try again.",
+          package,
+          paste0(repos, collapse = ", ")
+        )
+      )
+      
     } else {
-      return(empty_checks_df)
+      warning(
+        sprintf(
+          "Package `%s` not found in repositories `%s`. Skipping 'release' version of the package",
+          package,
+          paste0(repos, collapse = ", ")
+        ),
+        immediate. = TRUE
+      )
     }
+    
+    TRUE
+  } else {
+    FALSE
   }
 
   task_specs_function <- if (all(c("dev", "release") %in% versions)) {
     rev_dep_check_tasks_specs
   } else {
-    rev_dep_check_tasks_specs_development
+    check_tasks_specs
   }
 
   if ("dev" %in% versions) {
@@ -125,15 +140,19 @@ rev_dep_check_tasks_df <- function(
   }
 
   if ("release" %in% versions) {
-    package_v <- ap[package, "Version"]
+    package_v <- if (reverse_suggests) "missing" else ap[package, "Version"]
     df_rel$alias <- paste0(df_rel$alias, " (v", package_v, ")")
     df_rel$package <- task_specs_function(revdeps, repos, df_rel$alias, "old", ...)
-    df_rel$custom <- rep(list(custom_install_task_spec(
-      alias = paste0(package, " (release)"),
-      package_spec = package_spec(name = package, repos = repos),
-      # make sure to use the release version built against the same system
-      type = "source"
-    )), times = NROW(df_dev))
+    df_rel$custom <- if (reverse_suggests) {
+      rep(list(custom_install_task_spec()), times = NROW(df_dev))
+    } else {
+      rep(list(custom_install_task_spec(
+        alias = paste0(package, " (release)"),
+        package_spec = package_spec(name = package, repos = repos),
+        # make sure to use the release version built against the same system
+        type = "source"
+      )), times = NROW(df_dev))
+    }
   }
 
   if (identical(versions, "dev")) {
@@ -176,7 +195,7 @@ rev_dep_check_tasks_specs <- function(packages, repos, aliases, revdep, ...) {
   ))
 }
 
-rev_dep_check_tasks_specs_development <- function(
+check_tasks_specs <- function(
   packages,
   repos,
   aliases,

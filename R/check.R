@@ -66,6 +66,7 @@ check_rev_deps <- function(
   checks <- rev_dep_check_tasks_df(
     path = path,
     repos = reverse_repos,
+    lib.loc = lib.loc,
     ...
   )
 
