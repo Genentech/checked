@@ -13,7 +13,7 @@ including dependencies installation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">checked</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,6 +58,7 @@ including dependencies installation.</p>
 <span>  <span class="va">path</span>,</span>
 <span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span>,</span>
 <span>  versions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dev"</span>, <span class="st">"release"</span><span class="op">)</span>,</span>
+<span>  lib.loc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/libPaths.html" class="external-link">.libPaths</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -84,6 +85,11 @@ checks only against development version of the package which is applicable
 mostly when checking whether adding new package would break tests of
 packages already in the repository and take the package as suggests
 dependency.</p></dd>
+
+
+<dt id="arg-lib-loc">lib.loc<a class="anchor" aria-label="anchor" href="#arg-lib-loc"></a></dt>
+<dd><p>vector of libraries used to check whether reverse dependency
+check can return accurate results.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
