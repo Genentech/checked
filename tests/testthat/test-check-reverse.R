@@ -90,7 +90,7 @@ test_that("check_rev_deps works for a package without release version", {
 
   # Ensure source installation to make sure test works also on mac and windows
   withr::with_options(list(pkgType = "source"), {
-    expect_warning(design <- check_rev_deps(
+    expect_no_warning(design <- check_rev_deps(
       file.path(sources_new, "pkg.suggests"),
       n = 2L, repos = repo, env = c("NOT_CRAN" = "false", options::opt("check_envvars"))))
   })
@@ -105,26 +105,59 @@ test_that("check_rev_deps works for a package without release version", {
   expect_true(is.list(r))
   expect_named(r)
   expect_length(r, 1L)
-  expect_length(r$check_task_spec, 1L)
+  expect_length(r$revdep_check_task_spec, 2L)
 
-  expect_length(r$check_task_spec$`pkg.none (dev)`$notes$issues, 0L)
-  expect_length(r$check_task_spec$`pkg.none (dev)`$notes$potential_issues$new, 0L)
-  expect_length(r$check_task_spec$`pkg.none (dev)`$notes$potential_issues$old, 0L)
-
-  expect_length(r$check_task_spec$`pkg.none (dev)`$warnings$issues, 0L)
-  expect_length(r$check_task_spec$`pkg.none (dev)`$warnings$potential_issues$new, 0L)
-  expect_length(r$check_task_spec$`pkg.none (dev)`$warnings$potential_issues$old, 0L)
-
-
-  expect_length(r$check_task_spec$`pkg.none (dev)`$errors$issues, 1L)
+  # pkg.none
+  expect_length(r$revdep_check_task_spec$pkg.none$notes$issues, 0L)
+  expect_length(r$revdep_check_task_spec$pkg.none$notes$potential_issues$new, 0L)
+  expect_length(r$revdep_check_task_spec$pkg.none$notes$potential_issues$old, 0L)
+  
+  expect_length(r$revdep_check_task_spec$pkg.none$warnings$issues, 0L)
+  expect_length(r$revdep_check_task_spec$pkg.none$warnings$potential_issues$new, 0L)
+  expect_length(r$revdep_check_task_spec$pkg.none$warnings$potential_issues$old, 0L)
+  
+  
+  expect_length(r$revdep_check_task_spec$pkg.none$errors$issues, 0L)
+  expect_length(r$revdep_check_task_spec$pkg.none$errors$potential_issues$new, 0L)
+  expect_length(r$revdep_check_task_spec$pkg.none$errors$potential_issues$old, 0L)
+  
+  
+  # pkg.none.broken
+  expect_length(r$revdep_check_task_spec$pkg.none.broken$notes$issues, 0L)
+  expect_length(r$revdep_check_task_spec$pkg.none.broken$notes$potential_issues$new, 0L)
+  expect_length(r$revdep_check_task_spec$pkg.none.broken$notes$potential_issues$old, 0L)
+  
+  expect_length(r$revdep_check_task_spec$pkg.none.broken$warnings$issues, 0L)
+  expect_length(r$revdep_check_task_spec$pkg.none.broken$warnings$potential_issues$new, 0L)
+  expect_length(r$revdep_check_task_spec$pkg.none.broken$warnings$potential_issues$old, 0L)
+  
+  
+  expect_length(r$revdep_check_task_spec$pkg.none.broken$errors$issues, 1L)
   expect_true(
     grepl("Running the tests in",
-          r$check_task_spec$`pkg.none (dev)`$errors$issues),
+          r$revdep_check_task_spec$pkg.none.broken$errors$issues),
     grepl("\"hello world\" is not TRUE",
-          r$check_task_spec$`pkg.none (dev)`$errors$issues)
+          r$revdep_check_task_spec$pkg.none.broken$errors$issues)
   )
-  expect_length(r$check_task_spec$`pkg.none (dev)`$errors$potential_issues$new, 0L)
-  expect_length(r$check_task_spec$`pkg.none (dev)`$errors$potential_issues$old, 0L)
+  expect_length(r$revdep_check_task_spec$pkg.none.broken$errors$potential_issues$new, 0L)
+  expect_length(r$revdep_check_task_spec$pkg.none.broken$errors$potential_issues$old, 0L)
+  
+  # Error testing
+   dir.create(temp_lib <- tempfile("testing_lib"))
+   install.packages(
+     file.path(sources_new, "pkg.suggests"),
+     lib = temp_lib,
+     type = "source",
+     repos = NULL
+   )
+   
+   withr::with_options(list(pkgType = "source"), {
+     expect_error(design <- check_rev_deps(
+       file.path(sources_new, "pkg.suggests"),
+       lib.loc = temp_lib,
+       n = 2L, repos = repo, env = c("NOT_CRAN" = "false", options::opt("check_envvars"))),
+       "cannot provide accurate reverse dependency check results")
+   })
 })
 
 test_that("check_dev_rev_deps works as expected", {

@@ -13,6 +13,7 @@ rev_dep_check_tasks_df(
   path,
   repos = getOption("repos"),
   versions = c("dev", "release"),
+  lib.loc = .libPaths(),
   ...
 )
 }
@@ -30,6 +31,9 @@ checks only against development version of the package which is applicable
 mostly when checking whether adding new package would break tests of
 packages already in the repository and take the package as suggests
 dependency.}
+
+\item{lib.loc}{vector of libraries used to check whether reverse dependency
+check can return accurate results.}
 
 \item{...}{parameters passed to the task specs allowing to customize
 subprocesses.}

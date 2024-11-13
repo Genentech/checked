@@ -329,11 +329,11 @@ task_graph_set_task_process <- function(g, v, process) {
 
 task_graph_update_done <- function(g, lib.loc) {
   v <- igraph::V(g)[igraph::V(g)$type == "install"]
-  which_done <- which(vlapply(v$name, is_package_done, lib.loc = lib.loc))
+  which_done <- which(vlapply(v$name, is_package_installed, lib.loc = lib.loc))
   task_graph_set_package_status(g, v[which_done], STATUS$done)
 }
 
-is_package_done <- function(pkg, lib.loc) {  # nolint object_name_linter
+is_package_installed <- function(pkg, lib.loc) {  # nolint object_name_linter
   path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
   length(path) > 0
 }

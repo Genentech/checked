@@ -1,3 +1,7 @@
+# checked 0.2.5
+
+* Refine reverse suggested dependecy strategy.
+
 # checked 0.2.4
 
 * Fix check processes hanging forever in some system configurations.
