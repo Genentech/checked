@@ -86,7 +86,7 @@ test_that("check_rev_deps works for a package without release version", {
 
   # Ensure source installation to make sure test works also on mac and windows
   withr::with_options(list(pkgType = "source"), {
-    expect_warning(design <- check_rev_deps(
+    expect_no_warning(design <- check_rev_deps(
       file.path(sources_new, "pkg.suggests"),
       n = 2L, repos = repo, env = c("NOT_CRAN" = "false", options::opt("check_envvars"))))
   })

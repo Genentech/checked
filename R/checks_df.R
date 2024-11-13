@@ -107,17 +107,7 @@ rev_dep_check_tasks_df <- function(
         )
       )
       
-    } else {
-      warning(
-        sprintf(
-          "Package `%s` not found in repositories `%s`. Skipping 'release' version of the package",
-          package,
-          paste0(repos, collapse = ", ")
-        ),
-        immediate. = TRUE
-      )
-    }
-    
+    } 
     TRUE
   } else {
     FALSE
