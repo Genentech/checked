@@ -1,8 +1,19 @@
 split_packages_names <- function(x) {
   if (is.na(x)) {
-    return(x)
+    data.frame(
+      dep = character(0),
+      op = character(0),
+      version = character(0)
+    )
+  } else {
+    drlapply(.tools$.split_dependencies(x), function(x){
+      data.frame(
+        dep = x$name,
+        op = x$op %||% ">",
+        version = x$version %||% numeric_version("0")
+      )
+    })
   }
-  vcapply(.tools$.split_dependencies(x), "[[", "name", USE.NAMES = FALSE)
 }
 
 check_dependencies <- function(dependencies) {

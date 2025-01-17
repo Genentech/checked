@@ -5,17 +5,22 @@
 #'
 #' @param name name of the package.
 #' @param repos repository where package with given name should identified.
+#' @param version package_version object specifying minimal version required
+#'  by packages depending on this package.
+#' @param op operator used with \code{version}.
 #' @param path path to the source of the package (either bundled or not). URLs
 #' are acceptable.
 #' @param ... parameters passed to downstream constructors
 #'
 #' @family specs
 #' @export
-package_spec <- function(name = NULL, repos = NULL) {
+package_spec <- function(name = NULL, repos = NULL, version = NULL, op = NULL) {
   structure(
     list(
       name = name,
-      repos = repos
+      repos = repos,
+      version = version,
+      op = op
     ),
     class = "package_spec"
   )

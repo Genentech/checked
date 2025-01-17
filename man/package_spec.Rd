@@ -6,7 +6,7 @@
 \alias{package_spec_archive_source}
 \title{Package specification}
 \usage{
-package_spec(name = NULL, repos = NULL)
+package_spec(name = NULL, repos = NULL, version = NULL, op = NULL)
 
 package_spec_source(path = NULL, ...)
 
@@ -16,6 +16,11 @@ package_spec_archive_source(path = NULL, ...)
 \item{name}{name of the package.}
 
 \item{repos}{repository where package with given name should identified.}
+
+\item{version}{package_version object specifying minimal version required
+by packages depending on this package.}
+
+\item{op}{operator used with \code{version}.}
 
 \item{path}{path to the source of the package (either bundled or not). URLs
 are acceptable.}
