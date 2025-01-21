@@ -19,6 +19,11 @@ replace_with_map <- function(x, value, replacement) {
   x
 }
 
+is_package_installed <- function(pkg, lib.loc) {  # nolint object_name_linter
+  path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
+  length(path) > 0
+}
+
 hash_alias <- function(x) {
   paste0(c("hash", as.character(charToRaw(x))), collapse = "")
 }

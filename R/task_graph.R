@@ -100,11 +100,12 @@ task_edges_df <- function(df, repos) {
         empty_edge
       } else {
         deps <- split_packages_names(deps)
-        deps <- deps[deps %in% dependencies]
-        data.frame(
-          dep = deps,
-          root = rep(p, times = length(deps)),
-          type = rep(type, times = length(deps))
+        # Filter out base packages
+        deps <- deps[deps$dep %in% dependencies, ]
+        cbind(
+          deps,
+          root = rep(p, times = NROW(deps)),
+          type = rep(type, times = NROW(deps))
         )
       }
     })
@@ -112,7 +113,8 @@ task_edges_df <- function(df, repos) {
 
   edges$dep <- replace_with_map(edges$dep, custom_aliases_map$hash, custom_aliases_map$value)
   edges$root <- replace_with_map(edges$root, custom_aliases_map$hash, custom_aliases_map$value)
-  edges
+  # reorder columns to the igraph format
+  edges[, c("dep", "root", "type", "op", "version")]
 }
 
 task_vertices_df <- function(df, edges, repos) {
@@ -126,9 +128,25 @@ task_vertices_df <- function(df, edges, repos) {
     } else if (v %in% custom_pkgs_aliases) {
       df$custom[[utils::head(which(as.character(lapply(df$custom, `[[`, "alias")) == v), 1)]]
     } else {
+      e <- edges[edges$dep == v, ]
+      ver_order <- order(
+        e$version,
+        # In case of multiple requirements with the same version
+        # prioritize those using ">" operator
+        e$op,
+        na.last = TRUE,
+        decreasing = c(TRUE, FALSE),
+        method = "radix"
+      )
       install_task_spec(
         alias = v,
-        package_spec = package_spec(name = v, repos = repos)
+        package_spec = package_spec(
+          name = v,
+          repos = repos,
+          # Specify version requirements for dependencies
+          op = e$op[[ver_order[[1]]]],
+          version = e$version[[ver_order[[1]]]]
+        )
       )
     }
   })
@@ -329,12 +347,21 @@ task_graph_set_task_process <- function(g, v, process) {
 
 task_graph_update_done <- function(g, lib.loc) {
   v <- igraph::V(g)[igraph::V(g)$type == "install"]
-  which_done <- which(vlapply(v$name, is_package_installed, lib.loc = lib.loc))
+  which_done <- which(vlapply(v$spec, is_package_satisfied, lib.loc = lib.loc))
   task_graph_set_package_status(g, v[which_done], STATUS$done)
 }
 
-is_package_installed <- function(pkg, lib.loc) {  # nolint object_name_linter
-  path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
-  length(path) > 0
+is_package_satisfied <- function(v, lib.loc) {  # nolint object_name_linter
+  if (!is.null(v$package_spec$version)) {
+    installed_version <- tryCatch(
+      utils::packageVersion(v$package_spec$name),
+      error = function(e) {
+        numeric_version("0")
+      }
+    )
+    get(v$package_spec$op)(installed_version, v$package_spec$version)
+  } else {
+    FALSE
+  }
 }
 

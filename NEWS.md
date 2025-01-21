@@ -1,3 +1,8 @@
+# checked 0.2.6
+
+* Save minimal version required by each edge and use them to properly identify
+  whether dependecy is satisfied when calling `task_graph_update_done`
+
 # checked 0.2.5
 
 * Refine reverse suggested dependecy strategy.
