@@ -14,16 +14,17 @@
 #'
 #' @family specs
 #' @export
-package_spec <- function(name = NULL, repos = NULL, version = NULL, op = NULL) {
-  structure(
-    list(
-      name = name,
-      repos = repos,
-      version = version,
-      op = op
-    ),
-    class = "package_spec"
-  )
+package_spec <- function(
+    name = NULL,
+    repos = NULL,
+    version = numeric_version("0.0"),
+    op = ">") {
+  structure(list(
+    name = name,
+    repos = repos,
+    version = version,
+    op = op
+  ), class = "package_spec")
 }
 
 #' @export

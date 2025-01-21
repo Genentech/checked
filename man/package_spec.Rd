@@ -6,7 +6,12 @@
 \alias{package_spec_archive_source}
 \title{Package specification}
 \usage{
-package_spec(name = NULL, repos = NULL, version = NULL, op = NULL)
+package_spec(
+  name = NULL,
+  repos = NULL,
+  version = numeric_version("0.0"),
+  op = ">"
+)
 
 package_spec_source(path = NULL, ...)
 
