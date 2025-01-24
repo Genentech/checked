@@ -411,7 +411,7 @@ as_visNetwork <- function(x, ...) {
 
   nodes <- igraph::as_data_frame(x, what = "vertices")
   task_type <- vcapply(igraph::V(x)$task, function(task) {
-    if (is_install(task)) return(class(task$origin)[[1]])
+    if (inherits(task, "install_task")) return(class(task$origin)[[1]])
     class(task)[[1]]
   })
 
