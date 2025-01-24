@@ -28,4 +28,9 @@ local or remote packages, so those are first appended to this data set
 prior to calculating edges. The bulk of this function serves to join this
 data.
 }
+\examples{
+\dontrun{
+task_graph_create(plan_rev_dep_checks("."))
+}
+}
 \keyword{internal}

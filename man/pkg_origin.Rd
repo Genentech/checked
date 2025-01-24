@@ -3,6 +3,8 @@
 \name{pkg_origin}
 \alias{pkg_origin}
 \alias{pkg_origin_repo}
+\alias{try_pkg_origin_repo}
+\alias{pkg_origin_unknown}
 \alias{pkg_origin_local}
 \alias{pkg_origin_archive}
 \title{Package specification}
@@ -10,6 +12,10 @@
 pkg_origin(package, ..., .class = c())
 
 pkg_origin_repo(package, repos, ...)
+
+try_pkg_origin_repo(package, repos, ...)
+
+pkg_origin_unknown(package, ...)
 
 pkg_origin_local(path = NULL, ...)
 

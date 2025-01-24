@@ -37,7 +37,7 @@ print.task <- function(x, ...) {
 #' @export
 format.task <- function(x, ..., indent = 0L) {
   paste(collapse = "\n", c(
-    paste0(strrep(" ", indent * 2), "<", friendly_name(x), ">"),
+    paste0(strrep(" ", indent * 2), "<", friendly_name(x, ...), ">"),
     vcapply(x$tasks, function(xi) format(xi, ..., indent = indent + 1))
   ))
 }
@@ -47,35 +47,17 @@ friendly_name.task <- function(x) {
   "task"
 }
 
-friendly_name <- function(x) {
+friendly_name <- function(x, ...) {
   UseMethod("friendly_name")
 }
 
 #' @export
-friendly_name.default <- function(x) {
+friendly_name.default <- function(x, ...) {
   stop(
     "Dont' know how to name object with class(es) `",
     deparse(class(x)),
     "`"
   )
-}
-
-#' @family tasks
-#' @export
-subtasks <- function(name, tasks, ...) {
-  task <- task(name = name, tasks = tasks, ...)
-  class(task) <- c("subtasks_task", class(task))
-  task
-}
-
-#' Attach Subtasks to an Existing Task
-#'
-#' @family tasks
-#' @export
-with_subtasks <- function(task, tasks) {
-  task$tasks <- tasks
-  class(task) <- c("subtasks_task", class(task))
-  task
 }
 
 #' Create a task to install a package and dependencies
@@ -108,8 +90,8 @@ lib.install_task <- function(x, ...) {
 }
 
 #' @export
-friendly_name.install_task <- function(x, ...) {
-  paste0("install ", format(x$origin))
+friendly_name.install_task <- function(x, ..., short = FALSE) {
+  paste0(if (!short) "install ", format(x$origin, ..., short = short))
 }
 
 is_install_task <- function(x) {
@@ -156,11 +138,7 @@ is_check_task <- function(x) {
 #' @family tasks
 #' @export
 friendly_name.check_task <- function(x, ...) {
-  paste0("check ", format(x$origin))
-}
-
-friendly_name.subtasks_task <- function(x, ...) {
-  if (!is.null(x$name)) x$name else NextMethod()
+  paste0("check ", format(x$origin, ...))
 }
 
 #' Specify a library install
@@ -170,9 +148,9 @@ friendly_name.subtasks_task <- function(x, ...) {
 #' but does not spawn a process. It is used primarily for organizing the
 #' library precedence for check tasks.
 #'
-library_task <- function(packages, loc = lib_loc_default(), ...) {
+library_task <- function(origins = list(), loc = lib_loc_default(), ...) {
   task <- task(...)
-  task$packages <- packages
+  task$origins <- origins
   task$loc <- loc
   class(task) <- c("library_task", class(task))
   task
@@ -180,21 +158,20 @@ library_task <- function(packages, loc = lib_loc_default(), ...) {
 
 #' @export
 friendly_name.library_task <- function(x, ...) {
-  fmt_pkgs <- if (is.null(x$packages)) {
-    "all other packages"
-  } else if (length(x$packages) <= 3) {
+  fmt_pkgs <- if (length(x$origins) == 0) {
+  } else if (length(x$origins) <= 3) {
     paste0(
-      "package(s) ",
+      " with ",
       paste0(collapse = ", ", vcapply(
-        x$packages,
+        x$origins,
         function(pkg) format(pkg, short = TRUE)
       ))
     )
   } else {
-    paste0(length(x$packages), " packages")
+    paste0(" with ", length(x$origins), " packages")
   }
 
-  paste(format(x$loc), "with", fmt_pkgs)
+  paste0(format(x$loc), fmt_pkgs)
 }
 
 #' Create a task to run reverse dependency checks

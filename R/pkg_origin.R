@@ -15,25 +15,28 @@ pkg_origin <- function(package, ..., .class = c()) {
   structure(list(package = package, ...), class = c(.class, "pkg_origin"))
 }
 
+fmt_pkg_origin_source <- function(x, ...) {
+  if (is.null(x$source)) {
+    ""
+  } else if (is.null(names(x$source))) {
+    format(x$source, ..., pretty = TRUE)
+  } else {
+    names(x$source)
+  }
+}
+
 #' @export
 format.pkg_origin <- function(x, ..., short = FALSE) {
   paste(collapse = " ", c(
-    if (!short) x$package,
+    x$package,
     if (!short && !is.null(x$version)) {
       switch(class(x$version)[[1]],
         package_version = paste0("(v", format(x$version), ")"),
         x$version
       )
     },
-    if (!is.null(x$source)) {
-      paste0(
-        if (!short) "from ",
-        if (is.null(names(x$source))) {
-          format(x$source, pretty = TRUE)
-        } else {
-          names(x$source)
-        }
-      )
+    if (!short && !is.null(x$source)) {
+      paste0("from ", fmt_pkg_origin_source(x))
     }
   ))
 }
@@ -56,6 +59,27 @@ pkg_origin_repo <- function(package, repos, ...) {
     repos = repos,
     ...,
     .class = "pkg_origin_repo"
+  )
+}
+
+
+#' @export
+#' @rdname pkg_origin
+try_pkg_origin_repo <- function(package, repos, ...) {
+  if (package %in% available_packages(repos = repos)[, "Package"]) {
+    pkg_origin_repo(package = package, repos = repos, ...)
+  } else {
+    pkg_origin_unknown(package = package, ...)
+  }
+}
+
+
+#' @export
+#' @rdname pkg_origin
+pkg_origin_unknown <- function(package, ...) {
+  pkg_origin(
+    package = package,
+    .class = "pkg_origin_unknown"
   )
 }
 
@@ -123,7 +147,12 @@ install_params <- function(x) {
 }
 
 #' @export
-install_params.pkg_origin_source <- function(x) {
+install_params.pkg_origin <- function(x, output, ...) {
+  stop(sprintf("Can't determine origin of package '%s'", x$name))
+}
+
+#' @export
+install_params.pkg_origin_repo <- function(x) {
   list(package = x$name, repos = x$repos)
 }
 
@@ -148,7 +177,7 @@ check_path.pkg_origin <- function(x, output, ...) {
 
 #' @export
 check_path.pkg_origin_repo <- function(x, output, ...) {
-  get_package_source(x$name, x$repos, destdir = output)
+  get_package_source(x$package, x$repos, destdir = output)
 }
 
 #' @export
@@ -160,3 +189,65 @@ check_path.pkg_origin_local <- function(x, ...) {
 check_path.pkg_origin_archive <- function(x, ...) {
   x$path
 }
+
+dep_tree <- function(x, ...) {
+  UseMethod("dep_tree")
+}
+
+#' @export
+dep_tree.check_task <- function(x, ...) {
+  dep_tree(x$origin)
+}
+
+#' @export
+dep_tree.install_task <- function(x, ...) {
+  dep_tree(x$origin)
+}
+
+#' @export
+dep_tree.pkg_origin <- function(
+  x,
+  ...,
+  db = available_packages(),
+  dependencies = TRUE
+) {
+  dep_tree(x$package, ..., db = db, dependencies = dependencies)
+}
+
+#' @export
+dep_tree.character <- function(
+  x,
+  ...,
+  db = available_packages(),
+  dependencies = TRUE
+) {
+  dependencies <- as_pkg_dependencies(dependencies)
+  direct_deps <- tools::package_dependencies(
+    x,
+    db = db,
+    which = dependencies$direct,
+    recursive = FALSE
+  )
+
+  indirect_deps <- tools::package_dependencies(
+    x,
+    db = db,
+    which = dependencies$indirect,
+    recursive = TRUE
+  )
+
+  all_deps <- tools::package_dependencies(
+    unique(unlist(c(x, direct_deps, indirect_deps))),
+    db = db,
+    which = "strong",
+    recursive = FALSE
+  )
+
+  edges <- data.frame(
+    from = rep(names(all_deps), times = viapply(all_deps, length)),
+    to = unlist(all_deps)
+  )
+
+  igraph::graph_from_data_frame(edges)
+}
+

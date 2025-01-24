@@ -38,7 +38,6 @@ Other tasks:
 \code{\link{custom_install_task}()},
 \code{\link{install_task}()},
 \code{\link{revdep_check_task}()},
-\code{\link{task}()},
-\code{\link{with_subtasks}()}
+\code{\link{task}()}
 }
 \concept{tasks}

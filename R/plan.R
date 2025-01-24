@@ -105,42 +105,42 @@ plan_rev_dep_checks <- function(
 }
 
 plan_rev_dep_dev_check <- function(path, revdep, repos) {
-  check_revdep <- make_unique_task(seed = "dev", check_task(
-    origin = pkg_origin_repo(package = revdep, repos = repos),
-    env = DEFAULT_R_CMD_CHECK_ENVVARS,
-    args = DEFAULT_R_CMD_CHECK_ARGS,
-    build_args = DEFAULT_R_CMD_BUILD_ARGS
-  ))
+  origin <- pkg_origin_local(path = path)
 
-  install_dev <- library_task(
-    packages = list(pkg_origin_local(path = path)),
-    loc = lib_loc_isolated()
+  tasks <- list(
+    make_unique_task(seed = "dev", check_task(
+      origin = pkg_origin_repo(package = revdep, repos = repos),
+      env = DEFAULT_R_CMD_CHECK_ENVVARS,
+      args = DEFAULT_R_CMD_CHECK_ARGS,
+      build_args = DEFAULT_R_CMD_BUILD_ARGS
+    )),
+    install_task(origin = origin)
   )
 
-  install_deps <- library_task(
-    packages = NULL
+  sequence_graph(
+    name = vcapply(tasks, hash),
+    task = tasks,
+    task_type = lapply(tasks, function(task) class(task)[[1]]),
+    package = c(revdep, origin$package)
   )
-
-  tasks <- list(check_revdep, install_dev, install_deps)
-  names(tasks) <- lapply(tasks, hash)
-  sequence_graph(name = names(tasks), task = tasks)
 }
 
 plan_rev_dep_release_check <- function(revdep, repos) {
-  check_revdep <- make_unique_task(seed = "release", check_task(
-    origin = pkg_origin_repo(package = revdep, repos = repos),
-    env = DEFAULT_R_CMD_CHECK_ENVVARS,
-    args = DEFAULT_R_CMD_CHECK_ARGS,
-    build_args = DEFAULT_R_CMD_BUILD_ARGS
-  ))
-
-  install_deps <- library_task(
-    packages = NULL
+  tasks <- list(
+    make_unique_task(seed = "release", check_task(
+      origin = pkg_origin_repo(package = revdep, repos = repos),
+      env = DEFAULT_R_CMD_CHECK_ENVVARS,
+      args = DEFAULT_R_CMD_CHECK_ARGS,
+      build_args = DEFAULT_R_CMD_BUILD_ARGS
+    ))
   )
 
-  tasks <- list(check_revdep, install_deps)
-  names(tasks) <- lapply(tasks, hash)
-  sequence_graph(name = names(tasks), task = tasks)
+  sequence_graph(
+    name = vcapply(tasks, hash),
+    task = tasks,
+    task_type = lapply(tasks, function(task) class(task)[[1]]),
+    package = revdep
+  )
 }
 
 rev_dep_check_tasks <- function(packages, repos, aliases, revdep) {

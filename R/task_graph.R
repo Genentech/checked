@@ -1,24 +1,3 @@
-# #' Create Task Graph
-# #'
-# #' @param df data.frame listing
-# #' @param repos repositories which will be used to identify dependencies chain
-# #' to run R CMD checks
-# #' @return A dependency graph with vertex attributes "root" (a logical value
-# #'   indicating whether the package as one of the roots used to create the
-# #'   graph), "status" (installation status) and "order" (installation order).
-# #'
-# #' @keywords internal
-# #' @importFrom igraph V
-# task_graph_create <- function(df, repos = getOption("repos")) {
-#   edges <- task_graph_edges(df, repos)
-#   vertices <- task_graph_vertices(df, edges, repos)
-
-#   g <- igraph::graph_from_data_frame(edges, vertices = vertices)
-#   igraph::V(g)$status <- STATUS$pending  # nolint object_name_linter
-#   igraph::V(g)$process <- rep_len(list(), length(g))
-#   task_graph_sort(g)
-# }
-
 #' Build task graph edges
 #'
 #' Edges describe relationships between tasks. Often, this is a dependency
@@ -37,52 +16,103 @@
 #'   determine package relationships.
 #' @return A `data.frame` that can be used to build [`igraph`] edges.
 #'
+#' @examples
+#' \dontrun{
+#  # requires that source code directory is for a package with revdeps
+#' task_graph_create(plan_rev_dep_checks("."))
+#' }
 #' @keywords internal
 task_graph_create <- function(plan, repos = getOption("repos")) {
-  if (NROW(plan) == 0) return(empty_edge)
-
-  # build task hashmap, allowing for graph analysis using description files
-  taskmap <- unique(flatten(plan))
-  names(taskmap) <- vcapply(taskmap, hash)
-
-  # build supplementary database entries for package tasks
-  # tasks receive an additional "Task" column, containing a hash of the task
-  desc_db <- unique(as_desc(plan))
-  packages <- desc_db[, "Package"]
-
-  # add task package origin descriptions into database
-  db <- available_packages(repos = repos)[, DB_COLNAMES]
-  db <- cbind(db, Task = NA_character_)
-  db <- rbind(desc_db[, colnames(db)], db)
-  db <- db[!duplicated(db[, c("Package", DB_COLNAMES)]), ]
-
-  # create dependencies graph
-  g <- package_graph(db, packages)
-
-  # populate install tasks for new dependencies, installing from repos
-  v_db_idx <- match(V(g)$name, db[, "Package"])
-  V(g)$task <- taskmap[db[v_db_idx, "Task"]]
-
-  no_task <- vlapply(V(g)$task, is.null)
-  is_base <- V(g)$name %in% base_pkgs()
-  is_known <- V(g)$name %in% db[, "Package"]
-  needs_install <- no_task & !is_base & is_known
-
-  V(g)$task[needs_install] <- lapply(
-    V(g)$name[needs_install],
-    function(package) {
-      install_task(
-        origin = pkg_origin_repo(package = package, repos = repos),
-        lib = lib_loc_default()
-      )
-    }
+  plan_tasks <- igraph::V(plan)[igraph::V(plan)$task_type == "check_task"]
+  plan_neighborhoods <- igraph::neighborhood(
+    plan,
+    order = length(plan),
+    mode = "out",
+    nodes = plan_tasks
   )
 
-  # standardize graph fields
+  # for each check task in the plan, build a dependency tree and merge it
+  # into the existing check task subtree
+  plan_neighborhoods <- lapply(plan_neighborhoods, function(nh) {
+    subtree <- igraph::induced_subgraph(plan, nh)
+    deps <- dep_tree(nh[[1]]$task)
+    igraph::reverse_edges(deps)
+
+    subtree <- graph_project(
+      x = deps,
+      onto = subtree,
+      where = c("name" = "package")
+    )
+
+    # set missing dependencies to be installed from repo
+    missing_task <- is.na(igraph::V(subtree)$task)
+    igraph::V(subtree)$task[missing_task] <- lapply(
+      igraph::V(subtree)$package[missing_task],
+      function(package) {
+        origin <- try_pkg_origin_repo(package = package, repos = repos)
+        install_task(origin = origin)
+      }
+    )
+
+    # re-hash tasks as vertex names (populate missing vertex names)
+    igraph::V(subtree)$name <- vcapply(igraph::V(subtree)$task, hash)
+    igraph::V(subtree)$task_type <- vcapply(
+      igraph::V(subtree)$task,
+      function(task) class(task)[[1]]
+    )
+
+    subtree
+  })
+
+  # then merge all the full check task task trees into a single graph
+  g <- merge_subgraphs(plan_neighborhoods)
+  class(g) <- c("task_graph", class(g))
+
   igraph::V(g)$status <- STATUS$pending
   igraph::V(g)$process <- rep_len(list(), length(g))
+  task_graph_sort(g)
+}
 
-  g
+lib_node_tasks <- function(g, nodes) {
+  install_nodes <- igraph::adjacent_vertices(g, nodes, mode = "out")
+  lapply(install_nodes, function(nodes) {
+    nodes$task[vlapply(nodes$task, inherits, "install_task")]
+  })
+}
+
+lib_node_pkgs <- function(g, nodes) {
+  install_nodes <- igraph::adjacent_vertices(g, nodes, mode = "out")
+  lapply(install_nodes, function(nodes) {
+    tasks <- nodes$task[vlapply(nodes$task, inherits, "install_task")]
+    vcapply(tasks, function(task) task$origin$package)
+  })
+}
+
+#' Project one graph onto another
+#'
+#' Project graph `x` onto graph `onto`, making a single graph with merged
+#' vertices where the attributes in `where` from `onto` map to the associated
+#' attributes in `x` given by the names of `where`. `where` _must_ contain
+#' an element called `name`, used to map vertices.
+#'
+#' The resulting graph will have the combined vertices and edges of both graphs.
+#'
+graph_project <- function(x, onto, where = c("name" = "name")) {
+  igraph::vertex.attributes(x)[where] <-
+    igraph::vertex.attributes(x)[names(where)]
+
+  projection <- match(
+    igraph::V(x)$name,
+    igraph::vertex_attr(onto, where[["name"]])
+  )
+
+  igraph::V(x)$name <- ifelse(
+    is.na(projection),
+    seq_along(igraph::V(x)),
+    igraph::V(onto)$name[projection]
+  )
+
+  merge_subgraphs(list(onto, x))
 }
 
 package_graph <- function(db, packages = db[, "Package"], dependencies = TRUE) {
@@ -366,11 +396,50 @@ is_package_done <- function(pkg, lib.loc) {
 }
 
 #' @export
+as_visNetwork <- function(x, ...) {
+  color_by_task_type <- c(
+    "check_task" = "lightblue",
+    "library_task" = "lightgreen",
+    "install_task" = "cornflowerblue",
+    "pkg_origin_repo" = "cornflowerblue",
+    "pkg_origin_unknown" = "red",
+    "pkg_origin_local" = "blue",
+    "red"
+  )
+
+  nodes <- igraph::as_data_frame(x, what = "vertices")
+  task_type <- vcapply(igraph::V(x)$task, function(task) {
+    if (inherits(task, "install_task")) return(class(task$origin)[[1]])
+    class(task)[[1]]
+  })
+
+  nodes$id <- nodes$name
+
+  nodes$label <- vcapply(igraph::V(g)$task, function(task) {
+    friendly_name(task, short = TRUE)
+  })
+
+  nodes$color <- color_by_task_type[match(
+    task_type,
+    names(color_by_task_type),
+    nomatch = length(color_by_task_type)
+  )]
+
+  edges <- igraph::as_data_frame(x)
+
+  nodes$task <- NULL  # work around for visNetwork infinite recursion issue?
+  visNetwork::visNetwork(nodes = nodes, edges = edges)
+}
+
+#' @export
 plot.task_graph <- function(x, ...) {
   color_by_task_type <- c(
     "check_task" = "lightblue",
     "library_task" = "lightgreen",
     "install_task" = "cornflowerblue",
+    "pkg_origin_repo" = "cornflowerblue",
+    "pkg_origin_unknown" = "red",
+    "pkg_origin_local" = "blue",
     "red"
   )
 
@@ -381,11 +450,20 @@ plot.task_graph <- function(x, ...) {
 
   size_by_task_type <- c(
     "install_task" = 5,
+    "pkg_origin_repo" = 5,
+    "pkg_origin_unknown" = 5,
+    "pkg_origin_local" = 5,
     15
   )
 
-  task_type <- vcapply(igraph::V(x)$task, function(task) class(task)[[1]])
-  label <- vcapply(igraph::V(x)$task, function(task) friendly_name(task))
+  task_type <- vcapply(igraph::V(x)$task, function(task) {
+    if (inherits(task, "install_task")) return(class(task$origin)[[1]])
+    class(task)[[1]]
+  })
+
+  label <- vcapply(igraph::V(x)$task, function(task) {
+    friendly_name(task, short = TRUE)
+  })
 
   color <- color_by_task_type[match(
     task_type,
@@ -404,6 +482,10 @@ plot.task_graph <- function(x, ...) {
     names(size_by_task_type),
     nomatch = length(size_by_task_type)
   )]
+
+  tail_ids <- igraph::ends(x, igraph::E(x))[, 2L]
+  is_install <- vlapply(igraph::V(x)[tail_ids]$task, inherits, "install_task")
+  igraph::E(x)$weights <- (1 + !is_install * 9)
 
   igraph::plot.igraph(
     x,

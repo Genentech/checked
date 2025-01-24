@@ -21,8 +21,8 @@ lib_loc_default <- function() {
   lib_loc(.class = "lib_loc_default")
 }
 
-lib_loc_isolated <- function() {
-  lib_loc(.class = "lib_loc_isolated")
+lib_loc_isolated <- function(seed = NULL) {
+  lib_loc(list(seed = seed), .class = "lib_loc_isolated")
 }
 
 #' Get Library Location

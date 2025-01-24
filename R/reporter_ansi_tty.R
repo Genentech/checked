@@ -100,7 +100,8 @@ report_initialize.reporter_ansi_tty <- function(
     format_done = "Finished in {cli::pb_elapsed}",
     total = sum(igraph::V(design$graph)$type == "check"),
     clear = FALSE,
-    auto_terminate = TRUE,
+    auto_terminate = FALSE,
+    .auto_close = FALSE,
     .envir = reporter,
   )
 }
@@ -213,7 +214,6 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) {
   }
 
   n_finished <- sum(v$status[v$type == "check"] >= STATUS$done)
-  print(unique(v$status))
   cli::cli_progress_update(
     set = n_finished,
     extra = list(message = inst_msg),
@@ -224,5 +224,6 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) {
 #' @export
 report_finalize.reporter_ansi_tty <- function(reporter, design) {
   report_status(reporter, design) # report completions of final processes
+  cli::cli_progress_done(.envir = reporter)
   cli::ansi_show_cursor()
 }

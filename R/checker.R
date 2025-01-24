@@ -106,7 +106,7 @@ checker <- R6::R6Class(
       private$lib.loc <- lib.loc
       private$repos <- repos
 
-      g <- task_graph_create(plan, repos)
+      g <- task_graph_create(self$plan, repos)
       self$graph <- task_graph_update_done(g, c(path_lib(output), lib.loc))
       private$restore_complete_checks()
     },

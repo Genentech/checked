@@ -70,19 +70,19 @@ start_task.install_task <- function(
   lib.loc,
   ...
 ) {
-  spec <- task_graph_task(g, task)
-  install_parameters <- install_params(spec$package)
-  libpaths <- c(task_graph_libpaths(g, node, output), lib.loc)
+  task <- node$task[[1]]
+  install_parameters <- install_params(task$origin)
+  libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc)
   install_packages_process$new(
     install_parameters$package,
     lib = path_lib(output),
     libpaths = libpaths,
-    repos = install_parameters$repos,
+    repos = task$origin$repos,
     dependencies = FALSE,
-    type = spec$type,
-    INSTALL_opts = spec$INSTALL_opts,
-    log = path_package_install_log(output, spec$alias),
-    env = spec$env
+    type = task$type,
+    INSTALL_opts = c(), # TODO
+    log = path_package_install_log(output, friendly_name(task)),
+    env = c() # TODO
   )
 }
 
@@ -119,18 +119,16 @@ start_task.check_task <- function(
   ...
 ) {
   task <- node$task[[1]]
-
   libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc)
-  browser()
-  path <- check_path(node$package, output = path_sources())
+  path <- check_path(task$origin, output = path_sources())
 
   check_process$new(
     path = path,
     check_dir = path_check_output(output, friendly_name(task)),
     libpath = libpaths,
-    repos = spec$package$repos,
-    args = spec$args,
-    build_args = spec$build_args,
-    env = spec$env
+    repos = task$repos,
+    args = task$args,
+    build_args = task$build_args,
+    env = task$env
   )
 }

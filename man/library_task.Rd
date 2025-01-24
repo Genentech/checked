@@ -4,7 +4,7 @@
 \alias{library_task}
 \title{Specify a library install}
 \usage{
-library_task(packages, loc = lib_loc_default(), ...)
+library_task(origins = list(), loc = lib_loc_default(), ...)
 }
 \description{
 A declarative task that specifies a set of packages that should be installed
