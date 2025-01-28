@@ -30,7 +30,7 @@ run.checker <- function(checker, ..., reporter = reporter_default()) {
   })
 
   report_initialize(reporter, checker)
-  while (checker$start_next_task() >= 0) {
+  while (checker$step()) {
     report_status(reporter, checker)
     report_sleep(reporter, checker)
   }

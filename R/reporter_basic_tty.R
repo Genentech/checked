@@ -48,29 +48,36 @@ report_status.reporter_basic_tty <- function(reporter, design, envir) {
             dur <- if (!is.null(p$get_duration)) {
               p$get_duration()
             }
-            if (node$type == "check") {
+
+            if (is_check(node$task)) {
               ewn <- c("ERROR", "WARNING", "NOTE")
               ewn <- table(p$get_checks())[ewn]
             } else {
               ewn <- c(0, 0, 0)
             }
+
+            fmt_error <- "{.err {ewn[[1]]} ERROR{?/S}}"
+            fmt_warning <- "{.warn {ewn[[2]]} WARNING{?/S}}"
+            fmt_note <- "{.note {ewn[[3]]} NOTE{?/S}}"
+            fmt_duration <- " {.time_taken ({format_time(dur)})}"
             cli::cli_fmt(cli::cli_text(
               "finished",
               if (sum(ewn) > 0) " with ",
               paste(collapse = ", ", c(
-                if (ewn[[1]] > 0) cli::format_inline("{.err {ewn[[1]]} ERROR{?/S}}"),
-                if (ewn[[2]] > 0) cli::format_inline("{.warn {ewn[[2]]} WARNING{?/S}}"),
-                if (ewn[[3]] > 0) cli::format_inline("{.note {ewn[[3]]} NOTE{?/S}}")
+                if (ewn[[1]] > 0) cli::format_inline(fmt_error),
+                if (ewn[[2]] > 0) cli::format_inline(fmt_warning),
+                if (ewn[[3]] > 0) cli::format_inline(fmt_note)
               )),
-              if (!is.null(dur)) cli::format_inline(" {.time_taken ({format_time(dur)})}")
+              if (!is.null(dur)) cli::format_inline(fmt_duration)
             ))
           }
         }
       )
 
       time <- Sys.time() - reporter$time_start # nolint (used via glue)
-      prefix <- cli::col_cyan("[{format_time(time)}][{node$type}] ")
-      cli::cli_text(prefix, "{.pkg {node$name}} {status}")
+      type <- friendly_class(node$task) # nolint (used via glue)
+      prefix <- cli::col_cyan("[{format_time(time)}][{type}] ")
+      cli::cli_text(prefix, "{.pkg {node$package}} {status}")
       reporter$statuses[[node$name]] <- node$status
     }
   }

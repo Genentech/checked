@@ -44,6 +44,7 @@ merge_subgraphs <- function(gs) {
 
   g <- igraph::graph_from_data_frame(es, vertices = vs)
 
+  # re-assign vertex and edge attributes to preserve class
   igraph::vertex.attributes(g) <- vs
   igraph::edge.attributes(g) <- es[, -(1:2), drop = FALSE]
 

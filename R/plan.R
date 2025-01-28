@@ -124,7 +124,7 @@ plan_rev_dep_dev_check <- function(path, revdep, repos) {
   )
 
   planned(sequence_graph(
-    name = vcapply(tasks, hash),
+    name = hashes(tasks),
     task = tasks,
     task_type = lapply(tasks, function(task) class(task)[[1]]),
     package = c(revdep, origin$package)
@@ -142,7 +142,7 @@ plan_rev_dep_release_check <- function(revdep, repos) {
   )
 
   planned(sequence_graph(
-    name = vcapply(tasks, hash),
+    name = hashes(tasks),
     task = tasks,
     task_type = lapply(tasks, function(task) class(task)[[1]]),
     package = revdep

@@ -5,8 +5,17 @@ hash <- function(x, n = 12) {
   substring(cli::hash_obj_sha256(x), 1, n)
 }
 
+hashes <- function(x, ...) {
+  vcapply(x, hash, ...)
+}
+
 base_pkgs <- function() {
   c("R", utils::installed.packages(priority = "base")[, "Package"])
+}
+
+is_package_installed <- function(pkg, lib.loc = .libPaths()) {
+  path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
+  length(path) > 0
 }
 
 .callr <- as.list(getNamespace("callr"), all.names = TRUE)[c(

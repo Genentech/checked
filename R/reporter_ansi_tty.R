@@ -110,13 +110,10 @@ report_initialize.reporter_ansi_tty <- function(
 #' @export
 report_status.reporter_ansi_tty <- function(reporter, design, envir) {
   v <- igraph::V(design$graph)
-  v_checks <- v[v$type == "check"]
+  v_checks <- v[is_check(v$task)]
   n_char_titles <- max(nchar(v_checks$name), 0)
   failed_tasks <- design$failed_tasks()
-  failed_packages <- failed_tasks[vlapply(
-    failed_tasks,
-    function(x) x$type == "install"
-  )]
+  failed_packages <- failed_tasks[is_install(failed_tasks)]
 
   # add newly started task status
   new_idx <- which(v_checks$status > STATUS$pending)
@@ -200,12 +197,7 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) {
 
   cat(paste0(buffer, reporter$failures_buffer))
 
-  is_inst <- vlapply(
-    design$active_processes(),
-    inherits,
-    "install_package_process"
-  )
-
+  is_inst <- is_install(design$active_processes())
   inst_pkgs <- names(design$active_processes()[is_inst])
   if (length(inst_pkgs)) {
     inst_msg <- paste0("installing ", paste0(inst_pkgs, collapse = ", "))

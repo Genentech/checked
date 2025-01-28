@@ -1,8 +1,8 @@
 #' @importFrom utils packageName install.packages
 #' @importFrom R6 R6Class
 #' @importFrom callr r_process
-install_packages_process <- R6::R6Class(
-  "install_package_process",
+install_process <- R6::R6Class(
+  "install_process",
   inherit = callr::r_process,
   public = list(
     log = NULL,
@@ -28,14 +28,14 @@ install_packages_process <- R6::R6Class(
           )
         },
         args = list(
-          pkgs,
+          private$package,
           ...,
           lib = lib,
           escalate_warning = is_install_failure_warning,
           available_packages_filters = available_packages_filters
         ),
         libpath = libpaths,
-        stdout = log,
+        stdout = self$log,
         stderr = "2>&1",
         system_profile = TRUE
       )

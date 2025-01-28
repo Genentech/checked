@@ -392,11 +392,6 @@ task_graph_update_done <- function(g, lib.loc) {
   task_graph_set_package_status(g, v[which_done], STATUS$done)
 }
 
-is_package_done <- function(pkg, lib.loc) {
-  path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
-  length(path) > 0
-}
-
 #' @export
 as_visNetwork <- function(x, ...) {
   color_by_task_type <- c(
@@ -411,7 +406,7 @@ as_visNetwork <- function(x, ...) {
 
   nodes <- igraph::as_data_frame(x, what = "vertices")
   task_type <- vcapply(igraph::V(x)$task, function(task) {
-    if (inherits(task, "install_task")) return(class(task$origin)[[1]])
+    if (is_install(task)) return(class(task$origin)[[1]])
     class(task)[[1]]
   })
 

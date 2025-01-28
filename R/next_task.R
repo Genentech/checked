@@ -73,7 +73,16 @@ start_task.install_task <- function(
   task <- node$task[[1]]
   install_parameters <- install_params(task$origin)
   libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc)
-  install_packages_process$new(
+
+  if (inherits(task$origin, "pkg_origin_base")) {
+    return(NULL)
+  }
+
+  if (is_package_installed(install_parameters$package, libpaths)) {
+    return(NULL)
+  }
+
+  install_process$new(
     install_parameters$package,
     lib = path_lib(output),
     libpaths = libpaths,
@@ -97,7 +106,7 @@ start_task.custom_install_task <- function(
   spec <- task_graph_task(g, task)
   install_parameters <- install_params(spec$package)
   libpaths <- c(task_get_lib_loc(g, node, output), lib.loc)
-  install_packages_process$new(
+  install_process$new(
     install_parameters$package,
     lib = path_custom_lib(output, spec$alias),
     libpaths = libpaths,
@@ -122,9 +131,13 @@ start_task.check_task <- function(
   libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc)
   path <- check_path(task$origin, output = path_sources())
 
+  # TODO: make output directory names more user-friendly, for now the vertex
+  # hash id is used to disambiguate output
+  output_dirname <- paste0(friendly_name(task), " <", node$name[[1]], ">")
+
   check_process$new(
     path = path,
-    check_dir = path_check_output(output, friendly_name(task)),
+    check_dir = path_check_output(output, output_dirname),
     libpath = libpaths,
     repos = task$repos,
     args = task$args,

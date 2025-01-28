@@ -176,6 +176,11 @@ checker <- R6::R6Class(
           lib.loc = private$lib.loc
         )
 
+        if (is.null(process)) {
+          private$finish_task(next_task)
+          return(1L)
+        }
+
         success <- private$push_process(next_task, process)
         return(as.integer(success))
       }
@@ -189,8 +194,8 @@ checker <- R6::R6Class(
     #'
     #' Checks whether all the scheduled tasks were successfully executed.
     is_done = function() {
-      is_check <- vlapply(igraph::V(self$graph)$task, inherits, "check_task")
-      checks <- igraph::V(self$graph)[is_check]
+      is_check_node <- is_check(igraph::V(self$graph)$task)
+      checks <- igraph::V(self$graph)[is_check_node]
       all(checks$status == STATUS$done)
     }
   ),
@@ -210,16 +215,24 @@ checker <- R6::R6Class(
     # failed tasks
     failed = list(),
 
+    start_task = function(task) {
+      task_graph_package_status(self$graph, task) <- STATUS$`in progress`
+    },
+
+    finish_task = function(task) {
+      task_graph_package_status(self$graph, task) <- STATUS$`done`
+    },
+
     push_process = function(task, x) {
       task_graph_task_process(self$graph, task) <- x
       name <- task_graph_task_name(self$graph, task)
-      task_graph_package_status(self$graph, task) <- STATUS$`in progress`
+      private$start_task(task)
       x$set_finisher(function(process) {
         if (process$get_r_exit_status() != 0) {
           private$failed[[name]] <- task
         }
         private$pop_process(name)
-        task_graph_package_status(self$graph, task) <- STATUS$done
+        private$finish_task(task)
       })
       private$active[[name]] <- x
       TRUE
