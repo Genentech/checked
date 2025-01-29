@@ -50,24 +50,62 @@ as_pkg_dependencies <- function(x) {
   do.call(into_deptype_list, x)
 }
 
+#' Build Package Dependencies Table
+#'
+#' Inspired by `tools::package_dependencies`, but with the added benefit
+#' of recording the dependency type and relationships throughout the
+#' dependency tree.
+#'
 pkg_dependencies <- function(
   packages,
   dependencies = TRUE,
-  repos = getOption("repos")
+  db = available.packages(),
+  verbose = FALSE
 ) {
   dependencies <- as_pkg_dependencies(dependencies)
-  unique(unlist(c(
-    tools::package_dependencies(
-      packages = packages,
-      db = available_packages(repos = repos),
-      recursive = FALSE,
-      which = dependencies$direct
-    ),
-    tools::package_dependencies(
-      packages = packages,
-      db = available_packages(repos = repos),
-      recursive = TRUE,
-      which = dependencies$indirect
+  na_version <- package_version(NA_character_, strict = FALSE)
+  proto_df <- data.frame(
+    package = character(0L),
+    type = character(0L),
+    name = character(0L),
+    op = character(0L),
+    version = na_version[c()]
+  )
+
+  depth <- 0L
+  out <- list()
+  while (length(packages) > 0L) {
+    depth <- depth + 1L
+    deptypes <- if (depth == 1L) dependencies$direct else dependencies$indirect
+    depstrs <- db[packages, deptypes, drop = FALSE]
+
+    n <- length(out) + 1
+    out[[n]] <- Map(
+      package = rep(packages, times = length(deptypes)),
+      depstr = as.vector(depstrs),
+      deptype = rep(deptypes, each = length(packages)),
+      f = function(package, depstr, deptype) {
+        if (is.na(depstr)) return()
+        deps <- tools:::.split_dependencies(depstr)
+        out <- proto_df[seq_along(deps), , drop = FALSE]
+        rownames(out) <- NULL
+
+        out$package <- package
+        out$type <- deptype
+        out$name <- vcapply(deps, `[[`, "name")
+        out$op <- vcapply(deps, function(i) i$op %||% NA_character_)
+        out$version <- lapply(deps, function(i) i$version %||% na_version)
+
+        out
+      }
     )
-  )))
+
+    old_deps <- unlist(lapply(out, names))
+    new_deps <- unlist(lapply(out[[n]], `[[`, "name"))
+    packages <- setdiff(new_deps, c(old_deps, base_pkgs()))
+  }
+
+  out <- do.call(rbind, unlist(out, recursive = FALSE))
+  rownames(out) <- NULL
+  out
 }

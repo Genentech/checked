@@ -16,7 +16,9 @@ sequence_graph <- function(name, ...) {
 }
 
 merge_subgraphs <- function(gs) {
-  # NOTE: igraph::as_data_frame will coerce factor variables to character
+  # NOTE: igraph::as_data_frame will coerce factor variables to character,
+  # reassign columns from attributes to avoid coercion
+
   edfs <- lapply(gs, function(g) {
     df <- igraph::as_data_frame(g)
     attrs <- igraph::edge.attributes(g)
@@ -52,6 +54,7 @@ merge_subgraphs <- function(gs) {
 }
 
 complete_columns <- function(df, cols) {
-  for (col in setdiff(cols, colnames(df))) df[[col]] <- NA
-  df[, cols]
+  n_gtz <- nrow(df) > 0
+  for (col in setdiff(cols, colnames(df))) df[[col]] <- NA[n_gtz]
+  df[, cols, drop = FALSE]
 }

@@ -477,7 +477,7 @@ plot.task_graph <- function(x, ...) {
 
   tail_ids <- igraph::ends(x, igraph::E(x))[, 2L]
   is_inst <- is_install(igraph::V(x)[tail_ids]$task)
-  igraph::E(x)$weights <- 1 + !is_inst * 9
+  is_check <- is_check(igraph::V(x)$task)
 
   igraph::plot.igraph(
     x,
@@ -487,6 +487,11 @@ plot.task_graph <- function(x, ...) {
     vertex.label = vertex.label,
     vertex.color = vertex.color,
     vertex.size = vertex.size,
-    edge.lty = edge.lty
+    edge.lty = edge.lty,
+    layout = igraph::layout_with_sugiyama(
+      x,
+      hgap = 200,
+      maxiter = 1000
+    )
   )
 }

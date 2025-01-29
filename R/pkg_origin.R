@@ -221,12 +221,12 @@ dep_tree <- function(x, ...) {
 
 #' @export
 dep_tree.check_task <- function(x, ...) {
-  dep_tree(x$origin)
+  dep_tree(x$origin, ...)
 }
 
 #' @export
 dep_tree.install_task <- function(x, ...) {
-  dep_tree(x$origin)
+  dep_tree(x$origin, ...)
 }
 
 #' @export
@@ -246,33 +246,11 @@ dep_tree.character <- function(
   db = available_packages(),
   dependencies = TRUE
 ) {
-  dependencies <- as_pkg_dependencies(dependencies)
-  direct_deps <- tools::package_dependencies(
-    x,
-    db = db,
-    which = dependencies$direct,
-    recursive = FALSE
-  )
-
-  indirect_deps <- tools::package_dependencies(
-    x,
-    db = db,
-    which = dependencies$indirect,
-    recursive = TRUE
-  )
-
-  all_deps <- tools::package_dependencies(
-    unique(unlist(c(x, direct_deps, indirect_deps))),
-    db = db,
-    which = "strong",
-    recursive = FALSE
-  )
-
-  edges <- data.frame(
-    from = rep(names(all_deps), times = viapply(all_deps, length)),
-    to = unlist(all_deps)
-  )
-
-  igraph::graph_from_data_frame(edges)
+  df <- pkg_dependencies(x, dependencies = dependencies, db = db, ...)
+  colmap <- c("package" = "from", "name" = "to")
+  rename <- match(names(df), names(colmap))
+  to_rename <- !is.na(rename)
+  names(df)[to_rename] <- colmap[rename[to_rename]]
+  df <- df[, c(which(to_rename), which(!to_rename)), drop = FALSE]
+  igraph::graph_from_data_frame(df)
 }
-
