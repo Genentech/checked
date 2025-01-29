@@ -33,6 +33,13 @@ STATUS <- enum(
   "done"
 )
 
+#' Check execution status categories
+#' @keywords internal
+PLAN <- enum(
+  "planned",
+  "inferred"
+)
+
 #' Dependencies categories
 #' @keywords internal
 DEP <- enum(

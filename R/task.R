@@ -60,6 +60,19 @@ friendly_name.default <- function(x, ...) {
   )
 }
 
+#' @export
+friendly_class.task <- function(x) {
+  if (length(class(x)) > 1) {
+    sub("_task$", "", class(x)[[1]])
+  } else {
+    class(x)[[1]]
+  }
+}
+
+friendly_class <- function(x, ...) {
+  UseMethod("friendly_class")
+}
+
 #' Create a task to install a package and dependencies
 #'
 #' @param ... Additional parameters passed to [`task()`]
@@ -94,8 +107,31 @@ friendly_name.install_task <- function(x, ..., short = FALSE) {
   paste0(if (!short) "install ", format(x$origin, ..., short = short))
 }
 
-is_install_task <- function(x) {
-  inherits(x, "install_task")
+is_type <- function(x, type) {
+  UseMethod("is_type")
+}
+
+#' @export
+is_type.list <- function(x, type) {
+  vlapply(x, is_type, type = type)
+}
+
+#' @export
+is_type.task <- function(x, type) {
+  inherits(x, paste0(type, "_task"))
+}
+
+#' @export
+is_type.process <- function(x, type) {
+  inherits(x, paste0(type, "_process"))
+}
+
+is_install <- function(x) {
+  is_type(x, "install")
+}
+
+is_check <- function(x) {
+  is_type(x, "check")
 }
 
 #' Create a custom install task

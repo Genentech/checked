@@ -70,20 +70,22 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
 
   igraph::V(g)$status <- STATUS$pending
   igraph::V(g)$process <- rep_len(list(), length(g))
+  igraph::E(g)$plan[is.na(igraph::E(g)$plan)] <- PLAN$inferred
+
   task_graph_sort(g)
 }
 
 lib_node_tasks <- function(g, nodes) {
   install_nodes <- igraph::adjacent_vertices(g, nodes, mode = "out")
   lapply(install_nodes, function(nodes) {
-    nodes$task[vlapply(nodes$task, inherits, "install_task")]
+    nodes$task[is_install(nodes$task)]
   })
 }
 
 lib_node_pkgs <- function(g, nodes) {
   install_nodes <- igraph::adjacent_vertices(g, nodes, mode = "out")
   lapply(install_nodes, function(nodes) {
-    tasks <- nodes$task[vlapply(nodes$task, inherits, "install_task")]
+    tasks <- nodes$task[is_install(nodes$task)]
     vcapply(tasks, function(task) task$origin$package)
   })
 }
@@ -322,7 +324,7 @@ task_graph_which_check_satisfied <- function(
 ) {
   task_graph_which_satisfied(
     g,
-    igraph::V(g)[vlapply(igraph::V(g)$task, inherits, "check_task")],
+    igraph::V(g)[vlapply(igraph::V(g)$task, is_check)],
     ...,
     dependencies = dependencies,
     status = status
@@ -337,7 +339,7 @@ task_graph_which_install_satisfied <- function(
 ) {
   task_graph_which_satisfied(
     g,
-    igraph::V(g)[vlapply(igraph::V(g)$task, inherits, "install_task")],
+    igraph::V(g)[is_install(igraph::V(g)$task)],
     ...,
     dependencies = dependencies,
     status = status
@@ -386,7 +388,7 @@ task_graph_set_task_process <- function(g, v, process) {
 
 task_graph_update_done <- function(g, lib.loc) {
   v <- igraph::V(g)[igraph::V(g)$type == "install"]
-  which_done <- which(vlapply(v$name, is_package_done, lib.loc = lib.loc))
+  which_done <- which(vlapply(v$name, is_package_installed, lib.loc = lib.loc))
   task_graph_set_package_status(g, v[which_done], STATUS$done)
 }
 
@@ -409,7 +411,7 @@ as_visNetwork <- function(x, ...) {
 
   nodes <- igraph::as_data_frame(x, what = "vertices")
   task_type <- vcapply(igraph::V(x)$task, function(task) {
-    if (inherits(task, "install_task")) return(class(task$origin)[[1]])
+    if (is_install(task)) return(class(task$origin)[[1]])
     class(task)[[1]]
   })
 
@@ -433,68 +435,63 @@ as_visNetwork <- function(x, ...) {
 
 #' @export
 plot.task_graph <- function(x, ...) {
-  color_by_task_type <- c(
+  style <- function(attr, ...) {
+    map <- simplify2array(list(...))
+    nomatch <- if (names(map[length(map)]) == "") length(map) else NA
+    map[match(attr, names(map), nomatch = nomatch)]
+  }
+
+  task_type <- vcapply(igraph::V(x)$task, function(task) {
+    if (is_install(task)) return(class(task$origin)[[1]])
+    class(task)[[1]]
+  })
+
+  vertex.color <- style(
+    task_type,
     "check_task" = "lightblue",
     "library_task" = "lightgreen",
     "install_task" = "cornflowerblue",
     "pkg_origin_repo" = "cornflowerblue",
+    "pkg_origin_base" = "lightgray",
     "pkg_origin_unknown" = "red",
     "pkg_origin_local" = "blue",
     "red"
   )
 
-  shape_by_task_type <- c(
-    "library_task" = "square",
-    "circle"
+  vertex.label <- vcapply(
+    igraph::V(x)$task,
+    friendly_name,
+    short = TRUE
   )
 
-  size_by_task_type <- c(
+  vertex.size <- style(
+    task_type,
     "install_task" = 5,
     "pkg_origin_repo" = 5,
     "pkg_origin_unknown" = 5,
     "pkg_origin_local" = 5,
-    15
+    "pkg_origin_base" = 5,
+    8
   )
 
-  task_type <- vcapply(igraph::V(x)$task, function(task) {
-    if (inherits(task, "install_task")) return(class(task$origin)[[1]])
-    class(task)[[1]]
-  })
-
-  label <- vcapply(igraph::V(x)$task, function(task) {
-    friendly_name(task, short = TRUE)
-  })
-
-  color <- color_by_task_type[match(
-    task_type,
-    names(color_by_task_type),
-    nomatch = length(color_by_task_type)
-  )]
-
-  shape <- shape_by_task_type[match(
-    task_type,
-    names(shape_by_task_type),
-    nomatch = length(shape_by_task_type)
-  )]
-
-  size <- size_by_task_type[match(
-    task_type,
-    names(size_by_task_type),
-    nomatch = length(size_by_task_type)
-  )]
+  edge.lty <- style(
+    igraph::E(x)$plan,
+    "planned" = 1,  # solid
+    "inferred" = 3  # dotted
+  )
 
   tail_ids <- igraph::ends(x, igraph::E(x))[, 2L]
-  is_install <- vlapply(igraph::V(x)[tail_ids]$task, inherits, "install_task")
-  igraph::E(x)$weights <- (1 + !is_install * 9)
+  is_inst <- is_install(igraph::V(x)[tail_ids]$task)
+  igraph::E(x)$weights <- 1 + !is_inst * 9
 
   igraph::plot.igraph(
     x,
     vertex.label.family = "sans",
     vertex.label.color = "gray4",
-    vertex.label.dist = 2.5,
-    vertex.label = label,
-    vertex.color = color,
-    vertex.shape = shape,
-    vertex.size = size
+    vertex.label.dist = 1,
+    vertex.label = vertex.label,
+    vertex.color = vertex.color,
+    vertex.size = vertex.size,
+    edge.lty = edge.lty
   )
 }

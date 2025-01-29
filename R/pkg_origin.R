@@ -66,11 +66,31 @@ pkg_origin_repo <- function(package, repos, ...) {
 #' @export
 #' @rdname pkg_origin
 try_pkg_origin_repo <- function(package, repos, ...) {
-  if (package %in% available_packages(repos = repos)[, "Package"]) {
+  if (isTRUE(pkg_origin_is_base(package))) {
+    return(pkg_origin_base(package, ...))
+  } else if (package %in% available_packages(repos = repos)[, "Package"]) {
     pkg_origin_repo(package = package, repos = repos, ...)
   } else {
     pkg_origin_unknown(package = package, ...)
   }
+}
+
+
+#' @export
+#' @rdname pkg_origin
+pkg_origin_is_base <- function(package, ...) {
+  package %in% installed.packages()[, "Package"] &&
+    installed.packages()[package, "Priority"] == "base"
+}
+
+
+#' @export
+#' @rdname pkg_origin
+pkg_origin_base <- function(package, ...) {
+  pkg_origin(
+    package = package,
+    .class = "pkg_origin_base"
+  )
 }
 
 
@@ -149,6 +169,11 @@ install_params <- function(x) {
 #' @export
 install_params.pkg_origin <- function(x, output, ...) {
   stop(sprintf("Can't determine origin of package '%s'", x$name))
+}
+
+#' @export
+install_params.pkg_origin_base <- function(x) {
+  list()  # no installation needed, distributed with R
 }
 
 #' @export

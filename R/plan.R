@@ -30,6 +30,12 @@ empty_checks_df <- data.frame(
 #' @name plan
 NULL
 
+#' Tag edges as 'planned'
+planned <- function(graph) {
+  igraph::E(graph)$plan <- PLAN$planned
+  graph
+}
+
 #' Plan Reverse Dependency Checks
 #'
 #' Generates a plan for running reverse dependency check for certain
@@ -117,12 +123,12 @@ plan_rev_dep_dev_check <- function(path, revdep, repos) {
     install_task(origin = origin)
   )
 
-  sequence_graph(
+  planned(sequence_graph(
     name = vcapply(tasks, hash),
     task = tasks,
     task_type = lapply(tasks, function(task) class(task)[[1]]),
     package = c(revdep, origin$package)
-  )
+  ))
 }
 
 plan_rev_dep_release_check <- function(revdep, repos) {
@@ -135,12 +141,12 @@ plan_rev_dep_release_check <- function(revdep, repos) {
     ))
   )
 
-  sequence_graph(
+  planned(sequence_graph(
     name = vcapply(tasks, hash),
     task = tasks,
     task_type = lapply(tasks, function(task) class(task)[[1]]),
     package = revdep
-  )
+  ))
 }
 
 rev_dep_check_tasks <- function(packages, repos, aliases, revdep) {

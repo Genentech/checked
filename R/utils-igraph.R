@@ -16,20 +16,38 @@ sequence_graph <- function(name, ...) {
 }
 
 merge_subgraphs <- function(gs) {
-  edfs <- lapply(gs, igraph::as_data_frame)
+  # NOTE: igraph::as_data_frame will coerce factor variables to character
+  edfs <- lapply(gs, function(g) {
+    df <- igraph::as_data_frame(g)
+    attrs <- igraph::edge.attributes(g)
+    df[names(attrs)] <- attrs
+    df
+  })
+
   all_cols <- unique(unlist(lapply(edfs, colnames)))
   edfs <- lapply(edfs, complete_columns, all_cols)
   es <- unique(do.call(rbind, edfs))
   rownames(es) <- NULL
 
-  vdfs <- lapply(gs, igraph::as_data_frame, what = "vertices")
+  vdfs <- lapply(gs, function(g) {
+    df <- igraph::as_data_frame(g, what = "vertices")
+    attrs <- igraph::vertex.attributes(g)
+    df[names(attrs)] <- attrs
+    df
+  })
+
   all_cols <- unique(unlist(lapply(vdfs, colnames)))
   vdfs <- lapply(vdfs, complete_columns, all_cols)
   vs <- do.call(rbind, vdfs)
   vs <- vs[!duplicated(vs$name), ]
   rownames(vs) <- NULL
 
-  igraph::graph_from_data_frame(es, vertices = vs)
+  g <- igraph::graph_from_data_frame(es, vertices = vs)
+
+  igraph::vertex.attributes(g) <- vs
+  igraph::edge.attributes(g) <- es[, -(1:2), drop = FALSE]
+
+  g
 }
 
 complete_columns <- function(df, cols) {
