@@ -29,13 +29,7 @@ merge_subgraphs <- function(gs) {
   vs <- vs[!duplicated(vs$name), ]
   rownames(vs) <- NULL
 
-  g <- igraph::graph_from_data_frame(es, vertices = vs)
-
-  # re-assign vertex and edge attributes to preserve class
-  igraph::vertex.attributes(g) <- as.list(vs)
-  igraph::edge.attributes(g) <- as.list(es[, -(1:2), drop = FALSE])
-
-  g
+  igraph::graph_from_data_frame(es, vertices = vs)
 }
 
 complete_columns <- function(df, cols) {
