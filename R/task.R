@@ -173,8 +173,8 @@ is_check_task <- function(x) {
 
 #' @family tasks
 #' @export
-friendly_name.check_task <- function(x, ...) {
-  paste0("check ", format(x$origin, ...))
+friendly_name.check_task <- function(x, ..., short = FALSE) {
+  paste0(if (short <= 1) "check ", format(x$origin, ..., short = short))
 }
 
 #' Specify a library install

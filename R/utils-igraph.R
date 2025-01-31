@@ -16,28 +16,13 @@ sequence_graph <- function(name, ...) {
 }
 
 merge_subgraphs <- function(gs) {
-  # NOTE: igraph::as_data_frame will coerce factor variables to character,
-  # reassign columns from attributes to avoid coercion
-
-  edfs <- lapply(gs, function(g) {
-    df <- igraph::as_data_frame(g)
-    attrs <- igraph::edge.attributes(g)
-    df[names(attrs)] <- attrs
-    df
-  })
-
+  edfs <- lapply(gs, igraph::as_data_frame)
   all_cols <- unique(unlist(lapply(edfs, colnames)))
   edfs <- lapply(edfs, complete_columns, all_cols)
   es <- unique(do.call(rbind, edfs))
   rownames(es) <- NULL
 
-  vdfs <- lapply(gs, function(g) {
-    df <- igraph::as_data_frame(g, what = "vertices")
-    attrs <- igraph::vertex.attributes(g)
-    df[names(attrs)] <- attrs
-    df
-  })
-
+  vdfs <- lapply(gs, igraph::as_data_frame, what = "vertices")
   all_cols <- unique(unlist(lapply(vdfs, colnames)))
   vdfs <- lapply(vdfs, complete_columns, all_cols)
   vs <- do.call(rbind, vdfs)
@@ -47,8 +32,8 @@ merge_subgraphs <- function(gs) {
   g <- igraph::graph_from_data_frame(es, vertices = vs)
 
   # re-assign vertex and edge attributes to preserve class
-  igraph::vertex.attributes(g) <- vs
-  igraph::edge.attributes(g) <- es[, -(1:2), drop = FALSE]
+  igraph::vertex.attributes(g) <- as.list(vs)
+  igraph::edge.attributes(g) <- as.list(es[, -(1:2), drop = FALSE])
 
   g
 }
