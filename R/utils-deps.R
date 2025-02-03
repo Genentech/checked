@@ -88,14 +88,19 @@ pkg_dependencies <- function(
         if (is.na(depstr)) return()
         deps <- tools:::.split_dependencies(depstr)
         out <- proto_df[seq_along(deps), , drop = FALSE]
-        rownames(out) <- NULL
 
         out$package <- package
         out$type <- deptype
         out$name <- vcapply(deps, `[[`, "name")
         out$op <- vcapply(deps, function(i) i$op %||% NA_character_)
-        out$version <- lapply(deps, function(i) i$version %||% na_version)
+        out$version <- mapply(
+          function(i) i$version %||% na_version,
+          deps,
+          USE.NAMES = FALSE,
+          SIMPLIFY = FALSE
+        )
 
+        rownames(out) <- paste0(out$package, "-", out$name)
         out
       }
     )

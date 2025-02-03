@@ -111,7 +111,7 @@ report_initialize.reporter_ansi_tty <- function(
 report_status.reporter_ansi_tty <- function(reporter, design, envir) {
   v <- igraph::V(design$graph)
   v_checks <- v[is_check(v$task)]
-  n_char_titles <- max(nchar(v_checks$name), 0)
+  n_char_titles <- max(nchar(vcapply(v_checks$task, friendly_name, short = 2L)))
   failed_tasks <- design$failed_tasks()
   failed_packages <- failed_tasks[is_install(failed_tasks)]
 
@@ -180,7 +180,7 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) {
     # derive reporter information
     n_lines <- length(reporter$status) - idx + 1L
     width <- cli::console_width() - n_char_titles - 2L
-    task_name <- v_checks$name[[v_idx]]
+    task_name <- friendly_name(v_checks[[v_idx]]$task, short = 2L)
     process <- task_graph_task_process(design$graph, v_checks[[v_idx]])
 
     # report status line
