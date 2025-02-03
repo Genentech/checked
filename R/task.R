@@ -13,8 +13,17 @@
 #'
 #' @family tasks
 #' @export
-task <- function(...) {
-  structure(list(...), class = "task")
+task <- function(..., .subclass = NULL) {
+  structure(list(...), class = c(sprintf("%s_task", .subclass), "task"))
+}
+
+#' Construct a 'Meta' Task
+#'
+#' Meta tasks are tasks which are not intended to perform computation. They
+#' exist simply to provide relationships among computational tasks.
+#'
+meta_task <- function(..., .subclass = NULL) {
+  task(..., .subclass = c(sprintf("%s_meta", .subclass), "meta"))
 }
 
 make_unique_task <- function(task, seed = runif(1)) {
@@ -43,7 +52,7 @@ format.task <- function(x, ..., indent = 0L) {
 }
 
 #' @export
-friendly_name.task <- function(x) {
+friendly_name.task <- function(x, ...) {
   "task"
 }
 
@@ -61,7 +70,7 @@ friendly_name.default <- function(x, ...) {
 }
 
 #' @export
-friendly_class.task <- function(x) {
+friendly_class.task <- function(x, ...) {
   if (length(class(x)) > 1) {
     sub("_task$", "", class(x)[[1]])
   } else {
@@ -89,12 +98,14 @@ install_task <- function(
   lib = lib_loc_default(),
   ...
 ) {
-  task <- task(origin = origin, ...)
-  task$type <- type
-  task$INSTALL_opts <- INSTALL_opts
-  task$lib <- lib
-  class(task) <- c("install_task", class(task))
-  task
+  task(
+    origin = origin,
+    type = type,
+    INSTALL_opts = INSTALL_opts,
+    lib = lib,
+    ...,
+    .subclass = "install"
+  )
 }
 
 #' @export
@@ -154,12 +165,13 @@ custom_install_task <- function(...) {
 #' @family tasks
 #' @export
 check_task <- function(build_args = NULL, args = NULL, env = NULL, ...) {
-  task <- task(...)
-  task$env <- env
-  task$args <- args
-  task$build_args <- build_args
-  class(task) <- c("check_task", class(task))
-  task
+  task(
+    env = env,
+    args = args,
+    build_args = build_args,
+    ...,
+    .subclass = "check"
+  )
 }
 
 #' @export
@@ -208,6 +220,18 @@ friendly_name.library_task <- function(x, ...) {
   }
 
   paste0(format(x$loc), fmt_pkgs)
+}
+
+friendly_name.rev_dep_dep_meta_task <- function(x, ..., short = FALSE) {
+  paste0(
+    "check ",
+    format(x$origin, ..., short = short),
+    if (!short) " reverse-dependencies"
+  )
+}
+
+friendly_name.rev_dep_check_meta_task <- function(x, ..., short = FALSE) {
+  paste0("check ", if (short) "revdep" else "reverse-dependency")
 }
 
 #' Create a task to run reverse dependency checks

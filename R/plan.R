@@ -92,30 +92,55 @@ plan_rev_dep_checks <- function(
     return(empty_checks_df)
   }
 
-  g <- merge_subgraphs(c(
-    lapply(
-      revdeps,
-      plan_rev_dep_dev_check,
-      path = path,
-      repos = repos
-    ),
-    lapply(
-      revdeps[revdeps %in% ap[, "Package"]],
-      plan_rev_dep_release_check,
-      repos = repos
+  task <- make_unique_task(
+    seed = path,
+    meta_task(
+      origin = pkg_origin_local(path),
+      .subclass = "rev_dep_dep"
     )
+  )
+
+  task <- sequence_graph(name = hashes(list(task)), task = list(task))
+
+  rev_dep_dev_check_tasks <- lapply(
+    revdeps,
+    plan_rev_dep_dev_check,
+    path = path,
+    repos = repos
+  )
+
+  rev_dep_release_check_tasks <- lapply(
+    revdeps[revdeps %in% ap[, "Package"]],
+    plan_rev_dep_release_check,
+    repos = repos
+  )
+
+  task_id <- V(task)[[1]]$name
+  rev_dep_meta_task_ids <- unique(c(
+    vcapply(rev_dep_dev_check_tasks, function(g) V(g)[[1]]$name),
+    vcapply(rev_dep_release_check_tasks, function(g) V(g)[[1]]$name)
   ))
+
+  g <- merge_subgraphs(c(
+    task,
+    rev_dep_dev_check_tasks,
+    rev_dep_release_check_tasks
+  ))
+
+  igraph::add_edges(g, )
 
   class(g) <- c("task_graph", class(g))
   g
 }
 
 plan_rev_dep_dev_check <- function(path, revdep, repos) {
+  rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
   origin <- pkg_origin_local(path = path)
 
   tasks <- list(
+    make_unique_task(seed = revdep, meta_task(.subclass = "rev_dep_check")),
     make_unique_task(seed = "dev", check_task(
-      origin = pkg_origin_repo(package = revdep, repos = repos),
+      origin = rev_dep_origin,
       env = DEFAULT_R_CMD_CHECK_ENVVARS,
       args = DEFAULT_R_CMD_CHECK_ARGS,
       build_args = DEFAULT_R_CMD_BUILD_ARGS
@@ -123,30 +148,23 @@ plan_rev_dep_dev_check <- function(path, revdep, repos) {
     install_task(origin = origin)
   )
 
-  planned(sequence_graph(
-    name = hashes(tasks),
-    task = tasks,
-    task_type = lapply(tasks, function(task) class(task)[[1]]),
-    package = c(revdep, origin$package)
-  ))
+  sequence_graph(name = hashes(tasks), task = tasks)
 }
 
 plan_rev_dep_release_check <- function(revdep, repos) {
+  rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
+
   tasks <- list(
+    make_unique_task(seed = revdep, meta_task(.subclass = "rev_dep_check")),
     make_unique_task(seed = "release", check_task(
-      origin = pkg_origin_repo(package = revdep, repos = repos),
+      origin = rev_dep_origin,
       env = DEFAULT_R_CMD_CHECK_ENVVARS,
       args = DEFAULT_R_CMD_CHECK_ARGS,
       build_args = DEFAULT_R_CMD_BUILD_ARGS
     ))
   )
 
-  planned(sequence_graph(
-    name = hashes(tasks),
-    task = tasks,
-    task_type = lapply(tasks, function(task) class(task)[[1]]),
-    package = revdep
-  ))
+  sequence_graph(name = hashes(tasks), task = tasks)
 }
 
 rev_dep_check_tasks <- function(packages, repos, aliases, revdep) {
