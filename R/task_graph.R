@@ -23,18 +23,23 @@
 #' }
 #' @keywords internal
 task_graph_create <- function(plan, repos = getOption("repos")) {
-  plan_tasks <- igraph::V(plan)[igraph::V(plan)$task_type == "check_task"]
-  plan_neighborhoods <- igraph::neighborhood(
+  check_tasks <- igraph::V(plan)[is_check(igraph::V(plan)$task)]
+  check_task_neighborhoods <- igraph::neighborhood(
     plan,
     order = length(plan),
     mode = "out",
-    nodes = plan_tasks
+    nodes = check_tasks
   )
 
   # for each check task in the plan, build a dependency tree and merge it
   # into the existing check task subtree
-  plan_neighborhoods <- lapply(plan_neighborhoods, function(nh) {
+  check_task_neighborhoods <- lapply(check_task_neighborhoods, function(nh) {
     subtree <- igraph::induced_subgraph(plan, nh)
+    V(subtree)$package <- vcapply(
+      V(subtree)$task,
+      function(i) i$origin$package %||% NA_character_
+    )
+
     deps <- dep_tree(nh[[1]]$task)
     igraph::reverse_edges(deps)
 
@@ -65,12 +70,11 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
   })
 
   # then merge all the full check task task trees into a single graph
-  g <- merge_subgraphs(plan_neighborhoods)
+  g <- merge_subgraphs(c(list(plan), check_task_neighborhoods))
   class(g) <- c("task_graph", class(g))
 
   igraph::V(g)$status <- STATUS$pending
   igraph::V(g)$process <- rep_len(list(), length(g))
-  igraph::E(g)$plan[is.na(igraph::E(g)$plan)] <- PLAN$inferred
 
   task_graph_sort(g)
 }
@@ -393,43 +397,7 @@ task_graph_update_done <- function(g, lib.loc) {
 }
 
 #' @export
-as_visNetwork <- function(x, ...) {
-  color_by_task_type <- c(
-    "check_task" = "lightblue",
-    "library_task" = "lightgreen",
-    "install_task" = "cornflowerblue",
-    "pkg_origin_repo" = "cornflowerblue",
-    "pkg_origin_unknown" = "red",
-    "pkg_origin_local" = "blue",
-    "red"
-  )
-
-  nodes <- igraph::as_data_frame(x, what = "vertices")
-  task_type <- vcapply(igraph::V(x)$task, function(task) {
-    if (is_install(task)) return(class(task$origin)[[1]])
-    class(task)[[1]]
-  })
-
-  nodes$id <- nodes$name
-
-  nodes$label <- vcapply(igraph::V(g)$task, function(task) {
-    friendly_name(task, short = TRUE)
-  })
-
-  nodes$color <- color_by_task_type[match(
-    task_type,
-    names(color_by_task_type),
-    nomatch = length(color_by_task_type)
-  )]
-
-  edges <- igraph::as_data_frame(x)
-
-  nodes$task <- NULL  # work around for visNetwork infinite recursion issue?
-  visNetwork::visNetwork(nodes = nodes, edges = edges)
-}
-
-#' @export
-plot.task_graph <- function(x, ...) {
+plot.task_graph <- function(x, ..., interactive = FALSE) {
   style <- function(attr, ...) {
     map <- simplify2array(list(...))
     nomatch <- if (names(map[length(map)]) == "") length(map) else NA
@@ -441,8 +409,13 @@ plot.task_graph <- function(x, ...) {
     class(task)[[1]]
   })
 
-  vertex.color <- style(
+  vertex <- igraph::as_data_frame(x, what = "vertices")
+  edge <- igraph::as_data_frame(x, what = "edges")
+
+  vertex$color <- style(
     task_type,
+    "rev_dep_dep_meta_task" = "blueviolet",
+    "rev_dep_check_meta_task" = "blueviolet",
     "check_task" = "lightblue",
     "library_task" = "lightgreen",
     "install_task" = "cornflowerblue",
@@ -453,13 +426,13 @@ plot.task_graph <- function(x, ...) {
     "red"
   )
 
-  vertex.label <- vcapply(
+  vertex$label <- vcapply(
     igraph::V(x)$task,
     friendly_name,
     short = TRUE
   )
 
-  vertex.size <- style(
+  vertex$size <- style(
     task_type,
     "install_task" = 5,
     "pkg_origin_repo" = 5,
@@ -469,29 +442,53 @@ plot.task_graph <- function(x, ...) {
     8
   )
 
-  edge.lty <- style(
-    igraph::E(x)$plan,
-    "planned" = 1,  # solid
-    "inferred" = 3  # dotted
-  )
+  if (interactive) {
+    plot_interactive_task_graph(x, vertex = vertex, edge = edge)
+  } else {
+    plot_static_task_graph(x, vertex = vertex, edge = edge)
+  }
+}
 
-  tail_ids <- igraph::ends(x, igraph::E(x))[, 2L]
-  is_inst <- is_install(igraph::V(x)[tail_ids]$task)
-  is_check <- is_check(igraph::V(x)$task)
-
+plot_static_task_graph <- function(
+  g,
+  vertex = igraph::as_data_frame(g, what = "vertices"),
+  edge = igraph::as_data_frame(g, what = "edges")
+) {
   igraph::plot.igraph(
-    x,
+    g,
     vertex.label.family = "sans",
     vertex.label.color = "gray4",
     vertex.label.dist = 1,
-    vertex.label = vertex.label,
-    vertex.color = vertex.color,
-    vertex.size = vertex.size,
-    edge.lty = edge.lty,
+    vertex.label = vertex$label,
+    vertex.color = vertex$color,
+    vertex.size = vertex$size,
+    edge.lty = edge$lty,
     layout = igraph::layout_with_sugiyama(
-      x,
+      g,
       hgap = 200,
       maxiter = 1000
     )
+  )
+}
+
+plot_interactive_task_graph <- function(
+  g,
+  vertex = igraph::as_data_frame(g, what = "vertices"),
+  edge = igraph::as_data_frame(g, what = "edges")
+) {
+  # visNetwork hates non-atomic vectors
+  vertex$task <- NULL
+  edge$version <- format(edge$version)
+
+  vertex$id <- seq_len(nrow(vertex))
+  edge$from <- vertex$id[match(edge$from, vertex$name)]
+  edge$to <- vertex$id[match(edge$to, vertex$name)]
+  edge$arrows <- "to"
+
+  visNetwork::visNetwork(
+    nodes = vertex,
+    edges = edge,
+    width = "100vw",
+    height = "100vh"
   )
 }

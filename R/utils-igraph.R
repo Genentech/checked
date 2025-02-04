@@ -6,7 +6,7 @@ vertex_df <- function(name, ...) {
   vertices
 }
 
-sequence_graph <- function(name, ...) {
+sequence_graph <- function(..., name_by = ..1, name = hashes(name_by)) {
   vertices <- vertex_df(name = name, ...)
   edges <- data.frame(
     from = utils::head(vertices$name, -1L),

@@ -38,6 +38,12 @@ reporter_ansi_tty <- function() {
 
 #' @rdname reporters
 #' @export
+reporter_ansi_tty2 <- function() {
+  reporter("ansi_tty2")
+}
+
+#' @rdname reporters
+#' @export
 reporter_basic_tty <- function() {
   reporter("basic_tty")
 }

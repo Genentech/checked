@@ -1,85 +1,16 @@
-format_status_line_ansi <- function(process, ...) {
-  UseMethod("format_status_line_ansi")
-}
-
 #' @export
-format_status_line_ansi.check_process <- function(
-  process,
-  ...,
-  width = getOption("width", 80L)
+report_sleep.reporter_ansi_tty2 <- function(
+  reporter,
+  checker,
+  sleep = default_tty_tick_interval()
 ) {
-  checks <- process$get_checks()
-
-  # runtime of process
-  process_time <- paste0(format_time(process$get_duration()), " ")
-
-  # runtime of current check (only displayed if >30s)
-  check_time <- Sys.time() - process$get_time_last_check_start()
-  if (length(check_time) == 0 || check_time < difftime(30, 0)) {
-    check_time <- ""
-  } else {
-    check_time <- cli::col_grey("(", format_time(check_time), ") ")
-  }
-
-  msg <- ""
-  status <- max(as.numeric(checks), -1)
-  if (length(checks) == 0) {
-    # have not hit checks yet
-    msg <- "starting ..."
-    status <- process$spin()
-  } else if (process$is_alive()) {
-    # processing checks
-    msg <- paste("checking", names(utils::tail(checks, 1)), "...")
-    status <- process$spin()
-    process_time <- cli::col_cyan(process_time)
-  } else {
-    # done
-    process_time <- cli::col_grey(process_time)
-  }
-
-  msg <- cli::format_inline("{process_time}{check_time}{msg}")
-  counts <- table(process$get_checks())
-  out <- cli_table_row(
-    status = status,
-    ok = counts[["NONE"]] + counts[["OK"]],
-    notes = counts[["NOTE"]],
-    warnings = counts[["WARNING"]],
-    errors = counts[["ERROR"]],
-    msg
-  )
-
-  cli::ansi_substring(out, 1, width)
-}
-
-#' @export
-format_status_line_ansi.default <- function(
-    process,
-    ...,
-    width = getOption("width", 80L)) {
-  out <- cli_table_row(
-    status = "NONE",
-    ok = 0,
-    notes = 0,
-    warnings = 0,
-    errors = 0,
-    "restored from system file."
-  )
-
-  cli::ansi_substring(out, 1, width)
-}
-
-#' @export
-report_sleep.reporter_ansi_tty <- function(
-    reporter,
-    design,
-    sleep = default_tty_tick_interval()) {
   Sys.sleep(sleep)
 }
 
 #' @export
-report_initialize.reporter_ansi_tty <- function(
+report_initialize.reporter_ansi_tty2 <- function(
   reporter,
-  design,
+  checker,
   envir = parent.frame()
 ) {
   # named factor vector, names as task aliases and value of last reported status
@@ -99,7 +30,7 @@ report_initialize.reporter_ansi_tty <- function(
     extra = list(message = ""),
     format = "ETA {cli::pb_eta} ({cli::pb_current}/{cli::pb_total}) [{cli::pb_elapsed}] {cli::pb_extra$message}", # nolint
     format_done = "Finished in {cli::pb_elapsed}",
-    total = sum(igraph::V(design$graph)$type == "check"),
+    total = sum(igraph::V(checker$graph)$type == "check"),
     clear = FALSE,
     auto_terminate = FALSE,
     .auto_close = FALSE,
@@ -109,11 +40,11 @@ report_initialize.reporter_ansi_tty <- function(
 
 #' @importFrom igraph V
 #' @export
-report_status.reporter_ansi_tty <- function(reporter, design, envir) {
-  v <- igraph::V(design$graph)
+report_status.reporter_ansi_tty2 <- function(reporter, checker, envir) {
+  v <- igraph::V(checker$graph)
   v_checks <- v[is_check(v$task)]
   n_char_titles <- max(nchar(vcapply(v_checks$task, friendly_name, short = 2L)))
-  failed_tasks <- design$failed_tasks()
+  failed_tasks <- checker$failed_tasks()
   failed_packages <- failed_tasks[is_install(failed_tasks)]
 
   # add newly started task status
@@ -182,7 +113,7 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) {
     n_lines <- length(reporter$status) - idx + 1L
     width <- cli::console_width() - n_char_titles - 2L
     task_name <- friendly_name(v_checks[[v_idx]]$task, short = 2L)
-    process <- task_graph_task_process(design$graph, v_checks[[v_idx]])
+    process <- task_graph_task_process(checker$graph, v_checks[[v_idx]])
 
     # report status line
     buffer <- paste0(
@@ -198,8 +129,8 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) {
 
   cat(paste0(buffer, reporter$failures_buffer))
 
-  is_inst <- is_install(design$active_processes())
-  inst_pkgs <- names(design$active_processes()[is_inst])
+  is_inst <- is_install(checker$active_processes())
+  inst_pkgs <- names(checker$active_processes()[is_inst])
   if (length(inst_pkgs)) {
     inst_msg <- paste0("installing ", paste0(inst_pkgs, collapse = ", "))
   } else {
@@ -215,8 +146,8 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) {
 }
 
 #' @export
-report_finalize.reporter_ansi_tty <- function(reporter, design) {
-  report_status(reporter, design) # report completions of final processes
+report_finalize.reporter_ansi_tty2 <- function(reporter, checker) {
+  report_status(reporter, checker) # report completions of final processes
   cli::cli_progress_done(.envir = reporter)
   cli::ansi_show_cursor()
 }

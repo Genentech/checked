@@ -185,8 +185,8 @@ is_check_task <- function(x) {
 
 #' @family tasks
 #' @export
-friendly_name.check_task <- function(x, ..., short = FALSE) {
-  paste0(if (short <= 1) "check ", format(x$origin, ..., short = short))
+friendly_name.check_task <- function(x, ...) {
+  paste0("check ", format(x$origin, ...))
 }
 
 #' Specify a library install
@@ -222,14 +222,16 @@ friendly_name.library_task <- function(x, ...) {
   paste0(format(x$loc), fmt_pkgs)
 }
 
+#' @export
 friendly_name.rev_dep_dep_meta_task <- function(x, ..., short = FALSE) {
   paste0(
     "check ",
     format(x$origin, ..., short = short),
-    if (!short) " reverse-dependencies"
+    if (short) " revdeps" else " reverse-dependencies"
   )
 }
 
+#' @export
 friendly_name.rev_dep_check_meta_task <- function(x, ..., short = FALSE) {
   paste0("check ", if (short) "revdep" else "reverse-dependency")
 }
