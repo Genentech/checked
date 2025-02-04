@@ -1,3 +1,8 @@
+# checked 0.2.7
+
+* Fix a bug where wrong lib.loc was used to derive whether a package has already
+  been satisfied.
+  
 # checked 0.2.6
 
 * Save minimal version required by each edge and use them to properly identify
