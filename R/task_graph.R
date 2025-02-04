@@ -346,7 +346,14 @@ task_graph_set_task_process <- function(g, v, process) {
 }
 
 task_graph_update_done <- function(g, lib.loc) {
-  v <- igraph::V(g)[igraph::V(g)$type == "install"]
+  custom_installs <- vlapply(
+    igraph::V(g)$spec,
+    inherits,
+    "custom_install_task_spec"
+  )
+  installs <- igraph::V(g)$type == "install" 
+  # custom install cannot be satisfied
+  v <- igraph::V(g)[installs & !custom_installs]
   which_done <- which(vlapply(v$spec, is_package_satisfied, lib.loc = lib.loc))
   task_graph_set_package_status(g, v[which_done], STATUS$done)
 }
@@ -354,7 +361,7 @@ task_graph_update_done <- function(g, lib.loc) {
 is_package_satisfied <- function(v, lib.loc) {  # nolint object_name_linter
   if (!is.null(v$package_spec$version)) {
     installed_version <- tryCatch(
-      utils::packageVersion(v$package_spec$name),
+      utils::packageVersion(v$package_spec$name, lib.loc = lib.loc),
       error = function(e) {
         numeric_version("0")
       }
