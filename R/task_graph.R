@@ -469,16 +469,6 @@ plot.task_graph <- function(x, ...) {
     8
   )
 
-  edge.lty <- style(
-    igraph::E(x)$plan,
-    "planned" = 1,  # solid
-    "inferred" = 3  # dotted
-  )
-
-  tail_ids <- igraph::ends(x, igraph::E(x))[, 2L]
-  is_inst <- is_install(igraph::V(x)[tail_ids]$task)
-  is_check <- is_check(igraph::V(x)$task)
-
   igraph::plot.igraph(
     x,
     vertex.label.family = "sans",
@@ -487,7 +477,6 @@ plot.task_graph <- function(x, ...) {
     vertex.label = vertex.label,
     vertex.color = vertex.color,
     vertex.size = vertex.size,
-    edge.lty = edge.lty,
     layout = igraph::layout_with_sugiyama(
       x,
       hgap = 200,
