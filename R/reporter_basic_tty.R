@@ -20,12 +20,11 @@ report_initialize.reporter_basic_tty <- function(
 #' @export
 report_status.reporter_basic_tty <- function(reporter, design, envir) { # nolint
   cli_theme()
-  for (i in seq_along(igraph::V(design$graph))) {
-    node <- igraph::V(design$graph)[[i]]
-
-    # skip if queued, but not started
-    if (node$status <= STATUS$`pending`) next
-
+  g <- design$graph
+  # skip if queued, but not started
+  for (i in igraph::V(g)[igraph::V(g)$status > STATUS$`ready`]) {
+    node <- igraph::V(g)[[i]]
+    
     p <- node$process
 
     # report stating of new checks

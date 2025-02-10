@@ -114,7 +114,7 @@ report_status.reporter_ansi_tty <- function(reporter, design, envir) { # nolint
   failed_packages <- failed_tasks[vlapply(failed_tasks, function(x) x$type == "install")]
 
   # add newly started task status
-  new_idx <- which(v_checks$status > STATUS$pending)
+  new_idx <- which(v_checks$status > STATUS$ready)
   new_idx <- new_idx[!v_checks$name[new_idx] %in% names(reporter$status)]
   if (length(new_idx) > 0) {
     # print header if this is the first status line of the reporter
