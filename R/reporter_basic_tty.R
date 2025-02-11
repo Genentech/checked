@@ -21,10 +21,16 @@ report_initialize.reporter_basic_tty <- function(
 report_status.reporter_basic_tty <- function(reporter, design, envir) { # nolint
   cli_theme()
   g <- design$graph
-  # skip if queued, but not started
-  for (i in igraph::V(g)[igraph::V(g)$status > STATUS$`ready`]) {
+  tasks_names <- names(igraph::V(g))
+  # skip if queued, but not started or already finished
+  reported_statuses <- sapply(reporter$statuses, `[[`, 1)
+  reported_done <- names(reported_statuses[reported_statuses == STATUS$done])
+  tasks_not_started <- names(igraph::V(g)[igraph::V(g)$status <= STATUS$`ready`])
+  tasks_to_report <- tasks_names[!tasks_names %in% c(reported_done, tasks_not_started)]
+
+  for (i in igraph::V(g)[tasks_to_report]) {
     node <- igraph::V(g)[[i]]
-    
+
     p <- node$process
 
     # report stating of new checks
