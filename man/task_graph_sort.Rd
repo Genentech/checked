@@ -7,10 +7,10 @@
 task_graph_sort(g)
 }
 \arguments{
-\item{g}{A \link[igraph:graph]{igraph::graph}, expected to contain node attribute \code{type}.}
+\item{g}{A \link[igraph:make_graph]{igraph::graph}, expected to contain node attribute \code{type}.}
 }
 \value{
-The \link[igraph:graph]{igraph::graph} \code{g}, with vertices sorted in preferred
+The \link[igraph:make_graph]{igraph::graph} \code{g}, with vertices sorted in preferred
 installation order.
 }
 \description{
