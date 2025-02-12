@@ -226,22 +226,23 @@ task_graph_sort <- function(g) {
 
 #' Find the Next Packages Not Dependent on an Unavailable Package
 #'
-#' While other packages are in progress, ensure that the next selected package
-#' already has its dependencies done.
-#'
+#' While other packages are in progress, identify tasks with all the
+#' dependencies done and mark them as \code{ready} already has its dependencies
+#' done.
+#' 
 #' @details
 #' There are helpers defined for particular use cases that strictly rely on the
-#' [`task_graph_which_satisfied()`], they are:
+#' [`task_graph_update_ready()`], they are:
 #'
-#' * `task_graph_which_satisfied_strong()` - List vertices whose strong
+#' * `task_graph_update_ready_strong()` - List vertices whose strong
 #'   dependencies are satisfied.
-#' * `task_graph_which_check_satisfied()` - List root vertices whose all
+#' * `task_graph_update_check_ready()` - List root vertices whose all
 #'   dependencies are satisfied.
-#' * `task_graph_which_install_satisfied()` - List install vertices whose
+#' * `task_graph_update_install_ready()` - List install vertices whose
 #'   dependencies are all satisfied
 #'
 #' @param g A dependency graph, as produced with [task_graph_create()].
-#' @param v Names or nodes objects of packages whose satisfiability should be
+#' @param v Names or nodes objects of packages whose readiness should be
 #' checked.
 #' @param dependencies Which dependencies types should be met for a node to be
 #' considered satisfied.
@@ -252,7 +253,7 @@ task_graph_sort <- function(g) {
 #'
 #' @importFrom igraph incident_edges tail_of
 #' @keywords internal
-task_graph_which_satisfied <- function(
+task_graph_update_ready <- function(
     g,
     v = igraph::V(g),
     dependencies = TRUE,
@@ -263,6 +264,7 @@ task_graph_which_satisfied <- function(
     idx <- v$status %in% status
     v <- v[idx]
   }
+
   deps_met <- vlapply(
     igraph::incident_edges(g, v, mode = "in"),
     function(edges) {
@@ -270,19 +272,25 @@ task_graph_which_satisfied <- function(
       all(igraph::tail_of(g, edges)$status == STATUS$done)
     }
   )
-  names(deps_met[deps_met])
+
+  task_graph_set_package_status(
+    g,
+    names(deps_met[deps_met]),
+    STATUS$ready
+  )
 }
 
-task_graph_which_satisfied_strong <- function(..., dependencies = "strong") { # nolint
-  task_graph_which_satisfied(..., dependencies = dependencies)
+task_graph_update_ready_strong <- function(..., dependencies = "strong") { # nolint
+  task_graph_update_ready(..., dependencies = dependencies)
 }
 
-task_graph_which_check_satisfied <- function(
+
+task_graph_update_check_ready <- function(
     g,
     ...,
     dependencies = "all",
     status = STATUS$pending) {
-  task_graph_which_satisfied(
+  task_graph_update_ready(
     g,
     igraph::V(g)[igraph::V(g)$type == "check"],
     ...,
@@ -291,18 +299,45 @@ task_graph_which_check_satisfied <- function(
   )
 }
 
-task_graph_which_install_satisfied <- function(
+task_graph_update_install_ready <- function(
     g,
     ...,
     dependencies = "strong",
     status = STATUS$pending) {
-  task_graph_which_satisfied(
+  task_graph_update_ready(
     g,
     igraph::V(g)[igraph::V(g)$type == "install"],
     ...,
     dependencies = dependencies,
     status = status
   )
+}
+
+
+#' Find task with ready state
+#'
+#' List tasks which have ready state prioritizing check tasks over
+#' install tasks.
+#'
+#' @param g A dependency graph, as produced with [task_graph_create()].
+#'
+#' @return The names of packages with ready state.
+#'
+#' @importFrom igraph incident_edges tail_of
+#' @keywords internal
+task_graph_which_ready <- function(g) {
+  ready_checks <- task_graph_get_package_with_status(
+    g,
+    igraph::V(g)[igraph::V(g)$type == "check"],
+    "ready"
+  )
+  ready_installs <- task_graph_get_package_with_status(
+    g,
+    igraph::V(g)[igraph::V(g)$type == "install"],
+    "ready"
+  )
+
+  c(ready_checks, ready_installs)
 }
 
 empty_edge <- data.frame(
@@ -322,6 +357,17 @@ task_graph_package_status <- function(g, v) {
 
 `task_graph_package_status<-` <- function(x, v, value) {
   task_graph_set_package_status(x, v, value)
+}
+
+`task_graph_package_status<-` <- function(x, v, value) {
+  task_graph_set_package_status(x, v, value)
+}
+
+task_graph_get_package_with_status <- function(g, v, status) {
+  if (is.character(status)) status <- STATUS[[status]]
+  statuses <- igraph::vertex.attributes(g, v)$status
+  
+  v[statuses == .env$status]
 }
 
 `task_graph_task_process<-` <- function(x, v, value) {

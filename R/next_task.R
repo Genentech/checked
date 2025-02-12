@@ -1,10 +1,8 @@
-next_task_to_run <- function(g) {
-  checks <- task_graph_which_check_satisfied(g)
-  installs <- task_graph_which_install_satisfied(g)
-
-  # Prioritize checks overs installs
-  v <- igraph::V(g)[c(checks, installs)]
-  utils::head(v, 1L)
+upadate_next_tasks <- function(g) {
+  g <- task_graph_update_check_ready(g)
+  g <- task_graph_update_install_ready(g)
+  
+  g
 }
 
 #' @importFrom igraph .env

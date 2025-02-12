@@ -29,6 +29,7 @@ Ops.factor <- function(e1, e2) {
 #' @keywords internal
 STATUS <- enum( # nolint
   "pending",
+  "ready",
   "in progress",
   "done"
 )

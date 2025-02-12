@@ -173,8 +173,16 @@ check_design <- R6::R6Class( # nolint cyclocomp_linter
         return(0L)
       }
 
-      next_task <- next_task_to_run(self$graph)
+      next_task <- task_graph_which_ready(self$graph)
+
+      # If there are not new tasks cache, update the graph looking for new tasks
+      if (length(next_task) == 0) {
+        self$graph <- upadate_next_tasks(self$graph)
+        next_task <- task_graph_which_ready(self$graph)
+      }
+
       if (length(next_task) > 0) {
+        next_task <- head(next_task, 1L)
         process <- start_task(
           task = next_task,
           g = self$graph,
