@@ -42,7 +42,8 @@
 <url><loc>https://Genentech.github.io/checked/reference/task_graph_create.html</loc></url>
 <url><loc>https://Genentech.github.io/checked/reference/task_graph_neighborhoods.html</loc></url>
 <url><loc>https://Genentech.github.io/checked/reference/task_graph_sort.html</loc></url>
-<url><loc>https://Genentech.github.io/checked/reference/task_graph_which_satisfied.html</loc></url>
+<url><loc>https://Genentech.github.io/checked/reference/task_graph_update_ready.html</loc></url>
+<url><loc>https://Genentech.github.io/checked/reference/task_graph_which_ready.html</loc></url>
 <url><loc>https://Genentech.github.io/checked/reference/task_spec.html</loc></url>
 <url><loc>https://Genentech.github.io/checked/reference/throttle.html</loc></url>
 </urlset>
