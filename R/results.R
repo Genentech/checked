@@ -98,11 +98,11 @@ results.revdep_check_task_spec <- function(x, y, output, ...) {
   structure(
     lapply(CHECK_ISSUES_TYPES, function(i) {
       new_i <- structure(
-        new[[i]],
+        if (is.list(new[[i]])) "" else new[[i]],
         names = get_issue_header(new[[i]])
       )
       old_i <- structure(
-        old[[i]],
+        if (is.list(old[[i]])) "" else old[[i]],
         names = get_issue_header(old[[i]])
       )
 
@@ -381,7 +381,7 @@ strip_details_from_issue <- function(x) {
   gsub_checked(
     x = x,
     pattern = "[[:space:]]",
-    replacement = x
+    replacement = ""
   )
 }
 
