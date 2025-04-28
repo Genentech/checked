@@ -1,3 +1,7 @@
+# checked 0.2.8
+
+* Accommodate new R4.5.0 `gsub` behaviour when an empty list is passed.
+  
 # checked 0.2.7
 
 * Fix a bug where wrong lib.loc was used to derive whether a package has already

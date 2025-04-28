@@ -373,10 +373,30 @@ print.potential_issues <- function(x, ...) {
 }
 
 strip_details_from_issue <- function(x) {
-  x <- gsub("See(.*?)for details", "See <path> for details", "", x)
-  gsub("[[:space:]]", "", x)
+  x <- gsub_checked(
+    x = x,
+    pattern = "See(.*?)for details",
+    replacement = "See <path> for details"
+  )
+  gsub_checked(
+    x = x,
+    pattern = "[[:space:]]",
+    replacement = x
+  )
 }
 
 collapse_new_lines <- function(x) {
-  gsub("(\\n\\s*){2,}", "\n\n", x)  
+  gsub_checked(
+    x = x,
+    pattern = "(\\n\\s*){2,}",
+    replacement = "\n\n",
+  )  
+}
+
+gsub_checked <- function(x, ...) {
+  if (length(x) == 0) {
+    ""
+  } else {
+    gsub(x = x, ...)
+  }
 }
