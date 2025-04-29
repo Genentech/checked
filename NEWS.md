@@ -1,6 +1,7 @@
 # checked 0.2.8
 
-* Accommodate new R4.5.0 `gsub` behaviour when an empty list is passed.
+* Unify notes, warnings and errors are internally stored when generating
+  results (R4.5 compatibility)
   
 # checked 0.2.7
 
