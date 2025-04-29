@@ -1,3 +1,8 @@
+# checked 0.2.8
+
+* Unify notes, warnings and errors are internally stored when generating
+  results (R4.5 compatibility)
+  
 # checked 0.2.7
 
 * Fix a bug where wrong lib.loc was used to derive whether a package has already
