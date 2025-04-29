@@ -98,11 +98,13 @@ results.revdep_check_task_spec <- function(x, y, output, ...) {
   structure(
     lapply(CHECK_ISSUES_TYPES, function(i) {
       new_i <- structure(
-        if (is.list(new[[i]])) "" else new[[i]],
+        # If no issues identified, object is an empty list instead of a character
+        # vector. Changing it to empty character for consistency.
+        if (is.list(new[[i]])) character(0) else new[[i]],
         names = get_issue_header(new[[i]])
       )
       old_i <- structure(
-        if (is.list(old[[i]])) "" else old[[i]],
+        if (is.list(old[[i]])) character(0) else old[[i]],
         names = get_issue_header(old[[i]])
       )
 
@@ -373,12 +375,12 @@ print.potential_issues <- function(x, ...) {
 }
 
 strip_details_from_issue <- function(x) {
-  x <- gsub_checked(
+  x <- gsub(
     x = x,
     pattern = "See(.*?)for details",
     replacement = "See <path> for details"
   )
-  gsub_checked(
+  gsub(
     x = x,
     pattern = "[[:space:]]",
     replacement = ""
@@ -386,17 +388,9 @@ strip_details_from_issue <- function(x) {
 }
 
 collapse_new_lines <- function(x) {
-  gsub_checked(
+  gsub(
     x = x,
     pattern = "(\\n\\s*){2,}",
     replacement = "\n\n",
   )  
-}
-
-gsub_checked <- function(x, ...) {
-  if (length(x) == 0) {
-    ""
-  } else {
-    gsub(x = x, ...)
-  }
 }
