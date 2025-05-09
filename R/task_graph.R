@@ -211,7 +211,7 @@ task_graph_sort <- function(g) {
 
   # use only strong dependencies to prioritize by topology (leafs first)
   strong_edges <- igraph::E(g)[igraph::E(g)$type %in% DEP_STRONG]
-  g_strong <- igraph::subgraph_from_edges(g, strong_edges, delete.vertices = FALSE)
+  g_strong <- igraph_subgraph_from_edges(g, strong_edges, delete.vertices = FALSE)
   topo <- igraph::topo_sort(g_strong, mode = "in")
   priority_topo <- integer(length(g))
   priority_topo[match(topo$name, igraph::V(g)$name)] <- rev(seq_along(topo))
@@ -418,3 +418,10 @@ is_package_satisfied <- function(v, lib.loc) {  # nolint object_name_linter
   }
 }
 
+igraph_subgraph_from_edges <- function(...) {
+  if (packageVersion("igraph") < "2.1.0") {
+    igraph::subgraph.edges(...)
+  } else {
+    igraph::subgraph_from_edges(...)
+  }
+}
