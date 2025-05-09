@@ -1,3 +1,9 @@
+# checked (devel)
+
+* Add `igraph_subgraph_from_edges` wrapper to used work around deprecation
+  messages and alternate between `igraph::subgraph.edges` and 
+  `igraph::subgraph_from_edges` depending on the `igraph` version.
+
 # checked 0.2.8
 
 * Unify notes, warnings and errors are internally stored when generating
