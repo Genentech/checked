@@ -13,8 +13,17 @@
 #'
 #' @family tasks
 #' @export
-task <- function(...) {
-  structure(list(...), class = "task")
+task <- function(..., .subclass = NULL) {
+  structure(list(...), class = c(sprintf("%s_task", .subclass), "task"))
+}
+
+#' Construct a 'Meta' Task
+#'
+#' Meta tasks are tasks which are not intended to perform computation. They
+#' exist simply to provide relationships among computational tasks.
+#'
+meta_task <- function(..., .subclass = NULL) {
+  task(..., .subclass = c(sprintf("%s_meta", .subclass), "meta"))
 }
 
 make_unique_task <- function(task, seed = runif(1)) {
@@ -25,52 +34,13 @@ make_unique_task <- function(task, seed = runif(1)) {
 #' @family tasks
 #' @export
 lib.task <- function(x, ...) {
-  stop("Don't know how to determine a library path for generic task")
+  character(0L)
 }
 
 #' @family tasks
 #' @export
 print.task <- function(x, ...) {
   cat(format(x, ...), "\n")
-}
-
-#' @export
-format.task <- function(x, ..., indent = 0L) {
-  paste(collapse = "\n", c(
-    paste0(strrep(" ", indent * 2), "<", friendly_name(x, ...), ">"),
-    vcapply(x$tasks, function(xi) format(xi, ..., indent = indent + 1))
-  ))
-}
-
-#' @export
-friendly_name.task <- function(x) {
-  "task"
-}
-
-friendly_name <- function(x, ...) {
-  UseMethod("friendly_name")
-}
-
-#' @export
-friendly_name.default <- function(x, ...) {
-  stop(
-    "Dont' know how to name object with class(es) `",
-    deparse(class(x)),
-    "`"
-  )
-}
-
-#' @export
-friendly_class.task <- function(x) {
-  if (length(class(x)) > 1) {
-    sub("_task$", "", class(x)[[1]])
-  } else {
-    class(x)[[1]]
-  }
-}
-
-friendly_class <- function(x, ...) {
-  UseMethod("friendly_class")
 }
 
 #' Create a task to install a package and dependencies
@@ -89,12 +59,14 @@ install_task <- function(
   lib = lib_loc_default(),
   ...
 ) {
-  task <- task(origin = origin, ...)
-  task$type <- type
-  task$INSTALL_opts <- INSTALL_opts
-  task$lib <- lib
-  class(task) <- c("install_task", class(task))
-  task
+  task(
+    origin = origin,
+    type = type,
+    INSTALL_opts = INSTALL_opts,
+    lib = lib,
+    ...,
+    .subclass = "install"
+  )
 }
 
 #' @export
@@ -102,14 +74,12 @@ lib.install_task <- function(x, ...) {
   lib(x$lib, name = hash(x), ...)
 }
 
-#' @export
-friendly_name.install_task <- function(x, ..., short = FALSE) {
-  paste0(if (!short) "install ", format(x$origin, ..., short = short))
-}
-
 is_type <- function(x, type) {
   UseMethod("is_type")
 }
+
+#' @export
+is_type.default <- inherits
 
 #' @export
 is_type.list <- function(x, type) {
@@ -154,12 +124,13 @@ custom_install_task <- function(...) {
 #' @family tasks
 #' @export
 check_task <- function(build_args = NULL, args = NULL, env = NULL, ...) {
-  task <- task(...)
-  task$env <- env
-  task$args <- args
-  task$build_args <- build_args
-  class(task) <- c("check_task", class(task))
-  task
+  task(
+    env = env,
+    args = args,
+    build_args = build_args,
+    ...,
+    .subclass = "check"
+  )
 }
 
 #' @export
@@ -169,12 +140,6 @@ lib.check_task <- function(x, ...) {
 
 is_check_task <- function(x) {
   inherits(x, "check_task")
-}
-
-#' @family tasks
-#' @export
-friendly_name.check_task <- function(x, ..., short = FALSE) {
-  paste0(if (short <= 1) "check ", format(x$origin, ..., short = short))
 }
 
 #' Specify a library install
@@ -190,24 +155,6 @@ library_task <- function(origins = list(), loc = lib_loc_default(), ...) {
   task$loc <- loc
   class(task) <- c("library_task", class(task))
   task
-}
-
-#' @export
-friendly_name.library_task <- function(x, ...) {
-  fmt_pkgs <- if (length(x$origins) == 0) {
-  } else if (length(x$origins) <= 3) {
-    paste0(
-      " with ",
-      paste0(collapse = ", ", vcapply(
-        x$origins,
-        function(pkg) format(pkg, short = TRUE)
-      ))
-    )
-  } else {
-    paste0(" with ", length(x$origins), " packages")
-  }
-
-  paste0(format(x$loc), fmt_pkgs)
 }
 
 #' Create a task to run reverse dependency checks

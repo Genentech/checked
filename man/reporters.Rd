@@ -3,11 +3,14 @@
 \name{reporters}
 \alias{reporters}
 \alias{reporter_ansi_tty}
+\alias{reporter_ansi_tty2}
 \alias{reporter_basic_tty}
 \alias{reporter_default}
 \title{Check Design Runner Reporters}
 \usage{
 reporter_ansi_tty()
+
+reporter_ansi_tty2()
 
 reporter_basic_tty()
 

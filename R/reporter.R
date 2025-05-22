@@ -38,6 +38,12 @@ reporter_ansi_tty <- function() {
 
 #' @rdname reporters
 #' @export
+reporter_ansi_tty2 <- function() {
+  reporter("ansi_tty2")
+}
+
+#' @rdname reporters
+#' @export
 reporter_basic_tty <- function() {
   reporter("basic_tty")
 }
@@ -85,8 +91,13 @@ report_sleep.default <- function(reporter, design, sleep = 1) {
 }
 
 #' @rdname reporters-internal
-report_initialize <- function(reporter, design, envir = parent.frame()) {
-  UseMethod("report_initialize")
+report_start_setup <- function(reporter, design, ..., envir = parent.frame()) {
+  UseMethod("report_start_setup")
+}
+
+#' @rdname reporters-internal
+report_start_checks <- function(reporter, design, ..., envir = parent.frame()) {
+  UseMethod("report_start_checks")
 }
 
 #' @rdname reporters-internal

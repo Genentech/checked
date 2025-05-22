@@ -7,13 +7,14 @@
 \title{Internal Utilities for Command-line Output}
 \usage{
 cli_table_row(
-  status,
+  status = "",
   ok = "OK",
   notes = "N",
   warnings = "W",
   errors = "E",
   msg = "",
-  title = FALSE
+  style = c("row", "title", "header"),
+  symbols = list(bar = "│")
 )
 
 cli_theme(..., .envir = parent.frame())

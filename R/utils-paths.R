@@ -2,14 +2,18 @@ filepath <- function(x) {
   structure(x, class = "filepath")
 }
 
+cli_type <- function(types, x) {
+  structure(x, class = paste0("cli_", types))
+}
+
 #' @export
-format.filepath <- function(x, ..., pretty = FALSE) {
-  if (!pretty) {
-    return(as.character(x))
+format_simplify_path <- function(x, ..., full.path = FALSE) {
+  if (full.path) {
+    return(normalizePath(x, mustWork = FALSE))
   }
 
   wp <- path_parts(getwd())
-  xp <- path_parts(normalizePath(x))
+  xp <- path_parts(normalizePath(x, mustWork = FALSE))
   min_len <- min(length(wp), length(xp))
   first_diff <- Position(identity, head(wp, min_len) != head(xp, min_len))
 
@@ -18,18 +22,18 @@ format.filepath <- function(x, ..., pretty = FALSE) {
     if (length(parts) == 0) {
       parts <- "."
     }
-    return(format(do.call(file.path, as.list(parts))))
+    do.call(file.path, as.list(parts))
   }
 
   if (first_diff > min_len) {
     parts <- utils::tail(xp, -first_diff + 1)
-    format(do.call(file.path, as.list(parts)))
+    do.call(file.path, as.list(parts))
   } else if (first_diff <= min_len) {
     parents <- rep_len("..", length(xp) - first_diff + 1)
     parts <- c(parents, utils::tail(xp, -first_diff + 1))
-    format(do.call(file.path, as.list(parts)))
+    do.call(file.path, as.list(parts))
   } else {
-    format(x)
+    x
   }
 }
 

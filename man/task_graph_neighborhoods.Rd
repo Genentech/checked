@@ -4,7 +4,7 @@
 \alias{task_graph_neighborhoods}
 \title{Find Task Neighborhood}
 \usage{
-task_graph_neighborhoods(g, nodes)
+task_graph_neighborhoods(g, nodes, ...)
 }
 \arguments{
 \item{g}{A task graph, as produced with \code{\link[=task_graph_create]{task_graph_create()}}}

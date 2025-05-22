@@ -7,16 +7,15 @@
 enum <- function(...) {
   x <- c(...)
   f <- factor(x, levels = x)
-  structure(
-    lapply(f, identity),
-    names = levels(f)
-  )
+  names(f) <- as.character(f)
+  structure(f, class = c("enum", "factor"))
 }
 
 #' Internally provide extended mathematical operators for enums
 #' @noRd
+#' @export
 #' @keywords internal
-Ops.factor <- function(e1, e2) {
+Ops.enum <- function(e1, e2) {
   # nolint start, styler: off
   switch(.Generic, ">" = , ">=" = , "==" = , "<" = , "<=" = {
     return(do.call(.Generic, list(as.numeric(e1), as.numeric(e2))))
@@ -25,19 +24,30 @@ Ops.factor <- function(e1, e2) {
   NextMethod()
 }
 
+#' Internally provide `$` for enum factors
+#' @noRd
+#' @keywords internal
+#' @export
+`$.enum` <- function(x, i) {
+  x[[i]]
+}
+
+#' Relation types
+#'
+#' A flag for edges that articulate different relations between nodes.
+#'
+#' @keywords internal
+RELATION <- enum(
+  "dep",    # for task dependencies
+  "report"  # for reporting graph, from task to reporting node
+)
+
 #' Check execution status categories
 #' @keywords internal
 STATUS <- enum(
   "pending",
   "in progress",
   "done"
-)
-
-#' Check execution status categories
-#' @keywords internal
-PLAN <- enum(
-  "planned",
-  "inferred"
 )
 
 #' Dependencies categories

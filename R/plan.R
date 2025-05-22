@@ -30,12 +30,6 @@ empty_checks_df <- data.frame(
 #' @name plan
 NULL
 
-#' Tag edges as 'planned'
-planned <- function(graph) {
-  igraph::E(graph)$plan <- PLAN$planned
-  graph
-}
-
 #' Plan Reverse Dependency Checks
 #'
 #' Generates a plan for running reverse dependency check for certain
@@ -92,61 +86,97 @@ plan_rev_dep_checks <- function(
     return(empty_checks_df)
   }
 
-  g <- merge_subgraphs(c(
-    lapply(
-      revdeps,
-      plan_rev_dep_dev_check,
-      path = path,
-      repos = repos
-    ),
-    lapply(
-      revdeps[revdeps %in% ap[, "Package"]],
-      plan_rev_dep_release_check,
-      repos = repos
-    )
+  # root meta task, indicating a reverse-dependency check plan
+  task <- sequence_graph(task = list(meta_task(
+    origin = pkg_origin_local(path),
+    .subclass = "rev_dep_dep"
+  )))
+
+  # build individual plans for development version reverse-dependency checks
+  rev_dep_dev_check_tasks <- lapply(
+    revdeps,
+    plan_rev_dep_dev_check,
+    origin = pkg_origin_local(path),
+    repos = repos
+  )
+
+  # build individual plans for release version reverse-dependency checks
+  rev_dep_release_check_tasks <- lapply(
+    revdeps[revdeps %in% ap[, "Package"]],
+    plan_rev_dep_release_check,
+    origin = pkg_origin_local(path),
+    repos = repos
+  )
+
+  # store vertex names so that we can build edges after merging
+  task_id <- V(task)[[1]]$name
+  rev_dep_meta_task_ids <- unique(c(
+    vcapply(rev_dep_dev_check_tasks, function(g) V(g)[[1]]$name),
+    vcapply(rev_dep_release_check_tasks, function(g) V(g)[[1]]$name)
   ))
 
+  # combine component plans into an overall plan
+  g <- graph_dedup_attrs(igraph::union(
+    task,
+    rev_dep_dev_check_tasks,
+    rev_dep_release_check_tasks
+  ))
+
+  # reconstruct edges from planned root node to individual checks
+  edges <- as.vector(rbind(task_id, rev_dep_meta_task_ids))
+  g <- igraph::add_edges(g, edges = edges, attr = list(relation = RELATION$dep))
   class(g) <- c("task_graph", class(g))
   g
 }
 
-plan_rev_dep_dev_check <- function(path, revdep, repos) {
-  origin <- pkg_origin_local(path = path)
 
-  tasks <- list(
+plan_rev_dep_dev_check <- function(origin, revdep, repos) {
+  rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
+  g <- sequence_graph(task = list(
+    make_unique_task(seed = revdep, meta_task(
+      origin = origin,
+      .subclass = "rev_dep_check"
+    )),
     make_unique_task(seed = "dev", check_task(
-      origin = pkg_origin_repo(package = revdep, repos = repos),
+      origin = rev_dep_origin,
       env = DEFAULT_R_CMD_CHECK_ENVVARS,
       args = DEFAULT_R_CMD_CHECK_ARGS,
       build_args = DEFAULT_R_CMD_BUILD_ARGS
     )),
     install_task(origin = origin)
-  )
-
-  planned(sequence_graph(
-    name = hashes(tasks),
-    task = tasks,
-    task_type = lapply(tasks, function(task) class(task)[[1]]),
-    package = c(revdep, origin$package)
   ))
+
+  # this check is reported through a rev dep check meta task
+  .to <- NULL  # used by igraph NSE
+  g <- igraph::add_edges(g, edges = c(2, 1)) # NOTE: coerces factor to numeric
+  igraph::E(g)$relation <- RELATION$dep
+  igraph::E(g)[.to(1)]$relation <- RELATION$report
+
+  g
 }
 
-plan_rev_dep_release_check <- function(revdep, repos) {
-  tasks <- list(
+plan_rev_dep_release_check <- function(origin, revdep, repos) {
+  rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
+  g <- sequence_graph(task = list(
+    make_unique_task(seed = revdep, meta_task(
+      origin = origin,
+      .subclass = "rev_dep_check"
+    )),
     make_unique_task(seed = "release", check_task(
-      origin = pkg_origin_repo(package = revdep, repos = repos),
+      origin = rev_dep_origin,
       env = DEFAULT_R_CMD_CHECK_ENVVARS,
       args = DEFAULT_R_CMD_CHECK_ARGS,
       build_args = DEFAULT_R_CMD_BUILD_ARGS
     ))
-  )
-
-  planned(sequence_graph(
-    name = hashes(tasks),
-    task = tasks,
-    task_type = lapply(tasks, function(task) class(task)[[1]]),
-    package = revdep
   ))
+
+  # this check is reported through a rev dep check meta task
+  .to <- NULL  # used by igraph
+  g <- igraph::add_edges(g, edges = c(2, 1)) # NOTE: coerces factor to numeric
+  igraph::E(g)$relation <- RELATION$dep
+  igraph::E(g)[.to(1)]$relation <- RELATION$report
+
+  g
 }
 
 rev_dep_check_tasks <- function(packages, repos, aliases, revdep) {
