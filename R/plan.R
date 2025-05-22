@@ -96,7 +96,7 @@ plan_rev_dep_checks <- function(
   rev_dep_dev_check_tasks <- lapply(
     revdeps,
     plan_rev_dep_dev_check,
-    path = path,
+    origin = pkg_origin_local(path),
     repos = repos
   )
 
@@ -104,6 +104,7 @@ plan_rev_dep_checks <- function(
   rev_dep_release_check_tasks <- lapply(
     revdeps[revdeps %in% ap[, "Package"]],
     plan_rev_dep_release_check,
+    origin = pkg_origin_local(path),
     repos = repos
   )
 
@@ -115,25 +116,27 @@ plan_rev_dep_checks <- function(
   ))
 
   # combine component plans into an overall plan
-  g <- merge_subgraphs(c(
-    list(task),
+  g <- graph_dedup_attrs(igraph::union(
+    task,
     rev_dep_dev_check_tasks,
     rev_dep_release_check_tasks
   ))
 
   # reconstruct edges from planned root node to individual checks
   edges <- as.vector(rbind(task_id, rev_dep_meta_task_ids))
-  g <- igraph::add_edges(g, edges = edges, attr = list(type = EDGE$dep))
+  g <- igraph::add_edges(g, edges = edges, attr = list(relation = RELATION$dep))
   class(g) <- c("task_graph", class(g))
   g
 }
 
 
-plan_rev_dep_dev_check <- function(path, revdep, repos) {
+plan_rev_dep_dev_check <- function(origin, revdep, repos) {
   rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
-  origin <- pkg_origin_local(path = path)
   g <- sequence_graph(task = list(
-    make_unique_task(seed = revdep, meta_task(.subclass = "rev_dep_check")),
+    make_unique_task(seed = revdep, meta_task(
+      origin = origin,
+      .subclass = "rev_dep_check"
+    )),
     make_unique_task(seed = "dev", check_task(
       origin = rev_dep_origin,
       env = DEFAULT_R_CMD_CHECK_ENVVARS,
@@ -144,16 +147,21 @@ plan_rev_dep_dev_check <- function(path, revdep, repos) {
   ))
 
   # this check is reported through a rev dep check meta task
-  E(g)$type <- EDGE$dep
-  g <- igraph::add_edges(g, edges = c(2, 1), attr = list(type = EDGE$report))
+  .to <- NULL  # used by igraph NSE
+  g <- igraph::add_edges(g, edges = c(2, 1)) # NOTE: coerces factor to numeric
+  igraph::E(g)$relation <- RELATION$dep
+  igraph::E(g)[.to(1)]$relation <- RELATION$report
 
   g
 }
 
-plan_rev_dep_release_check <- function(revdep, repos) {
+plan_rev_dep_release_check <- function(origin, revdep, repos) {
   rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
   g <- sequence_graph(task = list(
-    make_unique_task(seed = revdep, meta_task(.subclass = "rev_dep_check")),
+    make_unique_task(seed = revdep, meta_task(
+      origin = origin,
+      .subclass = "rev_dep_check"
+    )),
     make_unique_task(seed = "release", check_task(
       origin = rev_dep_origin,
       env = DEFAULT_R_CMD_CHECK_ENVVARS,
@@ -163,8 +171,10 @@ plan_rev_dep_release_check <- function(revdep, repos) {
   ))
 
   # this check is reported through a rev dep check meta task
-  E(g)$type <- EDGE$dep
-  g <- igraph::add_edges(g, edges = c(2, 1), attr = list(type = EDGE$report))
+  .to <- NULL  # used by igraph
+  g <- igraph::add_edges(g, edges = c(2, 1)) # NOTE: coerces factor to numeric
+  igraph::E(g)$relation <- RELATION$dep
+  igraph::E(g)[.to(1)]$relation <- RELATION$report
 
   g
 }

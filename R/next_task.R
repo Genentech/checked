@@ -33,11 +33,7 @@ task_graph_libpaths <- function(g, node = NULL, lib.loc = .libPaths()) {
   }
 
   # iterate over tasks and derive a library location
-  task_lib <- lapply(
-    vs$task,
-    function(x, ...) lib(x, ...), lib.loc = lib.loc
-  )
-
+  task_lib <- lapply(vs$task, lib, lib.loc = lib.loc)
   unique(unlist(task_lib))
 }
 
@@ -90,7 +86,7 @@ start_task.install_task <- function(
     dependencies = FALSE,
     type = task$type,
     INSTALL_opts = c(), # TODO
-    log = path_package_install_log(output, friendly_name(task)),
+    log = path_package_install_log(output, format_task_name(task)),
     env = c() # TODO
   )
 }
@@ -133,7 +129,7 @@ start_task.check_task <- function(
 
   # TODO: make output directory names more user-friendly, for now the vertex
   # hash id is used to disambiguate output
-  output_dirname <- paste0(friendly_name(task), " <", node$name[[1]], ">")
+  output_dirname <- paste0(format_task_name(task), " <", node$name[[1]], ">")
 
   check_process$new(
     path = path,

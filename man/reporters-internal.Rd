@@ -4,7 +4,8 @@
 \alias{reporters-internal}
 \alias{report_sleep}
 \alias{report_sleep.default}
-\alias{report_initialize}
+\alias{report_start_setup}
+\alias{report_start_checks}
 \alias{report_status}
 \alias{report_finalize}
 \title{Reporter Internal Methods}
@@ -13,7 +14,9 @@ report_sleep(reporter, design, sleep)
 
 \method{report_sleep}{default}(reporter, design, sleep = 1)
 
-report_initialize(reporter, design, envir = parent.frame())
+report_start_setup(reporter, design, ..., envir = parent.frame())
+
+report_start_checks(reporter, design, ..., envir = parent.frame())
 
 report_status(reporter, design, envir = parent.frame())
 

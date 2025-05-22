@@ -75,7 +75,7 @@ report_status.reporter_basic_tty <- function(reporter, design, envir) {
       )
 
       time <- Sys.time() - reporter$time_start # nolint (used via glue)
-      type <- friendly_class(node$task) # nolint (used via glue)
+      type <- format_task_type(node$task) # nolint (used via glue)
       prefix <- cli::col_cyan("[{format_time(time)}][{type}] ")
       cli::cli_text(prefix, "{.pkg {node$package}} {status}")
       reporter$statuses[[node$name]] <- node$status

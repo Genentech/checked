@@ -15,30 +15,32 @@ pkg_origin <- function(package, ..., .class = c()) {
   structure(list(package = package, ...), class = c(.class, "pkg_origin"))
 }
 
-fmt_pkg_origin_source <- function(x, ...) {
+#' @export
+format.pkg_origin_source <- function(x, ...) {
   if (is.null(x$source)) {
-    ""
+    character(0L)
   } else if (is.null(names(x$source))) {
-    format(x$source, ..., pretty = TRUE)
+    format(x$source, ...)
   } else {
     names(x$source)
   }
 }
 
 #' @export
-format.pkg_origin <- function(x, ..., short = FALSE) {
-  paste(collapse = " ", c(
-    x$package,
-    if (!short && !is.null(x$version)) {
-      switch(class(x$version)[[1]],
-        package_version = paste0("(v", format(x$version), ")"),
-        x$version
-      )
-    },
-    if (!short && !is.null(x$source)) {
-      paste0("from ", fmt_pkg_origin_source(x))
-    }
-  ))
+format.pkg_origin_local <- function(x, ...) {
+  simple_paths <- format_simplify_path(x$source)
+  names(x$source) <- simple_paths
+  x$source
+}
+
+#' @export
+format.pkg_origin_base <- function(x, ...) {
+  character(0L)
+}
+
+#' @export
+format.pkg_origin <- function(x, ...) {
+  format(x$source, ...)
 }
 
 #' @export
@@ -79,8 +81,10 @@ try_pkg_origin_repo <- function(package, repos, ...) {
 #' @export
 #' @rdname pkg_origin
 pkg_origin_is_base <- function(package, ...) {
-  package %in% installed.packages()[, "Package"] &&
-    installed.packages()[package, "Priority"] == "base"
+  is_base <- package == "R"
+  is_inst <- package %in% installed.packages()[, "Package"]
+  is_base[is_inst] <- installed.packages()[package[is_inst], "Priority"] == "base" # nolint
+  is_base
 }
 
 

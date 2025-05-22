@@ -23,10 +23,13 @@
 #' }
 #' @keywords internal
 task_graph_create <- function(plan, repos = getOption("repos")) {
-  check_tasks <- igraph::V(plan)[is_check(igraph::V(plan)$task)]
+  # only use dependency edges when populating graph
+  dep_g <- dep_subgraph(plan)
+  check_tasks <- igraph::V(dep_g)[is_check(igraph::V(dep_g)$task)]
+
   check_task_neighborhoods <- igraph::neighborhood(
-    plan,
-    order = length(plan),
+    dep_g,
+    order = length(dep_g),
     mode = "out",
     nodes = check_tasks
   )
@@ -34,32 +37,30 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
   # for each check task in the plan, build a dependency tree and merge it
   # into the existing check task subtree
   check_task_neighborhoods <- lapply(check_task_neighborhoods, function(nh) {
-    subtree <- igraph::induced_subgraph(plan, nh)
-    V(subtree)$package <- vcapply(
+    subtree <- igraph::induced_subgraph(dep_g, nh)
+    V(subtree)$name <- vcapply(
       V(subtree)$task,
       function(i) i$origin$package %||% NA_character_
     )
 
+    # build dependency graph, with fallback installation task
+    # TODO: if this is too slow, could move after all neighborhoods are merged
     deps <- dep_tree(nh[[1]]$task)
     igraph::reverse_edges(deps)
-
-    subtree <- graph_project(
-      x = deps,
-      onto = subtree,
-      where = c("name" = "package")
-    )
-
-    # set missing dependencies to be installed from repo
-    missing_task <- is.na(igraph::V(subtree)$task)
-    igraph::V(subtree)$task[missing_task] <- lapply(
-      igraph::V(subtree)$package[missing_task],
+    igraph::E(deps)$relation <- RELATION$dep
+    igraph::V(deps)$task <- lapply(
+      igraph::V(deps)$name,
       function(package) {
         origin <- try_pkg_origin_repo(package = package, repos = repos)
         install_task(origin = origin)
       }
     )
 
-    # re-hash tasks as vertex names (populate missing vertex names)
+    # merge trees on package names
+    # NOTE: attributes (tasks) are preserved in the order they appear
+    subtree <- graph_dedup_attrs(igraph::union(subtree, deps))
+
+    # re-hash tasks as vertex names
     igraph::V(subtree)$name <- vcapply(igraph::V(subtree)$task, hash)
     igraph::V(subtree)$task_type <- vcapply(
       igraph::V(subtree)$task,
@@ -70,13 +71,20 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
   })
 
   # then merge all the full check task task trees into a single graph
-  g <- merge_subgraphs(c(list(plan), check_task_neighborhoods))
+  g <- graph_dedup_attrs(igraph::union(plan, check_task_neighborhoods))
   class(g) <- c("task_graph", class(g))
 
   igraph::V(g)$status <- STATUS$pending
   igraph::V(g)$process <- rep_len(list(), length(g))
 
   task_graph_sort(g)
+}
+
+dep_subgraph <- function(g) {
+  igraph::subgraph_from_edges(
+    g,
+    igraph::E(g)[igraph::E(g)$relation == RELATION$dep]
+  )
 }
 
 lib_node_tasks <- function(g, nodes) {
@@ -92,33 +100,6 @@ lib_node_pkgs <- function(g, nodes) {
     tasks <- nodes$task[is_install(nodes$task)]
     vcapply(tasks, function(task) task$origin$package)
   })
-}
-
-#' Project one graph onto another
-#'
-#' Project graph `x` onto graph `onto`, making a single graph with merged
-#' vertices where the attributes in `where` from `onto` map to the associated
-#' attributes in `x` given by the names of `where`. `where` _must_ contain
-#' an element called `name`, used to map vertices.
-#'
-#' The resulting graph will have the combined vertices and edges of both graphs.
-#'
-graph_project <- function(x, onto, where = c("name" = "name")) {
-  igraph::vertex.attributes(x)[where] <-
-    igraph::vertex.attributes(x)[names(where)]
-
-  projection <- match(
-    igraph::V(x)$name,
-    igraph::vertex_attr(onto, where[["name"]])
-  )
-
-  igraph::V(x)$name <- ifelse(
-    is.na(projection),
-    seq_along(igraph::V(x)),
-    igraph::V(onto)$name[projection]
-  )
-
-  merge_subgraphs(list(onto, x))
 }
 
 package_graph <- function(db, packages = db[, "Package"], dependencies = TRUE) {
@@ -210,12 +191,13 @@ task_graph_vertices <- function(plan, df, edges, repos) {
 #'
 #' @importFrom igraph neighborhood
 #' @keywords internal
-task_graph_neighborhoods <- function(g, nodes) {
+task_graph_neighborhoods <- function(g, nodes, ...) {
   igraph::neighborhood(
     g,
     order = length(g),
     nodes = nodes,
-    mode = "out"
+    mode = "out",
+    ...
   )
 }
 
@@ -328,7 +310,7 @@ task_graph_which_check_satisfied <- function(
 ) {
   task_graph_which_satisfied(
     g,
-    igraph::V(g)[vlapply(igraph::V(g)$task, is_check)],
+    igraph::V(g)[is_check(igraph::V(g)$task)],
     ...,
     dependencies = dependencies,
     status = status
@@ -401,7 +383,7 @@ plot.task_graph <- function(x, ..., interactive = FALSE) {
   style <- function(attr, ...) {
     map <- simplify2array(list(...))
     nomatch <- if (names(map[length(map)]) == "") length(map) else NA
-    map[match(attr, names(map), nomatch = nomatch)]
+    map[match(as.character(attr), names(map), nomatch = nomatch)]
   }
 
   task_type <- vcapply(igraph::V(x)$task, function(task) {
@@ -428,7 +410,7 @@ plot.task_graph <- function(x, ..., interactive = FALSE) {
 
   vertex$label <- vcapply(
     igraph::V(x)$task,
-    friendly_name,
+    format_task_name,
     short = TRUE
   )
 
@@ -440,6 +422,19 @@ plot.task_graph <- function(x, ..., interactive = FALSE) {
     "pkg_origin_local" = 5,
     "pkg_origin_base" = 5,
     8
+  )
+
+  edge$lty <- style(
+    RELATION[igraph::E(x)$relation],
+    "dep" = 1,
+    "report" = 2,
+    1
+  )
+
+  edge$color <- style(
+    RELATION[igraph::E(x)$relation],
+    "report" = "lightgray",
+    NA
   )
 
   if (interactive) {
@@ -476,19 +471,36 @@ plot_interactive_task_graph <- function(
   vertex = igraph::as_data_frame(g, what = "vertices"),
   edge = igraph::as_data_frame(g, what = "edges")
 ) {
-  # visNetwork hates non-atomic vectors
-  vertex$task <- NULL
-  edge$version <- format(edge$version)
+  vertex$title <- gsub("<|>", "", vcapply(vertex$task, format))
+  edge_titles <- paste0(
+    edge$type,
+    ifelse(vlapply(edge$version, is.na),
+      "",
+      paste0(
+        "(",
+        ifelse(is.na(edge$op), "", paste0(edge$op, " ")),
+        format(edge$version),
+        ")"
+      )
+    )
+  )
 
+  if (length(edge_titles) > 0) edge$title <- edge_titles
   vertex$id <- seq_len(nrow(vertex))
   edge$from <- vertex$id[match(edge$from, vertex$name)]
   edge$to <- vertex$id[match(edge$to, vertex$name)]
   edge$arrows <- "to"
+  edge$dashes <- edge$lty != 1
+
+  # visNetwork hates non-atomic vectors
+  vertex$task <- NULL
+  edge$version <- format(edge$version)
 
   visNetwork::visNetwork(
     nodes = vertex,
     edges = edge,
     width = "100vw",
-    height = "100vh"
+    height = "100vh",
+    tooltipDelay = 0
   )
 }

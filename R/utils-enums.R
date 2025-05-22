@@ -7,16 +7,15 @@
 enum <- function(...) {
   x <- c(...)
   f <- factor(x, levels = x)
-  structure(
-    lapply(f, identity),
-    names = levels(f)
-  )
+  names(f) <- as.character(f)
+  structure(f, class = c("enum", "factor"))
 }
 
 #' Internally provide extended mathematical operators for enums
 #' @noRd
+#' @export
 #' @keywords internal
-Ops.factor <- function(e1, e2) {
+Ops.enum <- function(e1, e2) {
   # nolint start, styler: off
   switch(.Generic, ">" = , ">=" = , "==" = , "<" = , "<=" = {
     return(do.call(.Generic, list(as.numeric(e1), as.numeric(e2))))
@@ -25,16 +24,20 @@ Ops.factor <- function(e1, e2) {
   NextMethod()
 }
 
-#' Edge types
+#' Internally provide `$` for enum factors
+#' @noRd
+#' @keywords internal
+#' @export
+`$.enum` <- function(x, i) {
+  x[[i]]
+}
+
+#' Relation types
 #'
-#' Edges may have multiple relations. Most commonly, this relationship
-#' represents a dependency, meaning that a node's task must be performed before
-#' another node. However, this may also be a relationship that is used for
-#' grouping behaviors together during reporting, allowing a single task to
-#' redirect to another node.
+#' A flag for edges that articulate different relations between nodes.
 #'
 #' @keywords internal
-EDGE <- enum(
+RELATION <- enum(
   "dep",    # for task dependencies
   "report"  # for reporting graph, from task to reporting node
 )
