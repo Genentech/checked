@@ -1,12 +1,28 @@
 #' @export
 format.task <- function(x, ..., indent = 0L) {
-  fmt(task = x, "{action} {package} {version} {source}")
+  fmt(task = x, "{action} {package} {version} from {source}", ...)
+}
+
+format_task_type <- function(x, ...) {
+  UseMethod("format_task_type")
 }
 
 #' @export
-format_task_name.task <- function(x, ...) {
-  "task"
+format_task_type.task <- function(x, ...) {
+  sub("_task$", "", class(x)[[1]])
 }
+
+#' @export
+format_task_type.rev_dep_dep_meta_task <- function(x, ...) {
+  "check revdeps of"
+}
+
+#' @export
+format_task_type.rev_dep_check_meta_task <- function(x, ..., g = NULL) {
+  "check revdep of"
+}
+
+
 
 format_task_name <- function(x, ...) {
   UseMethod("format_task_name")
@@ -21,13 +37,9 @@ format_task_name.default <- function(x, ...) {
   )
 }
 
-format_task_type <- function(x, ...) {
-  UseMethod("format_task_type")
-}
-
 #' @export
-format_task_type.task <- function(x, ...) {
-  sub("_task$", "", class(x)[[1]])
+format_task_name.task <- function(x, ...) {
+  "task"
 }
 
 #' @export

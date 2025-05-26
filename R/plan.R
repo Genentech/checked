@@ -124,8 +124,19 @@ plan_rev_dep_checks <- function(
 
   # reconstruct edges from planned root node to individual checks
   edges <- as.vector(rbind(task_id, rev_dep_meta_task_ids))
-  g <- igraph::add_edges(g, edges = edges, attr = list(relation = RELATION$dep))
+
+  # meta tasks take dependency relationship with subtasks
+  g <- igraph::add_edges(g, edges = edges, attr = list(
+    relation = RELATION$dep,
+    type = DEP$Depends
+  ))
+
+  # recover coerced factor types
+  E(g)$relation <- RELATION[E(g)$relation]
+  E(g)$type <- DEP[E(g)$type]
+
   class(g) <- c("task_graph", class(g))
+
   g
 }
 
@@ -147,8 +158,10 @@ plan_rev_dep_dev_check <- function(origin, revdep, repos) {
   ))
 
   # this check is reported through a rev dep check meta task
-  .to <- NULL  # used by igraph NSE
   g <- igraph::add_edges(g, edges = c(2, 1)) # NOTE: coerces factor to numeric
+
+  .to <- NULL  # used by igraph NSE
+  igraph::E(g)$type <- DEP$Depends
   igraph::E(g)$relation <- RELATION$dep
   igraph::E(g)[.to(1)]$relation <- RELATION$report
 
@@ -171,8 +184,10 @@ plan_rev_dep_release_check <- function(origin, revdep, repos) {
   ))
 
   # this check is reported through a rev dep check meta task
-  .to <- NULL  # used by igraph
   g <- igraph::add_edges(g, edges = c(2, 1)) # NOTE: coerces factor to numeric
+
+  .to <- NULL  # used by igraph
+  igraph::E(g)$type <- DEP$Depends
   igraph::E(g)$relation <- RELATION$dep
   igraph::E(g)[.to(1)]$relation <- RELATION$report
 

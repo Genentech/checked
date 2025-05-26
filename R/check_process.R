@@ -148,7 +148,14 @@ check_process <- R6::R6Class(
     args = list(),
     time_last_check_start = NULL,
     time_finish = NULL,
-    parsed_checks = factor(levels = c("", "NONE", "OK", "NOTE", "WARNING", "ERROR")),
+    parsed_checks = factor(levels = c(
+      "",
+      "NONE",
+      "OK",
+      "NOTE",
+      "WARNING",
+      "ERROR"
+    )),
     parsed_partial_check_output = "",
     throttle = NULL,
     spinners = NULL,

@@ -52,7 +52,7 @@ task_formats <- function(
   })
 
   makeActiveBinding("action", env = environment(), function() {
-    cli_type("task_type", format_task_type(task))
+    cli_type("task_type", format_task_type(task, g = g))
   })
 
   makeActiveBinding("dep.sources", env = environment(), function() {
@@ -93,7 +93,14 @@ task_formats <- function(
 #'
 #' fmt(task = task, "{action} {package} ({version}) from {source}")
 #'
-fmt <- function(..., g, nodes, task = NULL, .envir = parent.frame()) {
+fmt <- function(
+  ...,
+  g,
+  nodes,
+  task = NULL,
+  .envir = parent.frame(),
+  ansi = TRUE
+) {
   env <- task_formats(g = g, nodes = nodes, task = task, tasks = NULL)
   parent.env(env) <- .envir
 
@@ -114,7 +121,12 @@ fmt <- function(..., g, nodes, task = NULL, .envir = parent.frame()) {
     )
   )
 
-  cli::format_inline(..., .envir = env)
+  out <- cli::format_inline(..., .envir = env)
+
+  # ideally would use `options(cli.ansi)`, but it seems to be unused
+  if (!ansi) out <- cli::ansi_strip(out)
+
+  out
 }
 
 glu <- function(..., g, nodes, task = NULL, .envir = parent.frame()) {

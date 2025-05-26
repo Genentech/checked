@@ -4,7 +4,7 @@
 \alias{fmt}
 \title{Produce cli output for a task}
 \usage{
-fmt(..., g, nodes, task = NULL, .envir = parent.frame())
+fmt(..., g, nodes, task = NULL, .envir = parent.frame(), ansi = TRUE)
 }
 \description{
 Provided a task, allows for use of a handful of shorthand symbols which will

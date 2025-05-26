@@ -168,7 +168,10 @@ checker <- R6::R6Class(
       }
 
       next_task <- next_task_to_run(self$graph)
+
       if (length(next_task) > 0) {
+        print(next_task$task[[1]])
+
         process <- start_task(
           node = next_task,
           g = self$graph,
@@ -186,7 +189,8 @@ checker <- R6::R6Class(
       }
 
       finished <- (length(private$active) == 0) && self$is_done()
-      return(-finished)
+
+      -finished
     },
 
     #' @description

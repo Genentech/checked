@@ -27,7 +27,7 @@ meta_task <- function(..., .subclass = NULL) {
 }
 
 make_unique_task <- function(task, seed = runif(1)) {
-  task$id <- hash(seed)
+  task$seed <- seed
   task
 }
 

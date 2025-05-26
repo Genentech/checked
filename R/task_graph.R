@@ -48,6 +48,7 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
     deps <- dep_tree(nh[[1]]$task)
     igraph::reverse_edges(deps)
     igraph::E(deps)$relation <- RELATION$dep
+    igraph::E(deps)$type <- DEP[igraph::E(deps)$type]
     igraph::V(deps)$task <- lapply(
       igraph::V(deps)$name,
       function(package) {
@@ -60,31 +61,41 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
     # NOTE: attributes (tasks) are preserved in the order they appear
     subtree <- graph_dedup_attrs(igraph::union(subtree, deps))
 
+    # fill new edges with dependency relation - between check task and installs
+    is_na <- is.na(E(subtree)$relation)
+    E(subtree)$relation[is_na] <- RELATION$dep
+    E(subtree)$type[is_na] <- DEP$Depends
+
     # re-hash tasks as vertex names
     igraph::V(subtree)$name <- vcapply(igraph::V(subtree)$task, hash)
-    igraph::V(subtree)$task_type <- vcapply(
-      igraph::V(subtree)$task,
-      function(task) class(task)[[1]]
-    )
 
     subtree
   })
 
   # then merge all the full check task task trees into a single graph
   g <- graph_dedup_attrs(igraph::union(plan, check_task_neighborhoods))
-  class(g) <- c("task_graph", class(g))
 
+  igraph::E(g)$relation <- RELATION[igraph::E(g)$relation]
+  igraph::E(g)$type <- DEP[igraph::E(g)$type]
   igraph::V(g)$status <- STATUS$pending
   igraph::V(g)$process <- rep_len(list(), length(g))
 
-  task_graph_sort(g)
+  g <- task_graph_sort(g)
+  class(g) <- c("task_graph", class(g))
+
+  g
+}
+
+dep_edges <- function(edges, dependencies = TRUE) {
+  if (!is.logical(dependencies)) {
+    dependencies <- edges$type %in% check_dependencies(dependencies)
+  }
+
+  edges$relation == RELATION$dep & dependencies
 }
 
 dep_subgraph <- function(g) {
-  igraph::subgraph_from_edges(
-    g,
-    igraph::E(g)[igraph::E(g)$relation == RELATION$dep]
-  )
+  igraph::subgraph_from_edges(g, igraph::E(g)[dep_edges(igraph::E(g))])
 }
 
 lib_node_tasks <- function(g, nodes) {
@@ -234,7 +245,7 @@ task_graph_sort <- function(g) {
   }
 
   # use only strong dependencies to prioritize by topology (leafs first)
-  strong_edges <- igraph::E(g)[igraph::E(g)$type %in% DEP_STRONG]
+  strong_edges <- igraph::E(g)[dep_edges(E(g), "strong")]
   g_strong <- igraph::subgraph.edges(g, strong_edges, delete.vertices = FALSE)
   topo <- igraph::topo_sort(g_strong, mode = "in")
   priority_topo <- integer(length(g))
@@ -282,19 +293,25 @@ task_graph_which_satisfied <- function(
   dependencies = TRUE,
   status = STATUS$pending
 ) {
-  if (is.character(status)) status <- STATUS[[status]]
+  if (is.character(status)) {
+    status <- STATUS[[status]]
+  }
+
   dependencies <- check_dependencies(dependencies)
+
   if (length(status) > 0) {
     idx <- v$status %in% status
     v <- v[idx]
   }
+
   deps_met <- vlapply(
-    igraph::incident_edges(g, v, mode = "in"),
+    igraph::incident_edges(g, v, mode = "out"),
     function(edges) {
-      edges <- edges[edges$type %in% dependencies]
-      all(igraph::tail_of(g, edges)$status == STATUS$done)
+      is_dep <- edges$relation == RELATION$dep & edges$type %in% dependencies
+      all(igraph::tail_of(g, edges[is_dep])$status == STATUS$done)
     }
   )
+
   names(deps_met[deps_met])
 }
 
@@ -391,6 +408,7 @@ plot.task_graph <- function(x, ..., interactive = FALSE) {
     class(task)[[1]]
   })
 
+  x <- dep_subgraph(x)
   vertex <- igraph::as_data_frame(x, what = "vertices")
   edge <- igraph::as_data_frame(x, what = "edges")
 
@@ -408,10 +426,19 @@ plot.task_graph <- function(x, ..., interactive = FALSE) {
     "red"
   )
 
-  vertex$label <- vcapply(
-    igraph::V(x)$task,
-    format_task_name,
-    short = TRUE
+  vertex$label <- cli::ansi_strip(vcapply(igraph::V(x)$task, format, g = x))
+
+  vertex$frame.color <- style(
+    STATUS[igraph::V(x)$status],
+    "done" = "green",
+    "in progress" = "lightgreen",
+    "black"
+  )
+
+  vertex$frame.width <- style(
+    STATUS[igraph::V(x)$status],
+    "done" = 3L,
+    1L
   )
 
   vertex$size <- style(
@@ -457,6 +484,8 @@ plot_static_task_graph <- function(
     vertex.label = vertex$label,
     vertex.color = vertex$color,
     vertex.size = vertex$size,
+    vertex.frame.color = vertex$frame.color,
+    vertex.frame.width = vertex$frame.width,
     edge.lty = edge$lty,
     layout = igraph::layout_with_sugiyama(
       g,

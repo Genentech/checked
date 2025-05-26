@@ -6,7 +6,13 @@ vertex_df <- function(name, ...) {
   vertices
 }
 
-sequence_graph <- function(..., name_by = ..1, name = hashes(name_by)) {
+sequence_graph <- function(
+  ...,
+  vertex_attrs = list(...),
+  edge_attrs = list(),
+  name_by = vertex_attrs[[1]],
+  name = hashes(name_by)
+) {
   vertices <- vertex_df(name = name, ...)
   edges <- data.frame(
     from = utils::head(vertices$name, -1L),
@@ -36,7 +42,6 @@ graph_dedup_attrs <- function(g) {
     attr_value <- igraph::vertex_attr(g, v_dup_attrs[[i]][[1L]])
     g <- igraph::remove.vertex.attribute(g, v_dup_attrs[[i]][[1L]])
     for (attr_dup_name in v_dup_attrs[[i]][-1L]) {
-      if (!anyNA(attr_value)) break
       is_na <- is.na(attr_value)
       attr_value[is_na] <- igraph::vertex_attr(g, attr_dup_name)[is_na]
       g <- igraph::remove.vertex.attribute(g, attr_dup_name)
@@ -54,7 +59,6 @@ graph_dedup_attrs <- function(g) {
     attr_value <- igraph::edge_attr(g, e_dup_attrs[[i]][[1L]])
     g <- igraph::remove.edge.attribute(g, e_dup_attrs[[i]][[1L]])
     for (attr_dup_name in e_dup_attrs[[i]][-1L]) {
-      if (!anyNA(attr_value)) break
       is_na <- is.na(attr_value)
       attr_value[is_na] <- igraph::edge_attr(g, attr_dup_name)[is_na]
       g <- igraph::remove.edge.attribute(g, attr_dup_name)

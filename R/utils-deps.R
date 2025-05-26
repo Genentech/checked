@@ -90,7 +90,7 @@ pkg_dependencies <- function(
         out <- proto_df[seq_along(deps), , drop = FALSE]
 
         out$package <- package
-        out$type <- deptype
+        out$type <- DEP[deptype]
         out$name <- vcapply(deps, `[[`, "name")
         out$op <- vcapply(deps, function(i) i$op %||% NA_character_)
         out$version <- mapply(

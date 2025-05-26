@@ -4,6 +4,7 @@ next_task_to_run <- function(g) {
 
   # Prioritize checks overs installs
   v <- igraph::V(g)[c(checks, installs)]
+
   utils::head(v, 1L)
 }
 
@@ -127,13 +128,9 @@ start_task.check_task <- function(
   libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc)
   path <- check_path(task$origin, output = path_sources())
 
-  # TODO: make output directory names more user-friendly, for now the vertex
-  # hash id is used to disambiguate output
-  output_dirname <- paste0(format_task_name(task), " <", node$name[[1]], ">")
-
   check_process$new(
     path = path,
-    check_dir = path_check_output(output, output_dirname),
+    check_dir = path_check_output(output, node$name[[1]]),
     libpath = libpaths,
     repos = task$repos,
     args = task$args,
