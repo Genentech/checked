@@ -36,7 +36,7 @@ lib <- function(x, ..., lib.loc = c()) {
 }
 
 #' Null Library Path
-#' 
+#'
 #' @export
 lib.NULL <- function(x, ...) {
   character(0L)

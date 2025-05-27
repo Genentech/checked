@@ -88,7 +88,10 @@ checker <- R6::R6Class(
     initialize = function(
       plan,
       n = 2L,
-      output = tempfile(paste(packageName(), Sys.Date(), sep = "-")),
+      output = file.path(
+        tempdir(),
+        paste(packageName(), Sys.Date(), sep = "-")
+      ),
       lib.loc = .libPaths(),
       repos = getOption("repos"),
       restore = TRUE,
@@ -170,8 +173,6 @@ checker <- R6::R6Class(
       next_task <- next_task_to_run(self$graph)
 
       if (length(next_task) > 0) {
-        print(next_task$task[[1]])
-
         process <- start_task(
           node = next_task,
           g = self$graph,

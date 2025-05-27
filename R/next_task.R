@@ -81,13 +81,13 @@ start_task.install_task <- function(
 
   install_process$new(
     install_parameters$package,
-    lib = path_lib(output),
+    lib = lib(task$lib, lib.loc = lib.loc),
     libpaths = libpaths,
     repos = task$origin$repos,
     dependencies = FALSE,
     type = task$type,
     INSTALL_opts = c(), # TODO
-    log = path_package_install_log(output, format_task_name(task)),
+    log = path_install_log(output, node$name[[1]]),
     env = c() # TODO
   )
 }
@@ -111,7 +111,7 @@ start_task.custom_install_task <- function(
     dependencies = FALSE,
     type = spec$type,
     INSTALL_opts = spec$INSTALL_opts,
-    log = path_package_install_log(output, spec$alias),
+    log = path_install_log(output, spec$alias),
     env = spec$env
   )
 }

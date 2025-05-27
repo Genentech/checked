@@ -182,7 +182,7 @@ install_params.pkg_origin_base <- function(x) {
 
 #' @export
 install_params.pkg_origin_repo <- function(x) {
-  list(package = x$name, repos = x$repos)
+  list(package = x$package, repos = x$repos)
 }
 
 #' @export

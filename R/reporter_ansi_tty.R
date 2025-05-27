@@ -155,14 +155,13 @@ report_task_ansi_tty.rev_dep_check_meta_task <- function(reporter, g, v) {
   package <- v$task$origin$package
 
   # subset for dependency edges from rev dep task
-  dep_edges <- E(g)$relation == as.numeric(RELATION$dep)
-  dep_g <- igraph::subgraph_from_edges(g, which(dep_edges))
+  dep_g <- dep_subgraph(g)
 
   # get individual rev dep checks, and get their trees
   check_nodes <- igraph::neighbors(dep_g, v$name, "out")
   check_neighborhoods <- igraph::make_neighborhood_graph(
     dep_g,
-    order = length(dep_g),
+    order = 1,  # NOTE: do we only want to check _direct_ reverse dependencies?
     check_nodes,
     mode = "out"
   )

@@ -308,7 +308,7 @@ task_graph_which_satisfied <- function(
     igraph::incident_edges(g, v, mode = "out"),
     function(edges) {
       is_dep <- edges$relation == RELATION$dep & edges$type %in% dependencies
-      all(igraph::tail_of(g, edges[is_dep])$status == STATUS$done)
+      all(igraph::head_of(g, edges[is_dep])$status == STATUS$done)
     }
   )
 
@@ -429,14 +429,14 @@ plot.task_graph <- function(x, ..., interactive = FALSE) {
   vertex$label <- cli::ansi_strip(vcapply(igraph::V(x)$task, format, g = x))
 
   vertex$frame.color <- style(
-    STATUS[igraph::V(x)$status],
+    STATUS[igraph::V(x)$status %||% 1],
     "done" = "green",
     "in progress" = "lightgreen",
     "black"
   )
 
   vertex$frame.width <- style(
-    STATUS[igraph::V(x)$status],
+    STATUS[igraph::V(x)$status %||% 1],
     "done" = 3L,
     1L
   )

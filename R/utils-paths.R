@@ -73,7 +73,7 @@ path_custom_lib <- function(path, custom) {
   normalizePath(p)
 }
 
-path_package_install_log <- function(path, package, name = "lib") {
+path_install_log <- function(path, package, name = "lib") {
   dir_create(p <- file.path(path_logs(path), name))
   normalizePath(file.path(p, sprintf("%s.log", package)), mustWork = FALSE)
 }
