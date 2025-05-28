@@ -19,7 +19,12 @@ run <- function(checker, ..., reporter = reporter_default()) {
 
 #' @export
 run.character <- function(checker, ..., reporter = reporter_default()) {
-  report_start_setup(reporter, checker, message = "planning checks ...")
+  report_start_setup(
+    reporter,
+    checker,
+    extra = list(message = "planning checks ...")
+  )
+
   run(new_rev_dep_checker(checker, ...), reporter = reporter)
 }
 
@@ -30,6 +35,7 @@ run.checker <- function(checker, ..., reporter = reporter_default()) {
     report_finalize(reporter, checker)
   })
 
+  report_start_setup(reporter, checker)
   report_start_checks(reporter, checker)
   while (checker$step()) {
     if (length(checker$active_processes()) == 0 && !checker$is_done()) {

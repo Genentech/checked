@@ -184,3 +184,7 @@ emoji <- list(
   dev = "\U0001F6A7",
   release = "\U0001F680"
 )
+
+cli_env_has_pb <- function(env) {
+  !is.null(attr(env, "withr_handlers"))
+}

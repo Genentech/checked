@@ -104,6 +104,10 @@ is_check <- function(x) {
   is_type(x, "check")
 }
 
+is_meta <- function(x) {
+  is_type(x, "meta")
+}
+
 #' Create a custom install task
 #'
 #' @inheritDotParams install_task

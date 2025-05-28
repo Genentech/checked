@@ -242,9 +242,12 @@ report_sleep.reporter_ansi_tty <- function(
 report_start_setup.reporter_ansi_tty <- function(
   reporter,
   checker,
-  message,
+  ...,
   envir = parent.frame()
 ) {
+  if (cli_env_has_pb(reporter$cli)) return()
+  reporter$cli <- new.env(parent = reporter)
+
   # hide cursor when initializer enters, ensure its restored even if interrupted
   cli::ansi_hide_cursor()
   do.call(
@@ -253,23 +256,36 @@ report_start_setup.reporter_ansi_tty <- function(
     envir = envir
   )
 
-  cli::cli_progress_message(
-    message,
+  cli::cli_progress_bar(
+    type = "custom",
+    format = paste(
+      "ETA {cli::pb_eta}",
+      "({cli::pb_current}/{cli::pb_total})",
+      "[{cli::pb_elapsed}]",
+      "{cli::pb_extra$message}"
+    ),
+    format_done = "Finished in {cli::pb_elapsed}",
+    ...,
     clear = FALSE,
     auto_terminate = FALSE,
     .auto_close = FALSE,
-    .envir = reporter,
+    .envir = reporter$cli
   )
+
+  cli::cli_progress_update(force = TRUE, .envir = reporter$cli)
 }
 
 get_reporter_node <- function(g, v, mode = "out") {
   end <- if (mode == "out") igraph::head_of else igraph::tail_of
   v_es <- igraph::incident_edges(g, v, mode = mode)
-  v_rep <- simplify2array(lapply(v_es, function(es) {
-    eidx <- es$relation == RELATION$report
-    as.numeric(end(g, es[eidx]))
+  v_rep <- simplify2array(lapply(seq_along(v), function(i) {
+    if (any(eidx <- v_es[[i]]$relation == RELATION$report)) {
+      as.numeric(end(g, v_es[[i]][eidx]))
+    } else {
+      as.numeric(v[[i]])
+    }
   }))
-  V(g)[ifelse(is.na(v_rep), as.numeric(v), v_rep)]
+  V(g)[ifelse(is.na(v_rep), as.numeric(v), unlist(v_rep))]
 }
 
 reporter_ansi_tty_get_label_nchar <- function(
@@ -340,44 +356,30 @@ report_start_checks.reporter_ansi_tty <- function(
     reporter$buffer_update(node, output)
   }
 
-  # hide cursor when initializer enters, ensure its restored even if interrupted
-  cli::ansi_hide_cursor()
-  do.call(
-    on.exit,
-    list(quote(cli::ansi_show_cursor()), add = TRUE),
-    envir = envir
-  )
-
-  cli::cli_progress_bar(
-    type = "custom",
-    extra = list(message = ""),
-    format = paste(
-      "ETA {cli::pb_eta}",
-      "({cli::pb_current}/{cli::pb_total})",
-      "[{cli::pb_elapsed}]",
-      "{cli::pb_extra$message}"
-    ),
-    format_done = "Finished in {cli::pb_elapsed}",
-    total = sum(igraph::V(checker$graph)$type == "check"),
-    clear = FALSE,
-    auto_terminate = FALSE,
-    .auto_close = FALSE,
-    .envir = reporter,
-  )
+  extra <- list(message = "")
+  if (cli_env_has_pb(reporter$cli)) {
+    cli::cli_progress_update(extra = extra, .envir = reporter$cli)
+  } else {
+    report_start_setup(
+      reporter,
+      checker,
+      extra = extra,
+      total = sum(is_check(igraph::V(checker$graph)$task)),
+      envir = envir
+    )
+  }
 }
 
 #' @importFrom igraph V
 #' @export
 report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
+  msg <- c()
   v <- igraph::V(checker$graph)
-  v_checks <- v[is_check(v$task)]
 
   # add newly started task status
   updated <- which(
-    v_checks$status > STATUS$pending | (
-      v_checks$status == STATUS$done &
-        !v_checks$name %in% reporter$buffer$node
-    )
+    v$status > STATUS$pending |
+      (v$status == STATUS$done & !v$name %in% reporter$buffer$node)
   )
 
   # skip if no updates
@@ -385,8 +387,8 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
     return()
   }
 
-  # find any reporter nodes for updated checks
-  updated <- unique(get_reporter_node(checker$graph, v_checks[updated]))
+  # find reporter nodes for updated tasks
+  updated <- unique(get_reporter_node(checker$graph, updated))
 
   # print header if this is the first status line of the reporter
   if (nrow(reporter$buffer) == 0L) {
@@ -399,8 +401,20 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
     )
   }
 
-  for (node_name in updated$name) {
+  # report check tasks in cli output
+  to_report <- is_meta(updated$task) | is_check(updated$task)
+  for (node_name in updated[to_report]$name) {
     reporter$buffer_report(node_name)
+  }
+
+  # report non-check tasks in status line
+  to_report <- is_install(updated$task) &
+    updated$status > STATUS$pending &
+    updated$status < STATUS$done
+
+  if (any(to_report)) msg[length(msg) + 1L] <- "installing"
+  for (node_name in updated[to_report]$name) {
+    msg[length(msg) + 1L] <- fmt("{package}", task = updated[[node_name]]$task)
   }
 
   # if console width has changed, redraw all
@@ -432,17 +446,17 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
   reporter$buffer$updated <- FALSE
   cat(buffer)
 
-  n_finished <- sum(v$status[v$type == "check"] >= STATUS$done)
+  n_finished <- sum(v[is_check(v$task)]$status >= STATUS$done)
   cli::cli_progress_update(
     set = n_finished,
-    extra = list(message = ""),
-    .envir = reporter
+    extra = list(message = paste(msg, collapse = " ")),
+    .envir = reporter$cli
   )
 }
 
 #' @export
 report_finalize.reporter_ansi_tty <- function(reporter, checker) {
   report_status(reporter, checker) # report completions of final processes
-  cli::cli_progress_done(.envir = reporter)
+  cli::cli_progress_done(.envir = reporter$cli)
   cli::ansi_show_cursor()
 }

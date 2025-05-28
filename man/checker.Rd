@@ -78,7 +78,7 @@ and installation order are embedded.
 \if{html}{\out{<div class="r">}}\preformatted{checker$new(
   plan,
   n = 2L,
-  output = tempfile(paste(packageName(), Sys.Date(), sep = "-")),
+  output = file.path(tempdir(), paste(packageName(), Sys.Date(), sep = "-")),
   lib.loc = .libPaths(),
   repos = getOption("repos"),
   restore = TRUE,
