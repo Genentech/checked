@@ -419,7 +419,7 @@ is_package_satisfied <- function(v, lib.loc) {  # nolint object_name_linter
 }
 
 igraph_subgraph_from_edges <- function(...) {
-  if (packageVersion("igraph") < "2.1.0") {
+  if (utils::packageVersion("igraph") < "2.1.0") {
     igraph::subgraph.edges(...)
   } else {
     igraph::subgraph_from_edges(...)

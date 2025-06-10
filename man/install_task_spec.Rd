@@ -15,7 +15,8 @@ install_task_spec(type = getOption("pkgType"), INSTALL_opts = NULL, ...)
 \item{INSTALL_opts}{
     an optional character vector of additional option(s) to be passed to
     \command{R CMD INSTALL} for a source package install.  E.g.,
-    \code{c("--html", "--no-multiarch", "--no-test-load")}.
+    \code{c("--html", "--no-multiarch", "--no-test-load")} or, for
+    macOS, \code{"--dsym"}.
 
     Can also be a named list of character vectors to be used as
     additional options, with names the respective package names.

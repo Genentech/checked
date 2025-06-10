@@ -6,6 +6,12 @@ path <- c(
   file.path(examples_path, "exampleOkay"),
   file.path(examples_path, "exampleBad")
 )
+expected_revdeps <- tools::package_dependencies(
+  "DALEXtra",
+  db = utils::available.packages(repos = "https://cran.r-project.org/"),
+  reverse = TRUE,
+  which = "all"
+)[[1]]
 
 test_that("rev_dep_check_tasks_df works with deafult params", {
   expect_silent(
@@ -15,7 +21,7 @@ test_that("rev_dep_check_tasks_df works with deafult params", {
     )
   )
   expect_s3_class(df, "data.frame")
-  expect_true(NROW(df) >= 8)
+  expect_true(NROW(df) >= 2*length(expected_revdeps))
   expect_named(df, c("alias", "version", "package", "custom"))
 
   expect_s3_class(df$package, "list_of_task_spec")
@@ -118,7 +124,7 @@ test_that("rev_dep_check_tasks_df development_only = TRUE", {
     )
   )
   expect_s3_class(df, "data.frame")
-  expect_true(NROW(df) >= 4)
+  expect_true(NROW(df) >= length(expected_revdeps))
   expect_named(df, c("alias", "version", "package", "custom"))
 
   expect_s3_class(df$package, "list_of_task_spec")

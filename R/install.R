@@ -19,7 +19,7 @@ install_packages_process <- R6::R6Class(
       private$callr_r_bg(
         function(..., escalate_warning, available_packages_filters) {
           options(available_packages_filters = available_packages_filters)
-          tryCatch(
+          withCallingHandlers(
             utils::install.packages(...),
             warning = function(w) {
               if (escalate_warning(w)) {
