@@ -14,12 +14,12 @@ format_task_type.task <- function(x, ...) {
 
 #' @export
 format_task_type.rev_dep_dep_meta_task <- function(x, ...) {
-  "check revdeps of"
+  "meta revdeps of"
 }
 
 #' @export
 format_task_type.rev_dep_check_meta_task <- function(x, ..., g = NULL) {
-  "check revdep of"
+  fmt(task = x, "meta revdep {.pkg {x$revdep}} of")
 }
 
 
