@@ -24,12 +24,11 @@
 #' @keywords internal
 task_graph_create <- function(plan, repos = getOption("repos")) {
   # only use dependency edges when populating graph
-  dep_g <- dep_subgraph(plan)
-  check_tasks <- igraph::V(dep_g)[is_check(igraph::V(dep_g)$task)]
+  check_tasks <- igraph::V(plan)[is_check(igraph::V(plan)$task)]
 
   check_task_neighborhoods <- igraph::neighborhood(
-    dep_g,
-    order = length(dep_g),
+    plan,
+    order = length(plan),
     mode = "out",
     nodes = check_tasks
   )
@@ -37,7 +36,7 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
   # for each check task in the plan, build a dependency tree and merge it
   # into the existing check task subtree
   check_task_neighborhoods <- lapply(check_task_neighborhoods, function(nh) {
-    subtree <- igraph::induced_subgraph(dep_g, nh)
+    subtree <- igraph::induced_subgraph(plan, nh)
     V(subtree)$name <- vcapply(
       V(subtree)$task,
       function(i) i$origin$package %||% NA_character_
@@ -47,7 +46,6 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
     # TODO: if this is too slow, could move after all neighborhoods are merged
     deps <- dep_tree(nh[[1]]$task)
     igraph::reverse_edges(deps)
-    igraph::E(deps)$relation <- RELATION$dep
     igraph::E(deps)$type <- DEP[igraph::E(deps)$type]
     igraph::V(deps)$task <- lapply(
       igraph::V(deps)$name,
@@ -62,8 +60,7 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
     subtree <- graph_dedup_attrs(igraph::union(subtree, deps))
 
     # fill new edges with dependency relation - between check task and installs
-    is_na <- is.na(E(subtree)$relation)
-    E(subtree)$relation[is_na] <- RELATION$dep
+    is_na <- is.na(E(subtree)$type)
     E(subtree)$type[is_na] <- DEP$Depends
 
     # re-hash tasks as vertex names
@@ -75,7 +72,6 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
   # then merge all the full check task task trees into a single graph
   g <- graph_dedup_attrs(igraph::union(plan, check_task_neighborhoods))
 
-  igraph::E(g)$relation <- RELATION[igraph::E(g)$relation]
   igraph::E(g)$type <- DEP[igraph::E(g)$type]
   igraph::V(g)$status <- STATUS$pending
   igraph::V(g)$process <- rep_len(list(), length(g))
@@ -87,15 +83,7 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
 }
 
 dep_edges <- function(edges, dependencies = TRUE) {
-  if (!is.logical(dependencies)) {
-    dependencies <- edges$type %in% check_dependencies(dependencies)
-  }
-
-  edges$relation == RELATION$dep & dependencies
-}
-
-dep_subgraph <- function(g) {
-  igraph::subgraph_from_edges(g, igraph::E(g)[dep_edges(igraph::E(g))])
+  edges[edges$type %in% dependencies]
 }
 
 lib_node_tasks <- function(g, nodes) {
@@ -245,7 +233,7 @@ task_graph_sort <- function(g) {
   }
 
   # use only strong dependencies to prioritize by topology (leafs first)
-  strong_edges <- igraph::E(g)[dep_edges(E(g), "strong")]
+  strong_edges <- dep_edges(E(g), "strong")
   g_strong <- igraph::subgraph.edges(g, strong_edges, delete.vertices = FALSE)
   topo <- igraph::topo_sort(g_strong, mode = "in")
   priority_topo <- integer(length(g))
@@ -307,7 +295,7 @@ task_graph_which_satisfied <- function(
   deps_met <- vlapply(
     igraph::incident_edges(g, v, mode = "out"),
     function(edges) {
-      is_dep <- edges$relation == RELATION$dep & edges$type %in% dependencies
+      is_dep <- edges$type %in% dependencies
       all(igraph::head_of(g, edges[is_dep])$status == STATUS$done)
     }
   )
@@ -408,7 +396,6 @@ plot.task_graph <- function(x, ..., interactive = FALSE) {
     class(task)[[1]]
   })
 
-  x <- dep_subgraph(x)
   vertex <- igraph::as_data_frame(x, what = "vertices")
   edge <- igraph::as_data_frame(x, what = "edges")
 
@@ -451,19 +438,6 @@ plot.task_graph <- function(x, ..., interactive = FALSE) {
     8
   )
 
-  edge$lty <- style(
-    RELATION[igraph::E(x)$relation],
-    "dep" = 1,
-    "report" = 2,
-    1
-  )
-
-  edge$color <- style(
-    RELATION[igraph::E(x)$relation],
-    "report" = "lightgray",
-    NA
-  )
-
   if (interactive) {
     plot_interactive_task_graph(x, vertex = vertex, edge = edge)
   } else {
@@ -486,7 +460,6 @@ plot_static_task_graph <- function(
     vertex.size = vertex$size,
     vertex.frame.color = vertex$frame.color,
     vertex.frame.width = vertex$frame.width,
-    edge.lty = edge$lty,
     layout = igraph::layout_with_sugiyama(
       g,
       hgap = 200,
