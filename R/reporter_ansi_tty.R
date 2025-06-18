@@ -378,8 +378,8 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
 
   # add newly started task status
   updated <- which(
-    v$status > STATUS$pending |
-      (v$status == STATUS$done & !v$name %in% reporter$buffer$node)
+    (v$status > STATUS$pending & v$status < STATUS$done) |
+      (v$status >= STATUS$done & !v$name %in% reporter$buffer$node)
   )
 
   # skip if no updates
@@ -402,18 +402,18 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
   }
 
   # report check tasks in cli output
-  to_report <- is_meta(updated$task) | is_check(updated$task)
-  for (node_name in updated[to_report]$name) {
+  to_report_main <- is_meta(updated$task)
+  for (node_name in updated[to_report_main]$name) {
     reporter$buffer_report(node_name)
   }
 
   # report non-check tasks in status line
-  to_report <- is_install(updated$task) &
+  to_report_bar <- is_install(updated$task) &
     updated$status > STATUS$pending &
     updated$status < STATUS$done
 
-  if (any(to_report)) msg[length(msg) + 1L] <- "installing"
-  for (node_name in updated[to_report]$name) {
+  if (any(to_report_bar)) msg[length(msg) + 1L] <- "installing"
+  for (node_name in updated[to_report_bar]$name) {
     msg[length(msg) + 1L] <- fmt("{package}", task = updated[[node_name]]$task)
   }
 
@@ -458,5 +458,6 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
 report_finalize.reporter_ansi_tty <- function(reporter, checker) {
   report_status(reporter, checker) # report completions of final processes
   cli::cli_progress_done(.envir = reporter$cli)
+  cat(ansi_line_erase()) # clear lingering progress bar output
   cli::ansi_show_cursor()
 }
