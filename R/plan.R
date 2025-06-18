@@ -144,10 +144,11 @@ plan_rev_dep_checks <- function(
 plan_rev_dep_dev_check <- function(origin, revdep, repos) {
   rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
   g <- sequence_graph(task = list(
-    make_unique_task(seed = revdep, meta_task(
+    meta_task(
       origin = origin,
+      revdep = revdep,
       .subclass = "rev_dep_check"
-    )),
+    ),
     make_unique_task(seed = "dev", check_task(
       origin = rev_dep_origin,
       env = DEFAULT_R_CMD_CHECK_ENVVARS,
@@ -171,10 +172,11 @@ plan_rev_dep_dev_check <- function(origin, revdep, repos) {
 plan_rev_dep_release_check <- function(origin, revdep, repos) {
   rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
   g <- sequence_graph(task = list(
-    make_unique_task(seed = revdep, meta_task(
+    meta_task(
       origin = origin,
+      revdep = revdep,
       .subclass = "rev_dep_check"
-    )),
+    ),
     make_unique_task(seed = "release", check_task(
       origin = rev_dep_origin,
       env = DEFAULT_R_CMD_CHECK_ENVVARS,

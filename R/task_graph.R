@@ -67,7 +67,7 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
     E(subtree)$type[is_na] <- DEP$Depends
 
     # re-hash tasks as vertex names
-    igraph::V(subtree)$name <- vcapply(igraph::V(subtree)$task, hash)
+    igraph::V(subtree)$name <- vcapply(igraph::V(subtree)$task, as_vertex_name)
 
     subtree
   })
