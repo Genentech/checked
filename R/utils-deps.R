@@ -77,7 +77,7 @@ pkg_dependencies <- function(
   while (length(packages) > 0L) {
     depth <- depth + 1L
     deptypes <- if (depth == 1L) dependencies$direct else dependencies$indirect
-    depstrs <- db[packages, deptypes, drop = FALSE]
+    depstrs <- safe_db_subset(db, packages, deptypes, drop = FALSE)
 
     n <- length(out) + 1
     out[[n]] <- Map(
@@ -100,6 +100,7 @@ pkg_dependencies <- function(
           SIMPLIFY = FALSE
         )
 
+        out <- out[!out$op %in% c("<", "<="), ]
         rownames(out) <- paste0(out$package, "-", out$name)
         out
       }
@@ -113,4 +114,22 @@ pkg_dependencies <- function(
   out <- do.call(rbind, unlist(out, recursive = FALSE))
   rownames(out) <- NULL
   out
+}
+
+safe_db_subset <- function(db, r, c, drop = FALSE) {
+  if (is.character(r) & !all(r %in% rownames(db))) {
+    missing <- r[!r %in% rownames(db)]
+    missing <- matrix(
+      NA,
+      nrow = length(missing),
+      ncol = NCOL(db),
+      dimnames = list(
+        missing,
+        colnames(db)
+      )
+    )
+    db <- rbind(db, missing)
+  }
+
+  db[r, c, drop = drop]
 }

@@ -266,3 +266,28 @@ flatten.subtasks_task <- function(x) {
     lapply(x$tasks, function(xi) flatten(xi))
   ))
 }
+
+
+package <- function(x) {
+  UseMethod("package")
+}
+
+#' @export
+package.default <- function(x) {
+  stop("Unrecognized type")
+}
+
+#' @export
+package.check_task <- function(x) {
+  package(x$origin)
+}
+
+#' @export
+package.install_task <- function(x) {
+  package(x$origin)
+}
+
+#' @export
+package.pkg_origin <- function(x) {
+  x$package
+}

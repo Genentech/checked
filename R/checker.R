@@ -109,8 +109,7 @@ checker <- R6::R6Class(
       private$lib.loc <- lib.loc
       private$repos <- repos
 
-      g <- task_graph_create(self$plan, repos)
-      self$graph <- task_graph_update_done(g, c(path_lib(output), lib.loc))
+      self$graph <- task_graph(self$plan, repos)
       private$restore_complete_checks()
     },
 
@@ -244,8 +243,8 @@ checker <- R6::R6Class(
     },
 
     restore_complete_checks = function() {
-      checks <- self$plan$alias
-      check_done <- vlapply(checks, function(check) {
+      checks <- igraph::V(self$graph)[is_check(igraph::V(self$graph)$task)]
+      check_done <- vlapply(checks$name, function(check) {
         file.exists(file.path(
           path_check_output(self$output, check),
           "result.json"

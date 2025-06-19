@@ -129,40 +129,46 @@ pkg_origin_archive <- function(path = NULL, ...) {
   pkg_origin(..., path = path, .class = "pkg_origin_archive")
 }
 
-pkg_deps <- function(x) {
+pkg_deps <- function(x, repos = getOption("repos"), dependencies = TRUE) {
   UseMethod("pkg_deps")
 }
 
 #' @export
-pkg_deps.default <- function(x) {
+pkg_deps.default <- function(x, repos = getOption("repos"), dependencies = TRUE) {
   NULL
 }
 
 #' @export
-pkg_deps.pkg_origin_local <- function(x) {
-  db <- available_packages(repos = x$repos)
-  row <- db[x$package, , drop = FALSE]
-  row[, DB_COLNAMES, drop = FALSE]
+pkg_deps.pkg_origin <- function(
+    x,
+    repos = getOption("repos"),
+    dependencies = TRUE
+  ) {
+  db <- available_packages(repos = repos)
+  pkg_dependencies(package(x), db = db, dependencies = dependencies)
 }
 
 #' @export
-pkg_deps.pkg_origin_local <- function(x) {
-  row <- as.data.frame(read.dcf(file.path(x$path, "DESCRIPTION")))
-  row <- row[, intersect(DB_COLNAMES, colnames(row)), drop = FALSE]
-  row[setdiff(DB_COLNAMES, colnames(row))] <- NA_character_
-  row
+pkg_deps.pkg_origin_local <- function(
+    x,
+    repos = getOption("repos"),
+    dependencies = TRUE
+  ) {
+  # TODO: Implement it by parsing DESCRIPTION to get a vector
+  # TODO: of all dependencies and call pkg_dependencies in lapply
+  # TODO: for all of them
+  pkg_deps.pkg_origin(x = x, repos = repos, dependencies = dependencies)
 }
 
 #' @export
-pkg_deps.pkg_origin_archive <- function(x) {
-  path <- if (!file.exists(x$path)) {
-    fetch_package_source(x$path, path_sources())
-  } else {
-    x$path
-  }
-  utils::untar(path, exdir = dir)
-  x$path <- file.path(path, x$name)
-  pkg_deps.pkg_origin_local(x)
+pkg_deps.pkg_origin_archive <- function(
+    x,
+    repos = getOption("repos"),
+    dependencies = TRUE
+  ) {
+  # TODO: Implement it by fetching tarball, untarring it and dispatching
+  # TODO: to origin_local
+  pkg_deps.pkg_origin_local(x = x, repos = repos, dependencies = dependencies)
 }
 
 
@@ -225,12 +231,12 @@ dep_tree <- function(x, ...) {
 
 #' @export
 dep_tree.check_task <- function(x, ...) {
-  dep_tree(x$origin, ...)
+  dep_tree(package(x), ...)
 }
 
 #' @export
 dep_tree.install_task <- function(x, ...) {
-  dep_tree(x$origin, ...)
+  dep_tree(package(x), ...)
 }
 
 #' @export
@@ -240,7 +246,7 @@ dep_tree.pkg_origin <- function(
   db = available_packages(),
   dependencies = TRUE
 ) {
-  dep_tree(x$package, ..., db = db, dependencies = dependencies)
+  dep_tree(package(x), ..., db = db, dependencies = dependencies)
 }
 
 #' @export

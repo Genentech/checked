@@ -11,9 +11,10 @@
 #' prior to calculating edges. The bulk of this function serves to join this
 #' data.
 #'
-#' @param plan a `plan` object, containing a list of related steps.
+#' @param x a `plan` object, containing a list of related steps.
 #' @param repos `repos`, as expected by [`tools::package_dependencies()`] to
 #'   determine package relationships.
+#' @param ... params passed to helper methods.
 #' @return A `data.frame` that can be used to build [`igraph`] edges.
 #'
 #' @examples
@@ -22,10 +23,56 @@
 #' task_graph_create(plan_rev_dep_checks("."))
 #' }
 #' @keywords internal
-task_graph_create <- function(plan, repos = getOption("repos")) {
+task_graph <- function(x, repos = getOption("repos"), ...) {
+  UseMethod("task_graph")
+}
+
+task_graph.task <- function(x, repos = getOption("repos"), ...) {
+  df <- pkg_deps(x$origin, repos = repos, dependencies = TRUE)
+  colmap <- c("package" = "from", "name" = "to")
+  rename <- match(names(df), names(colmap))
+  to_rename <- !is.na(rename)
+  names(df)[to_rename] <- colmap[rename[to_rename]]
+  df <- df[, c(which(to_rename), which(!to_rename)), drop = FALSE]
+  g_dep <- igraph::graph_from_data_frame(df)
+  
+  igraph::E(g_dep)$relation <- RELATION$dep
+  igraph::E(g_dep)$type <- DEP[igraph::E(g_dep)$type]
+  igraph::V(g_dep)$task <- lapply(
+    igraph::V(g_dep)$name,
+    function(p) {
+      origin <- try_pkg_origin_repo(package = p, repos = repos)
+      install_task(origin = origin)
+    }
+  )
+  
+  # Add the root node
+  g_dep <- igraph::add_vertices(
+    g_dep,
+    1,
+    attr = list(
+      name = "root-vertex",
+      task = list(x)
+    ))
+  
+  g_dep <- copy_edges_from_vertex(
+    g_dep,
+    v_to = "root-vertex",
+    v_from = package(x), 
+    mode = "out"
+  )
+  
+  igraph::V(g_dep)$name <- vcapply(igraph::V(g_dep)$task, hash)
+  
+  g_dep
+}
+
+task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
   # only use dependency edges when populating graph
-  dep_g <- dep_subgraph(plan)
-  check_tasks <- igraph::V(dep_g)[is_check(igraph::V(dep_g)$task)]
+  dep_g <- dep_subgraph(x)
+  check_tasks <- igraph::V(dep_g)[
+    is_check(igraph::V(dep_g)$task) | is_install(igraph::V(dep_g)$task)
+  ]
 
   check_task_neighborhoods <- igraph::neighborhood(
     dep_g,
@@ -38,24 +85,9 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
   # into the existing check task subtree
   check_task_neighborhoods <- lapply(check_task_neighborhoods, function(nh) {
     subtree <- igraph::induced_subgraph(dep_g, nh)
-    V(subtree)$name <- vcapply(
-      V(subtree)$task,
-      function(i) i$origin$package %||% NA_character_
-    )
 
     # build dependency graph, with fallback installation task
-    # TODO: if this is too slow, could move after all neighborhoods are merged
-    deps <- dep_tree(nh[[1]]$task)
-    igraph::reverse_edges(deps)
-    igraph::E(deps)$relation <- RELATION$dep
-    igraph::E(deps)$type <- DEP[igraph::E(deps)$type]
-    igraph::V(deps)$task <- lapply(
-      igraph::V(deps)$name,
-      function(package) {
-        origin <- try_pkg_origin_repo(package = package, repos = repos)
-        install_task(origin = origin)
-      }
-    )
+    deps <- task_graph(nh[[1]]$task, repos = repos)
 
     # merge trees on package names
     # NOTE: attributes (tasks) are preserved in the order they appear
@@ -66,14 +98,11 @@ task_graph_create <- function(plan, repos = getOption("repos")) {
     E(subtree)$relation[is_na] <- RELATION$dep
     E(subtree)$type[is_na] <- DEP$Depends
 
-    # re-hash tasks as vertex names
-    igraph::V(subtree)$name <- vcapply(igraph::V(subtree)$task, hash)
-
     subtree
   })
 
   # then merge all the full check task task trees into a single graph
-  g <- graph_dedup_attrs(igraph::union(plan, check_task_neighborhoods))
+  g <- graph_dedup_attrs(igraph::union(x, check_task_neighborhoods))
 
   igraph::E(g)$relation <- RELATION[igraph::E(g)$relation]
   igraph::E(g)$type <- DEP[igraph::E(g)$type]
@@ -247,7 +276,7 @@ task_graph_sort <- function(g) {
   # use only strong dependencies to prioritize by topology (leafs first)
   strong_edges <- igraph::E(g)[dep_edges(E(g), "strong")]
   g_strong <- igraph::subgraph.edges(g, strong_edges, delete.vertices = FALSE)
-  topo <- igraph::topo_sort(g_strong, mode = "in")
+  topo <- igraph::topo_sort(g_strong, mode = "out")
   priority_topo <- integer(length(g))
   priority_topo[match(topo$name, igraph::V(g)$name)] <- rev(seq_along(topo))
 
@@ -519,7 +548,7 @@ plot_interactive_task_graph <- function(
   edge$from <- vertex$id[match(edge$from, vertex$name)]
   edge$to <- vertex$id[match(edge$to, vertex$name)]
   edge$arrows <- "to"
-  edge$dashes <- edge$lty != 1
+  #edge$dashes <- edge$lty != 1
 
   # visNetwork hates non-atomic vectors
   vertex$task <- NULL
