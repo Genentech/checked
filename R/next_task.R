@@ -1,4 +1,4 @@
-next_task_to_run <- function(g) {
+next_node_to_run <- function(g) {
   checks <- task_graph_which_check_satisfied(g)
   installs <- task_graph_which_install_satisfied(g)
 

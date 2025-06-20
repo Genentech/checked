@@ -170,22 +170,21 @@ checker <- R6::R6Class(
         return(0L)
       }
 
-      next_task <- next_task_to_run(self$graph)
-
-      if (length(next_task) > 0) {
+      next_node <- next_node_to_run(self$graph)
+      if (length(next_node) > 0) {
         process <- start_task(
-          node = next_task,
+          node = next_node,
           g = self$graph,
           output = self$output,
           lib.loc = private$lib.loc
         )
 
         if (is.null(process)) {
-          private$finish_task(next_task)
+          private$finish_node(next_node)
           return(1L)
         }
 
-        success <- private$push_process(next_task, process)
+        success <- private$push_process(next_node, process)
         return(as.integer(success))
       }
 
@@ -220,24 +219,51 @@ checker <- R6::R6Class(
     # failed tasks
     failed = list(),
 
-    start_task = function(task) {
-      task_graph_package_status(self$graph, task) <- STATUS$`in progress`
+    start_node = function(node) {
+      task_graph_package_status(self$graph, node) <- STATUS$`in progress`
+      private$start_node_meta_parents(node)
     },
 
-    finish_task = function(task) {
+    start_node_meta_parents = function(node) {
+      # start parent meta tasks recursively once a child starts
+      parent_nodes <- igraph::adjacent_vertices(self$graph, node, mode = "in")
+      parent_nodes <- unlist(parent_nodes, use.names = FALSE)
+      parent_nodes <- V(self$graph)[parent_nodes]
+      meta_parent_nodes <- parent_nodes[is_meta(parent_nodes$task)]
+      for (meta in meta_parent_nodes) {
+        task_graph_package_status(self$graph, meta) <- STATUS$`in progress`
+        private$start_node_meta_parents(meta)
+      }
+    },
+
+    finish_node = function(task) {
       task_graph_package_status(self$graph, task) <- STATUS$`done`
+      private$finish_node_meta_parents(task)
     },
 
-    push_process = function(task, x) {
-      task_graph_task_process(self$graph, task) <- x
-      name <- task_graph_task_name(self$graph, task)
-      private$start_task(task)
+    finish_node_meta_parents = function(node) {
+      # parent meta tasks finish once _all_ children are finished
+      parent_nodes <- igraph::adjacent_vertices(self$graph, node, mode = "in")
+      parent_nodes <- unlist(parent_nodes, use.names = FALSE)
+      parent_nodes <- V(self$graph)[parent_nodes]
+      meta_parent_nodes <- parent_nodes[is_meta(parent_nodes$task)]
+      for (meta in meta_parent_nodes) {
+        siblings <- igraph::adjacent_vertices(self$graph, meta, "out")
+        if (!all(siblings$status == STATUS$`done`)) next
+        task_graph_package_status(self$graph, meta) <- STATUS$`done`
+      }
+    },
+
+    push_process = function(node, x) {
+      task_graph_task_process(self$graph, node) <- x
+      name <- task_graph_task_name(self$graph, node)
+      private$start_node(node)
       x$set_finisher(function(process) {
         if (process$get_r_exit_status() != 0) {
-          private$failed[[name]] <- task
+          private$failed[[name]] <- node
         }
         private$pop_process(name)
-        private$finish_task(task)
+        private$finish_node(node)
       })
       private$active[[name]] <- x
       TRUE
