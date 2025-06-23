@@ -68,8 +68,12 @@ start_task.install_task <- function(
   ...
 ) {
   task <- node$task[[1]]
-  install_parameters <- install_params(task$origin)
   libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc)
+  install_parameters <- try(install_params(task$origin), silent = TRUE)
+  
+  if (inherits(install_parameters, "try-error")) {
+    return(NULL)
+  }
 
   if (inherits(task$origin, "pkg_origin_base")) {
     return(NULL)

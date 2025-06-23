@@ -27,6 +27,7 @@ task_graph <- function(x, repos = getOption("repos"), ...) {
   UseMethod("task_graph")
 }
 
+#' @export
 task_graph.task <- function(x, repos = getOption("repos"), ...) {
   df <- pkg_deps(x$origin, repos = repos, dependencies = TRUE)
   colmap <- c("package" = "from", "name" = "to")
@@ -67,6 +68,7 @@ task_graph.task <- function(x, repos = getOption("repos"), ...) {
   g_dep
 }
 
+#' @export
 task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
   # only use dependency edges when populating graph
   dep_g <- dep_subgraph(x)
