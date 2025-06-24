@@ -11,7 +11,7 @@ sequence_graph <- function(
   vertex_attrs = list(...),
   edge_attrs = list(),
   name_by = vertex_attrs[[1]],
-  name = hashes(name_by)
+  name = vcapply(name_by, as_vertex_name)
 ) {
   vertices <- vertex_df(name = name, ...)
   edges <- data.frame(

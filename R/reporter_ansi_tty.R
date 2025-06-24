@@ -150,18 +150,22 @@ format.reporter_cell <- function(x,
 }
 
 #' @export
+report_task_ansi_tty.default <- function(reporter, g, v) {
+  NULL
+}
+
+#' @export
 report_task_ansi_tty.rev_dep_check_meta_task <- function(reporter, g, v) {
   # package being rev-dep-check'ed
   package <- v$task$origin$package
 
-  # subset for dependency edges from rev dep task
-  dep_g <- dep_subgraph(g)
-
   # get individual rev dep checks, and get their trees
-  check_nodes <- igraph::neighbors(dep_g, v$name, "out")
+  check_nodes <- igraph::neighbors(g, v$name, "out")
+
+  # NOTE: do we only want to check _direct_ reverse dependencies?
   check_neighborhoods <- igraph::make_neighborhood_graph(
-    dep_g,
-    order = 1,  # NOTE: do we only want to check _direct_ reverse dependencies?
+    g,
+    order = 1,
     check_nodes,
     mode = "out"
   )
@@ -186,8 +190,7 @@ report_task_ansi_tty.rev_dep_check_meta_task <- function(reporter, g, v) {
     }
   )
 
-  rev_dep_check_nodes <- get_reporter_node(g, v, mode = "in")
-  rev_dep <- fmt(task = rev_dep_check_nodes[[1]]$task, " {package} ")
+  rev_dep <- paste0(" ", v$task$revdep, " ")
   to_report <- mapply(
     function(label, i) {
       x <- report_task_ansi_tty(reporter = reporter, g = g, v = V(g)[[i]])
@@ -195,7 +198,7 @@ report_task_ansi_tty.rev_dep_check_meta_task <- function(reporter, g, v) {
       x
     },
     package_task_labels,
-    rev_dep_check_nodes,
+    check_nodes,
     SIMPLIFY = FALSE
   )
 
@@ -275,19 +278,6 @@ report_start_setup.reporter_ansi_tty <- function(
   cli::cli_progress_update(force = TRUE, .envir = reporter$cli)
 }
 
-get_reporter_node <- function(g, v, mode = "out") {
-  end <- if (mode == "out") igraph::head_of else igraph::tail_of
-  v_es <- igraph::incident_edges(g, v, mode = mode)
-  v_rep <- simplify2array(lapply(seq_along(v), function(i) {
-    if (any(eidx <- v_es[[i]]$relation == RELATION$report)) {
-      as.numeric(end(g, v_es[[i]][eidx]))
-    } else {
-      as.numeric(v[[i]])
-    }
-  }))
-  V(g)[ifelse(is.na(v_rep), as.numeric(v), unlist(v_rep))]
-}
-
 reporter_ansi_tty_get_label_nchar <- function(
   reporter,
   checker,
@@ -295,7 +285,7 @@ reporter_ansi_tty_get_label_nchar <- function(
 ) {
   # pre-calculate the maximum space needed for label column
   v <- igraph::V(checker$graph)
-  v_report <- unique(get_reporter_node(checker$graph, v[is_check(v$task)]))
+  v_report <- v[is_meta(v$task)]
 
   # for each reporter, produce output
   output <- unlist(recursive = FALSE, lapply(
@@ -377,18 +367,14 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
   v <- igraph::V(checker$graph)
 
   # add newly started task status
-  updated <- which(
-    v$status > STATUS$pending |
-      (v$status == STATUS$done & !v$name %in% reporter$buffer$node)
-  )
+  is_running <- v$status > STATUS$ready & v$status < STATUS$done
+  is_newly_done <- v$status >= STATUS$done & !v$name %in% reporter$buffer$node
+  updated <- v[is_running | is_newly_done]
 
   # skip if no updates
   if (length(updated) <= 0L) {
     return()
   }
-
-  # find reporter nodes for updated tasks
-  updated <- unique(get_reporter_node(checker$graph, updated))
 
   # print header if this is the first status line of the reporter
   if (nrow(reporter$buffer) == 0L) {
@@ -402,18 +388,18 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
   }
 
   # report check tasks in cli output
-  to_report <- is_meta(updated$task) | is_check(updated$task)
-  for (node_name in updated[to_report]$name) {
+  to_report_main <- is_meta(updated$task)
+  for (node_name in updated[to_report_main]$name) {
     reporter$buffer_report(node_name)
   }
 
   # report non-check tasks in status line
-  to_report <- is_install(updated$task) &
-    updated$status > STATUS$pending &
+  to_report_bar <- is_install(updated$task) &
+    updated$status > STATUS$ready &
     updated$status < STATUS$done
 
-  if (any(to_report)) msg[length(msg) + 1L] <- "installing"
-  for (node_name in updated[to_report]$name) {
+  if (any(to_report_bar)) msg[length(msg) + 1L] <- "installing"
+  for (node_name in updated[to_report_bar]$name) {
     msg[length(msg) + 1L] <- fmt("{package}", task = updated[[node_name]]$task)
   }
 
@@ -458,5 +444,6 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
 report_finalize.reporter_ansi_tty <- function(reporter, checker) {
   report_status(reporter, checker) # report completions of final processes
   cli::cli_progress_done(.envir = reporter$cli)
+  cat(ansi_line_erase()) # clear lingering progress bar output
   cli::ansi_show_cursor()
 }

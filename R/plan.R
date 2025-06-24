@@ -126,13 +126,7 @@ plan_rev_dep_checks <- function(
   edges <- as.vector(rbind(task_id, rev_dep_meta_task_ids))
 
   # meta tasks take dependency relationship with subtasks
-  g <- igraph::add_edges(g, edges = edges, attr = list(
-    relation = RELATION$dep,
-    type = DEP$Depends
-  ))
-
-  # recover coerced factor types
-  E(g)$relation <- RELATION[E(g)$relation]
+  g <- igraph::add_edges(g, edges = edges, attr = list(type = DEP$Depends))
   E(g)$type <- DEP[E(g)$type]
 
   class(g) <- c("task_graph", class(g))
@@ -143,11 +137,12 @@ plan_rev_dep_checks <- function(
 
 plan_rev_dep_dev_check <- function(origin, revdep, repos) {
   rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
-  g <- sequence_graph(task = list(
-    make_unique_task(seed = revdep, meta_task(
+  sequence_graph(task = list(
+    meta_task(
       origin = origin,
+      revdep = revdep,
       .subclass = "rev_dep_check"
-    )),
+    ),
     make_unique_task(seed = "dev", check_task(
       origin = rev_dep_origin,
       env = DEFAULT_R_CMD_CHECK_ENVVARS,
@@ -156,25 +151,16 @@ plan_rev_dep_dev_check <- function(origin, revdep, repos) {
     )),
     install_task(origin = origin)
   ))
-
-  # this check is reported through a rev dep check meta task
-  g <- igraph::add_edges(g, edges = c(2, 1)) # NOTE: coerces factor to numeric
-
-  .to <- NULL  # used by igraph NSE
-  igraph::E(g)$type <- DEP$Depends
-  igraph::E(g)$relation <- RELATION$dep
-  igraph::E(g)[.to(1)]$relation <- RELATION$report
-
-  g
 }
 
 plan_rev_dep_release_check <- function(origin, revdep, repos) {
   rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
-  g <- sequence_graph(task = list(
-    make_unique_task(seed = revdep, meta_task(
+  sequence_graph(task = list(
+    meta_task(
       origin = origin,
+      revdep = revdep,
       .subclass = "rev_dep_check"
-    )),
+    ),
     make_unique_task(seed = "release", check_task(
       origin = rev_dep_origin,
       env = DEFAULT_R_CMD_CHECK_ENVVARS,
@@ -182,16 +168,6 @@ plan_rev_dep_release_check <- function(origin, revdep, repos) {
       build_args = DEFAULT_R_CMD_BUILD_ARGS
     ))
   ))
-
-  # this check is reported through a rev dep check meta task
-  g <- igraph::add_edges(g, edges = c(2, 1)) # NOTE: coerces factor to numeric
-
-  .to <- NULL  # used by igraph
-  igraph::E(g)$type <- DEP$Depends
-  igraph::E(g)$relation <- RELATION$dep
-  igraph::E(g)[.to(1)]$relation <- RELATION$report
-
-  g
 }
 
 rev_dep_check_tasks <- function(packages, repos, aliases, revdep) {

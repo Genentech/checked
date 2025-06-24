@@ -46,6 +46,7 @@ RELATION <- enum(
 #' @keywords internal
 STATUS <- enum(
   "pending",
+  "ready",
   "in progress",
   "done"
 )

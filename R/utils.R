@@ -1,6 +1,23 @@
 #' @import cli
 NULL
 
+as_vertex_name <- function(x, ...) {
+  UseMethod("as_vertex_name")
+}
+
+#' @export
+as_vertex_name.default <- function(x, ...) {
+  hash(x, ...)
+}
+
+#' @export
+as_vertex_name.task <- function(x, ...) {
+  paste0(
+    hash(x, ...),
+    gsub("\\s+", "-", fmt(task = x, "-{action}-{package}", ansi = FALSE))
+  )
+}
+
 hash <- function(x, n = 12) {
   substring(cli::hash_obj_sha256(x), 1, n)
 }

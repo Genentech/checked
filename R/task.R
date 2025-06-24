@@ -104,6 +104,10 @@ is_check <- function(x) {
   is_type(x, "check")
 }
 
+is_actionable_task <- function(x) {
+  is_type(x, "check") | is_type(x, "install")
+}
+
 is_meta <- function(x) {
   is_type(x, "meta")
 }
