@@ -1,42 +1,20 @@
-#' @importFrom igraph .env
-task_get_lib_loc <- function(g, node, output) {
-  nhood <- task_graph_neighborhoods(g, node)[[1]]
-  name <- names(node) %||% node # nolint (used via non-standard-evaluation)
-  nhood <- nhood[names(nhood) != .env$name]
-
-  # Custom packages are possible only for the check type nodes which are
-  # always terminal. Therefore if we sort nhood making custom packages appear
-  # first, their lib will always be prioritized
-  attributes <- igraph::vertex.attributes(g, index = nhood)
-
-  paths <- vcapply(nhood, function(v) {
-    task_get_install_lib(g, v, output)
-  })
-
-  unique(paths[order(attributes$custom, decreasing = TRUE)])
-}
-
-task_graph_libpaths <- function(g, node = NULL, lib.loc = .libPaths()) {
-  vs <- if (is.null(node)) {
+task_graph_libpaths <- function(
+    g,
+    node = NULL,
+    lib.loc = .libPaths(),
+    output = tempdir()
+) {
+  # Maintain original vertices order to make sure libpaths are properly
+  # constructed
+  vs <- sort(if (is.null(node)) {
     igraph::V(g)
   } else {
     task_graph_neighborhoods(g, node)[[1]]
-  }
+  })
 
   # iterate over tasks and derive a library location
-  task_lib <- lapply(vs$task, lib, lib.loc = lib.loc)
+  task_lib <- lapply(vs$task, lib, lib.loc = lib.loc, lib.root = path_libs(output))
   unique(unlist(task_lib))
-}
-
-task_get_install_lib <- function(g, node, output) {
-  attributes <- igraph::vertex.attributes(g, index = node)
-  if (attributes$type == "check") {
-    path_check_output(output, attributes$spec[[1]]$alias)
-  } else if (attributes$custom) {
-    path_custom_lib(output, attributes$spec[[1]]$alias)
-  } else {
-    path_lib(output)
-  }
 }
 
 start_task <- function(node, g, ...) {
@@ -58,14 +36,11 @@ start_task.install_task <- function(
   ...
 ) {
   task <- node$task[[1]]
-  libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc)
-  install_parameters <- try(install_params(task$origin), silent = TRUE)
-  
-  if (inherits(install_parameters, "try-error")) {
-    return(NULL)
-  }
+  #if (length(task$origin$source) > 0 && task$origin$source == "/Users/maksymis/Desktop/validation/code/DALEX") browser()
+  libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc, output = output)
+  install_parameters <- install_params(task$origin)
 
-  if (inherits(task$origin, "pkg_origin_base")) {
+  if (any(inherits(task$origin, c("pkg_origin_base", "pkg_origin_unknown")))) {
     return(NULL)
   }
 
@@ -75,7 +50,7 @@ start_task.install_task <- function(
 
   install_process$new(
     install_parameters$package,
-    lib = lib(task$lib, lib.loc = lib.loc),
+    lib = lib(task$lib, lib.loc = lib.loc, lib.root = path_libs(output)),
     libpaths = libpaths,
     repos = task$origin$repos,
     dependencies = FALSE,
@@ -83,30 +58,6 @@ start_task.install_task <- function(
     INSTALL_opts = c(), # TODO
     log = path_install_log(output, node$name[[1]]),
     env = c() # TODO
-  )
-}
-
-#' @export
-start_task.custom_install_task <- function(
-  node,
-  g,
-  output,
-  lib.loc,
-  ...
-) {
-  spec <- task_graph_task(g, task)
-  install_parameters <- install_params(spec$package)
-  libpaths <- c(task_get_lib_loc(g, node, output), lib.loc)
-  install_process$new(
-    install_parameters$package,
-    lib = path_custom_lib(output, spec$alias),
-    libpaths = libpaths,
-    repos = install_parameters$repos,
-    dependencies = FALSE,
-    type = spec$type,
-    INSTALL_opts = spec$INSTALL_opts,
-    log = path_install_log(output, spec$alias),
-    env = spec$env
   )
 }
 
@@ -119,7 +70,7 @@ start_task.check_task <- function(
   ...
 ) {
   task <- node$task[[1]]
-  libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc)
+  libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc, output = output)
   path <- check_path(task$origin, output = path_sources())
 
   check_process$new(

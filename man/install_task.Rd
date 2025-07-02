@@ -6,9 +6,9 @@
 \usage{
 install_task(
   origin,
-  type = getOption("pkgType"),
+  type = package_type(origin),
   INSTALL_opts = NULL,
-  lib = lib_loc_default(),
+  lib = lib_path(origin),
   ...
 )
 }
@@ -39,7 +39,6 @@ Create a task to install a package and dependencies
 \seealso{
 Other tasks: 
 \code{\link{check_task}()},
-\code{\link{custom_install_task}()},
 \code{\link{revdep_check_task}()},
 \code{\link{task}()}
 }

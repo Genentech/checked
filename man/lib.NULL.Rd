@@ -4,7 +4,7 @@
 \alias{lib.NULL}
 \title{Null Library Path}
 \usage{
-\method{lib}{`NULL`}(x, ...)
+\method{lib}{`NULL`}(x, ..., lib.loc = c())
 }
 \description{
 Null Library Path

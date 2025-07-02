@@ -3,26 +3,33 @@
 #' A description of where packages should be installed. This object provides
 #' necessary information to determine where a package should be installed.
 #'
-#' @param x Any additional metadata that can be prescribed when describing
-#'   a library location and used when building the path. Defaults to an empty
-#'   [`list()`].
+#' @param x A [`pkg_origin()`] object
 #' @param .class An optional subclass, used primarily for dispatch.
-#'
-lib_loc <- function(x = list(), .class = c()) {
-  structure(x, class = c(.class, "lib_loc"))
+lib_path <- function(x, ..., .class = c()) {
+  UseMethod("lib_path")
 }
 
 #' @export
-format.lib_loc <- function(x, ...) {
+lib_path.default <- function(x, ..., .class = c()) {
+  structure(list(), class = c(.class, "lib_path_default"))
+}
+
+#' @export
+lib_path.pkg_origin_repo <- function(x, ..., .class = c()) {
+  lib_path.default(x, ..., .class = .class)
+}
+
+#' @export
+lib_path.pkg_origin_local <- function(x, ..., .class = c()) {
+  structure(
+    list(source = x$source),
+    class = c(.class, "lib_path_isolated")
+  )
+}
+
+#' @export
+format.lib_path <- function(x, ...) {
   "library"
-}
-
-lib_loc_default <- function() {
-  lib_loc(.class = "lib_loc_default")
-}
-
-lib_loc_isolated <- function(seed = NULL) {
-  lib_loc(list(seed = seed), .class = "lib_loc_isolated")
 }
 
 #' Get Library Location
@@ -38,7 +45,7 @@ lib <- function(x, ..., lib.loc = c()) {
 #' Null Library Path
 #'
 #' @export
-lib.NULL <- function(x, ...) {
+lib.NULL <- function(x, ..., lib.loc = c()) {
   character(0L)
 }
 
@@ -54,32 +61,32 @@ lib.character <- function(x, ..., lib.loc = c()) {
 
 #' Produce an Isolated Library Path
 #'
-#' @param x A `lib_loc_isolated` object.
+#' @param x A `lib_path_isolated` object.
 #' @param name A name for the library, defaults to a random hash.
 #' @param lib.root A root directory for the isolated library.
 #' @param ... Additional arguments unused
 #'
 #' @export
-lib.lib_loc_isolated <- function(
+lib.lib_path_isolated <- function(
   x,
-  name = rlang::hash(runif(1)),
   lib.root = tempdir(),
-  ...
+  ...,
+  lib.loc = c()
 ) {
-  file.path(lib.root, name)
+  file.path(lib.root, hash(x$source))
 }
 
 #' Produce a Default Library Path
 #'
-#' @param x A `lib_loc_default` object.
+#' @param x A `lib_path_default` object.
 #' @param ... Additional arguments unused
 #' @param lib.loc Library paths, defaulting to [`.libPaths()`].
 #'
 #' @export
-lib.lib_loc_default <- function(
+lib.lib_path_default <- function(
   x,
   ...,
-  lib.loc = .libPaths()
+  lib.loc = c()
 ) {
   lib.loc[[1]]
 }

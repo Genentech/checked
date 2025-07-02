@@ -106,7 +106,11 @@ checker <- R6::R6Class(
       self$plan <- plan
       self$output <- output
       private$n <- n
-      private$lib.loc <- lib.loc
+      private$lib.loc <- c(
+      # Append checker designated library
+        path_checker_lib(output),
+        lib.loc
+      )
       private$repos <- repos
 
       self$graph <- task_graph(self$plan, repos)

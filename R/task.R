@@ -54,9 +54,9 @@ print.task <- function(x, ...) {
 #' @export
 install_task <- function(
   origin,
-  type = getOption("pkgType"),
+  type = package_type(origin),
   INSTALL_opts = NULL,
-  lib = lib_loc_default(),
+  lib = lib_path(origin),
   ...
 ) {
   task(
@@ -71,7 +71,7 @@ install_task <- function(
 
 #' @export
 lib.install_task <- function(x, ...) {
-  lib(x$lib, name = hash(x), ...)
+  lib(x$lib, ...)
 }
 
 is_type <- function(x, type) {
@@ -112,18 +112,6 @@ is_meta <- function(x) {
   is_type(x, "meta")
 }
 
-#' Create a custom install task
-#'
-#' @inheritDotParams install_task
-#'
-#' @family tasks
-#' @export
-custom_install_task <- function(...) {
-  task <- install_task(...)
-  class(task) <- c("custom_install_task", class(task))
-  task
-}
-
 #' Create a task to run `R CMD check`
 #'
 #' @inheritParams rcmdcheck::rcmdcheck
@@ -143,26 +131,11 @@ check_task <- function(build_args = NULL, args = NULL, env = NULL, ...) {
 
 #' @export
 lib.check_task <- function(x, ...) {
-  character(0L)  # no additional libraries needed for checkign
+  character(0L)  # no additional libraries needed for checking
 }
 
 is_check_task <- function(x) {
   inherits(x, "check_task")
-}
-
-#' Specify a library install
-#'
-#' A declarative task that specifies a set of packages that should be installed
-#' to a given location. This task is typically used during planning of checks,
-#' but does not spawn a process. It is used primarily for organizing the
-#' library precedence for check tasks.
-#'
-library_task <- function(origins = list(), loc = lib_loc_default(), ...) {
-  task <- task(...)
-  task$origins <- origins
-  task$loc <- loc
-  class(task) <- c("library_task", class(task))
-  task
 }
 
 #' Create a task to run reverse dependency checks

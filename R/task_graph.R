@@ -109,8 +109,15 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
   V(g)$process <- rep_len(list(), length(g))
 
   g <- task_graph_sort(g)
+  
+  # Reindex nodes to keep original indexing.
+  x_ids <- as.numeric(igraph::V(g)[names(igraph::V(x))])
+  g_ids <- numeric(length(V(g)))
+  g_ids[x_ids] <- seq_along(x_ids)
+  g_ids[g_ids == 0] <- setdiff(seq_along(V(g)), seq_along(V(x)))
+  g <- igraph::permute(g, g_ids)
+  
   class(g) <- c("task_graph", class(g))
-
   g
 }
 
@@ -131,87 +138,6 @@ lib_node_pkgs <- function(g, nodes) {
     tasks <- nodes$task[is_install(nodes$task)]
     vcapply(tasks, function(task) task$origin$package)
   })
-}
-
-package_graph <- function(db, packages = db[, "Package"], dependencies = TRUE) {
-  dependencies <- as_pkg_dependencies(dependencies)
-
-  direct_deps <- unique(as.character(unlist(package_deps(
-    packages,
-    db = db,
-    which = dependencies$direct,
-    recursive = FALSE
-  ))))
-
-  indirect_deps <- unique(as.character(unlist(package_deps(
-    c(packages, direct_deps),
-    db = db,
-    which = dependencies$indirect,
-    recursive = TRUE
-  ))))
-
-  deps <- unique(c(packages, direct_deps, indirect_deps))
-  deps <- deps[!deps %in% base_pkgs() & deps %in% db[, "Package"]]
-
-  edges <- packages_edges(db[deps, ])
-  vertices <- data.frame(name = unique(c(edges$package, edges$dep)))
-  igraph::graph_from_data_frame(edges, vertices = vertices)
-}
-
-#' Produce Graph Edges from Packages Index
-#'
-#' @param ap `matrix`, as produced by [`utils::available.packages()`]
-#' @return `data.frame` with columns `package`, `dep` and `type` and
-#'   one row for each dependency relationship.
-#'
-packages_edges <- function(ap) {
-  deps_by_type <- lapply(names(DEP), function(deptype) {
-    is_na <- is.na(ap[, deptype])
-
-    # filter for available packages with at least one dep of deptype
-    deps <- ap[!is_na, deptype]
-    names(deps) <- ap[!is_na, "Package"]
-
-    # split deps of deptype
-    deps <- lapply(deps, .tools$.split_dependencies)
-
-    # and structure
-    data.frame(
-      package = rep(names(deps), times = viapply(deps, length)),
-      dep = unlist(lapply(deps, names), use.names = FALSE),
-      type = deptype
-    )
-  })
-
-  do.call(rbind, deps_by_type)
-}
-
-task_graph_vertices <- function(plan, df, edges, repos) {
-  vertices <- unique(c(edges$dep, edges$root))
-  custom_pkgs_aliases <- uulist(lapply(df$custom, `[[`, "alias"))
-  task_type <- ifelse(vertices %in% df$alias, "check", "install")
-
-  spec <- lapply(vertices, function(v) {
-    if (v %in% df$alias) {
-      df$package[[which(df$alias == v)]]
-    } else if (v %in% custom_pkgs_aliases) {
-      df$custom[[utils::head(which(as.character(lapply(df$custom, `[[`, "alias")) == v), 1)]]
-    } else {
-      install_task(
-        alias = v,
-        package = pkg_origin_repo(name = v, repos = repos)
-      )
-    }
-  })
-
-  out <- data.frame(
-    name = vertices,
-    type = task_type,
-    custom = vertices %in% custom_pkgs_aliases
-  )
-
-  out$spec <- spec
-  out
 }
 
 #' Find Task Neighborhood

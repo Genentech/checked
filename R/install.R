@@ -9,11 +9,12 @@ install_process <- R6::R6Class(
     initialize = function(
       pkgs,
       ...,
-      lib = .libPaths(),
+      lib = .libPaths()[[1]],
       libpaths = .libPaths(),
       available_packages_filters = getOption("available_packages_filters"),
       log
     ) {
+      if (!dir.exists(lib)) dir.create(lib, recursive = TRUE)
       private$package <- pkgs
       self$log <- log
       private$callr_r_bg(
