@@ -180,21 +180,26 @@ task_graph_neighborhoods <- function(g, nodes, ...) {
 #' @importFrom igraph E V E<- V<-
 #' @keywords internal
 task_graph_sort <- function(g) {
-  roots <- which(igraph::vertex_attr(g, "type") == "check")
+  roots <- which(is_check(V(g)$task))
 
-  # split into neighborhoods by root (revdep)
-  nhood <- task_graph_neighborhoods(g, roots)
+  # calculcate check task neighborhood sizes
+  nh_sizes <- igraph::neighborhood_size(
+    g,
+    nodes = roots,
+    order = length(g),
+    mode = "out"
+  )
 
   # prioritize by neighborhood size (small to large)
-  priority <- length(nhood)
+  priority <- length(roots)
   priority_footprint <- integer(length(g))
-  for (i in order(-vapply(nhood, length, integer(1L)))) {
-    priority_footprint[nhood[[i]]] <- priority
+  for (i in order(-nh_sizes)) {
+    priority_footprint[roots[[i]]] <- priority
     priority <- priority - 1
   }
 
   # use only strong dependencies to prioritize by topology (leafs first)
-  strong_edges <- dep_edges(E(g), "strong")
+  strong_edges <- dep_edges(E(g), check_dependencies("strong"))
   g_strong <- igraph::subgraph.edges(g, strong_edges, delete.vertices = FALSE)
   topo <- igraph::topo_sort(g_strong, mode = "out")
   priority_topo <- integer(length(g))
