@@ -10,7 +10,7 @@ exclusions:
       "tests/testthat/testing_pkgs",
       "tests/testthat/fixtures",
       "inst/",
-      # These file needs major refactor, skip until then
+      # TODO: These files need major refactor, skip until then
       "R/results.R",
       "tests/"
   )
