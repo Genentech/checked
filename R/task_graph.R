@@ -302,11 +302,7 @@ task_graph_update_install_ready <- function(
 #'
 #' @keywords internal
 task_graph_which_ready <- function(g) {
-  vs <- V(g)
-  nodes <- c(
-    vs[is_check(vs$task)],
-    vs[is_install(vs$task)]
-  )
+  nodes <- V(g)[is_actionable_task(V(g)$task)]
   statuses <- igraph::vertex.attributes(g, nodes)$status
   nodes[statuses == STATUS["ready"]]
 }

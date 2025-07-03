@@ -203,8 +203,8 @@ checker <- R6::R6Class(
     #'
     #' Checks whether all the scheduled tasks were successfully executed.
     is_done = function() {
-      is_check_node <- is_check(igraph::V(self$graph)$task)
-      checks <- igraph::V(self$graph)[is_check_node]
+      is_check_node <- is_check(V(self$graph)$task)
+      checks <- V(self$graph)[is_check_node]
       all(checks$status == STATUS$done)
     }
   ),
@@ -275,7 +275,7 @@ checker <- R6::R6Class(
     },
 
     restore_complete_checks = function() {
-      checks <- igraph::V(self$graph)[is_check(igraph::V(self$graph)$task)]
+      checks <- V(self$graph)[is_check(V(self$graph)$task)]
       check_done <- vlapply(checks$name, function(check) {
         file.exists(file.path(
           path_check_output(self$output, check),
