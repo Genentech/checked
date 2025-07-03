@@ -86,7 +86,7 @@ pkg_dependencies <- function(
       deptype = rep(deptypes, each = length(packages)),
       f = function(package, depstr, deptype) {
         if (is.na(depstr)) return()
-        deps <- tools:::.split_dependencies(depstr)
+        deps <- .tools$.split_dependencies(depstr)
         out <- proto_df[seq_along(deps), , drop = FALSE]
 
         out$package <- package
@@ -100,6 +100,11 @@ pkg_dependencies <- function(
           SIMPLIFY = FALSE
         )
 
+        # TODO: Although CRAN does not seem to officially support < and <=
+        # TODO: requirements for hard dependencies, as of 01.07.2025
+        # TODO: there is a singe package MatrixModels which specifies it.
+        # TODO: For now we decided to skip such requirements to assess
+        # TODO: the severity of this.
         out <- out[!out$op %in% c("<", "<="), ]
         rownames(out) <- paste0(out$package, "-", out$name)
         out
@@ -117,7 +122,7 @@ pkg_dependencies <- function(
 }
 
 safe_db_subset <- function(db, r, c, drop = FALSE) {
-  if (is.character(r) & !all(r %in% rownames(db))) {
+  if (is.character(r) && !all(r %in% rownames(db))) {
     missing <- r[!r %in% rownames(db)]
     missing <- matrix(
       NA,

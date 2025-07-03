@@ -28,7 +28,6 @@ should be run.
 }
 \seealso{
 Other plan: 
-\code{\link{plan_checks}()},
 \code{\link{plan_rev_dep_checks}()}
 }
 \concept{plan}

@@ -23,7 +23,7 @@
 #' task_graph_create(plan_rev_dep_checks("."))
 #' }
 #' @keywords internal
-#' 
+#'
 #' @importFrom igraph V E
 task_graph <- function(x, repos = getOption("repos"), ...) {
   UseMethod("task_graph")
@@ -38,7 +38,7 @@ task_graph.task <- function(x, repos = getOption("repos"), ...) {
   names(df)[to_rename] <- colmap[rename[to_rename]]
   df <- df[, c(which(to_rename), which(!to_rename)), drop = FALSE]
   g_dep <- igraph::graph_from_data_frame(df)
-  
+
   E(g_dep)$relation <- RELATION$dep
   E(g_dep)$type <- DEP[E(g_dep)$type]
   V(g_dep)$task <- lapply(
@@ -48,25 +48,21 @@ task_graph.task <- function(x, repos = getOption("repos"), ...) {
       install_task(origin = origin)
     }
   )
-  
+
   # Add the root node
   g_dep <- igraph::add_vertices(
-    g_dep,
-    1,
-    attr = list(
-      name = "root-vertex",
-      task = list(x)
-    ))
-  
+    g_dep, 1, attr = list(name = "root-vertex", task = list(x))
+  )
+
   g_dep <- copy_edges_from_vertex(
     g_dep,
     v_to = "root-vertex",
-    v_from = package(x), 
+    v_from = package(x),
     mode = "out"
   )
-  
+
   V(g_dep)$name <- vcapply(V(g_dep)$task, as_vertex_name)
-  
+
   g_dep
 }
 
@@ -109,14 +105,21 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
   V(g)$process <- rep_len(list(), length(g))
 
   g <- task_graph_sort(g)
-  
+
   # Reindex nodes to keep original indexing.
+  # TODO: It looks like nodes are already sorted in way which prioritize
+  # TODO: original id's and with current task_graph_sort they always end up at
+  # TODO: the end of the list. However I'm not sure whether this will always be
+  # TODO: the case or if it's an isolated case. After remotes packages are fully
+  # TODO: supported we should check it again and possibly simplify that part.
+  # TODO: Current implementation does not assume anything about the order in g
+  # TODO: and make sure proper reindexing is always applied.
   x_ids <- as.numeric(igraph::V(g)[names(igraph::V(x))])
   g_ids <- numeric(length(V(g)))
   g_ids[x_ids] <- seq_along(x_ids)
   g_ids[g_ids == 0] <- setdiff(seq_along(V(g)), seq_along(V(x)))
   g <- igraph::permute(g, g_ids)
-  
+
   class(g) <- c("task_graph", class(g))
   g
 }
@@ -462,7 +465,6 @@ plot_interactive_task_graph <- function(
   edge$from <- vertex$id[match(edge$from, vertex$name)]
   edge$to <- vertex$id[match(edge$to, vertex$name)]
   edge$arrows <- "to"
-  #edge$dashes <- edge$lty != 1
 
   # visNetwork hates non-atomic vectors
   vertex$task <- NULL

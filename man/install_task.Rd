@@ -6,7 +6,7 @@
 \usage{
 install_task(
   origin,
-  type = package_type(origin),
+  type = package_install_type(origin),
   INSTALL_opts = NULL,
   lib = lib_path(origin),
   ...

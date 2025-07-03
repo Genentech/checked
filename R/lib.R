@@ -88,5 +88,6 @@ lib.lib_path_default <- function(
   ...,
   lib.loc = c()
 ) {
+  # In most cases this assumes checker library was appended to the lib.loc
   lib.loc[[1]]
 }

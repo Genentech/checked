@@ -14,10 +14,10 @@ task_formats <- function(
     task <- nodes$task
   }
 
-  # # NOTE: currently unused, vestigial vectorized alternative
-  # if (length(tasks) == 1 && is.null(tasks[[1]])) {
-  #   tasks <- V(g)$task
-  # }
+  # # NOTE: currently unused, vestigial vectorized alternative # nolint
+  # if (length(tasks) == 1 && is.null(tasks[[1]])) { # nolint
+  #   tasks <- V(g)$task # nolint
+  # } # nolint
 
   makeActiveBinding("source", env = environment(), function() {
     src <- task$origin %||% character(0L)

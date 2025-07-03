@@ -1,8 +1,8 @@
 task_graph_libpaths <- function(
-    g,
-    node = NULL,
-    lib.loc = .libPaths(),
-    output = tempdir()
+  g,
+  node = NULL,
+  lib.loc = .libPaths(),
+  output = tempdir()
 ) {
   # Maintain original vertices order to make sure libpaths are properly
   # constructed
@@ -13,7 +13,12 @@ task_graph_libpaths <- function(
   })
 
   # iterate over tasks and derive a library location
-  task_lib <- lapply(vs$task, lib, lib.loc = lib.loc, lib.root = path_libs(output))
+  task_lib <- lapply(
+    vs$task,
+    lib,
+    lib.loc = lib.loc,
+    lib.root = path_libs(output)
+  )
   unique(unlist(task_lib))
 }
 
@@ -36,7 +41,6 @@ start_task.install_task <- function(
   ...
 ) {
   task <- node$task[[1]]
-  #if (length(task$origin$source) > 0 && task$origin$source == "/Users/maksymis/Desktop/validation/code/DALEX") browser()
   libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc, output = output)
   install_parameters <- install_params(task$origin)
 

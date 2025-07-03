@@ -69,7 +69,7 @@ pkg_origin_repo <- function(package, repos, ...) {
 #' @rdname pkg_origin
 try_pkg_origin_repo <- function(package, repos, ...) {
   if (isTRUE(pkg_origin_is_base(package))) {
-    return(pkg_origin_base(package, ...))
+    pkg_origin_base(package, ...)
   } else if (package %in% available_packages(repos = repos)[, "Package"]) {
     pkg_origin_repo(package = package, repos = repos, ...)
   } else {
@@ -134,26 +134,30 @@ pkg_deps <- function(x, repos = getOption("repos"), dependencies = TRUE) {
 }
 
 #' @export
-pkg_deps.default <- function(x, repos = getOption("repos"), dependencies = TRUE) {
+pkg_deps.default <- function(
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE
+) {
   NULL
 }
 
 #' @export
 pkg_deps.pkg_origin <- function(
-    x,
-    repos = getOption("repos"),
-    dependencies = TRUE
-  ) {
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE
+) {
   db <- available_packages(repos = repos)
   pkg_dependencies(package(x), db = db, dependencies = dependencies)
 }
 
 #' @export
 pkg_deps.pkg_origin_local <- function(
-    x,
-    repos = getOption("repos"),
-    dependencies = TRUE
-  ) {
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE
+) {
   # TODO: Implement it by parsing DESCRIPTION to get a vector
   # TODO: of all dependencies and call pkg_dependencies in lapply
   # TODO: for all of them
@@ -162,10 +166,10 @@ pkg_deps.pkg_origin_local <- function(
 
 #' @export
 pkg_deps.pkg_origin_archive <- function(
-    x,
-    repos = getOption("repos"),
-    dependencies = TRUE
-  ) {
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE
+) {
   # TODO: Implement it by fetching tarball, untarring it and dispatching
   # TODO: to origin_local
   pkg_deps.pkg_origin_local(x = x, repos = repos, dependencies = dependencies)
@@ -206,17 +210,17 @@ install_params.pkg_origin_archive <- function(x) {
   list(package = x$path, repos = NULL)
 }
 
-package_type <- function(x) {
-  UseMethod("package_type")
+package_install_type <- function(x) {
+  UseMethod("package_install_type")
 }
 
 #' @export
-package_type.pkg_origin <- function(x, output, ...) {
+package_install_type.pkg_origin <- function(x, output, ...) {
   getOption("pkgType")
 }
 
 #' @export
-package_type.pkg_origin_local <- function(x) {
+package_install_type.pkg_origin_local <- function(x) {
   "source"
 }
 

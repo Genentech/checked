@@ -82,12 +82,14 @@ copy_edges_from_vertex <- function(g, v_to, v_from, mode = "all") {
       g <- igraph::add_edges(
         g,
         c(v_to, v_ends[2]),
-        attr = igraph::edge.attributes(g, e))
+        attr = igraph::edge.attributes(g, e)
+      )
     } else {
       g <- igraph::add_edges(
         g,
         c(v_ends[1], v_to),
-        attr = igraph::edge.attributes(g, e))
+        attr = igraph::edge.attributes(g, e)
+      )
     }
   }
   g

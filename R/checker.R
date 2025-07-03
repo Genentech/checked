@@ -107,7 +107,7 @@ checker <- R6::R6Class(
       self$output <- output
       private$n <- n
       private$lib.loc <- c(
-      # Append checker designated library
+        # Append checker designated library
         path_checker_lib(output),
         lib.loc
       )
@@ -173,7 +173,6 @@ checker <- R6::R6Class(
         return(0L)
       }
 
-      
       next_node <- private$get_next_node()
 
       if (length(next_node) != 0) {
@@ -292,7 +291,9 @@ checker <- R6::R6Class(
     pop_process = function(name) {
       private$active[[name]] <- NULL
     },
-    
+    # With these approach we deviate slightly from always prioritizing check
+    # tasks across the entire graph in favor of prioritizing them on the given
+    # layer. We do that due to significant performance gain in graph searching.
     get_next_node = function(force = FALSE) {
       ready_nodes <- task_graph_which_ready(self$graph)
       if (length(ready_nodes) == 0 | force) {
