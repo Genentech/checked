@@ -106,18 +106,11 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
 
   g <- task_graph_sort(g)
 
-  # Reindex nodes to keep original indexing.
-  # TODO: It looks like nodes are already sorted in way which prioritize
-  # TODO: original id's and with current task_graph_sort they always end up at
-  # TODO: the end of the list. However I'm not sure whether this will always be
-  # TODO: the case or if it's an isolated case. After remotes packages are fully
-  # TODO: supported we should check it again and possibly simplify that part.
-  # TODO: Current implementation does not assume anything about the order in g
-  # TODO: and make sure proper reindexing is always applied.
-  x_ids <- as.numeric(igraph::V(g)[names(igraph::V(x))])
-  g_ids <- numeric(length(V(g)))
-  g_ids[x_ids] <- seq_along(x_ids)
-  g_ids[g_ids == 0] <- setdiff(seq_along(V(g)), seq_along(V(x)))
+  n_g <- length(V(g))
+  x_ids <- as.numeric(V(g)[names(V(x))])
+  g_ids <- numeric(n_g)
+  g_ids[x_ids] <- seq(from = n_g, length.out = length(x_ids), by = -1)
+  g_ids[g_ids == 0] <- setdiff(seq_along(V(g)), g_ids)
   g <- igraph::permute(g, g_ids)
 
   class(g) <- c("task_graph", class(g))

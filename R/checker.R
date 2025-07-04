@@ -296,7 +296,7 @@ checker <- R6::R6Class(
     # layer. We do that due to significant performance gain in graph searching.
     get_next_node = function(force = FALSE) {
       ready_nodes <- task_graph_which_ready(self$graph)
-      if (length(ready_nodes) == 0 | force) {
+      if (length(ready_nodes) == 0 || force) {
         self$graph <- task_graph_update_check_ready(self$graph)
         self$graph <- task_graph_update_install_ready(self$graph)
         ready_nodes <- task_graph_which_ready(self$graph)

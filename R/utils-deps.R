@@ -77,6 +77,8 @@ pkg_dependencies <- function(
   while (length(packages) > 0L) {
     depth <- depth + 1L
     deptypes <- if (depth == 1L) dependencies$direct else dependencies$indirect
+    # db does not need to have all the dependencies types.
+    deptypes <- intersect(colnames(db), deptypes)
     depstrs <- safe_db_subset(db, packages, deptypes, drop = FALSE)
 
     n <- length(out) + 1
@@ -136,5 +138,6 @@ safe_db_subset <- function(db, r, c, drop = FALSE) {
     db <- rbind(db, missing)
   }
 
+  c <- intersect(colnames(db), c)
   db[r, c, drop = drop]
 }

@@ -129,7 +129,12 @@ pkg_origin_archive <- function(path = NULL, ...) {
   pkg_origin(..., path = path, .class = "pkg_origin_archive")
 }
 
-pkg_deps <- function(x, repos = getOption("repos"), dependencies = TRUE) {
+pkg_deps <- function(
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE,
+  db = available_packages(repos = repos)
+) {
   UseMethod("pkg_deps")
 }
 
@@ -137,7 +142,8 @@ pkg_deps <- function(x, repos = getOption("repos"), dependencies = TRUE) {
 pkg_deps.default <- function(
   x,
   repos = getOption("repos"),
-  dependencies = TRUE
+  dependencies = TRUE,
+  db = available_packages(repos = repos)
 ) {
   NULL
 }
@@ -146,9 +152,9 @@ pkg_deps.default <- function(
 pkg_deps.pkg_origin <- function(
   x,
   repos = getOption("repos"),
-  dependencies = TRUE
+  dependencies = TRUE,
+  db = available_packages(repos = repos)
 ) {
-  db <- available_packages(repos = repos)
   pkg_dependencies(package(x), db = db, dependencies = dependencies)
 }
 
@@ -156,12 +162,25 @@ pkg_deps.pkg_origin <- function(
 pkg_deps.pkg_origin_local <- function(
   x,
   repos = getOption("repos"),
-  dependencies = TRUE
+  dependencies = TRUE,
+  db = available_packages(repos = repos)
 ) {
-  # TODO: Implement it by parsing DESCRIPTION to get a vector
-  # TODO: of all dependencies and call pkg_dependencies in lapply
-  # TODO: for all of them
-  pkg_deps.pkg_origin(x = x, repos = repos, dependencies = dependencies)
+  # We need to temporarily switch the object to data.frame, as subsetting
+  # assignemnt for matrix does not have drop parameter and always simplifies
+  # one row matrices to vectors.
+  row <- read.dcf(file.path(x$source, "DESCRIPTION"))
+  rownames(row) <- package(x)
+  direct_deps <- pkg_dependencies(
+    packages = package(x),
+    dependencies = dependencies,
+    db = row
+  )
+  undirect_deps <- pkg_dependencies(
+    packages = direct_deps$name,
+    dependencies = dependencies,
+    db = db
+  )
+  rbind(direct_deps, undirect_deps)
 }
 
 #' @export

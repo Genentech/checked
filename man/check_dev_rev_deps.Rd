@@ -49,8 +49,6 @@ as a \code{Suggests} dependency.
 }
 \seealso{
 Other checks: 
-\code{\link{check_dir}()},
-\code{\link{check_pkgs}()},
 \code{\link{check_rev_deps}()},
 \code{\link{checker}},
 \code{\link{new_checker}()}
