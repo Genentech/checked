@@ -10,7 +10,7 @@ task_graph_libpaths <- function(
     igraph::V(g)
   } else {
     task_graph_neighborhoods(g, node)[[1]]
-  })
+  }, decreasing = TRUE)
 
   # iterate over tasks and derive a library location
   task_lib <- lapply(
