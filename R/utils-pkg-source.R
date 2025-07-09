@@ -65,7 +65,7 @@ get_desc_field <- function(path, field) {
 }
 
 sub_desc_aliases <- function(
-  desc, 
+  desc,
   aliases = if ("Alias" %in% colnames(desc)) desc[, "Alias"]
 ) {
   if (is.null(aliases)) return(desc)

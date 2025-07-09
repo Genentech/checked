@@ -62,14 +62,8 @@ path_libs <- function(path) {
   normalizePath(p)
 }
 
-path_lib <- function(path) {
-  dir_create(p <- file.path(path_libs(path), "lib"))
-  normalizePath(p)
-}
-
-path_custom_lib <- function(path, custom) {
-  valid_name <- unique_alias(custom)
-  dir_create(p <- file.path(path_libs(path), valid_name))
+path_checker_lib <- function(path) {
+  dir_create(p <- file.path(path_libs(path), "checker_lib"))
   normalizePath(p)
 }
 

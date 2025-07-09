@@ -69,7 +69,7 @@ pkg_origin_repo <- function(package, repos, ...) {
 #' @rdname pkg_origin
 try_pkg_origin_repo <- function(package, repos, ...) {
   if (isTRUE(pkg_origin_is_base(package))) {
-    return(pkg_origin_base(package, ...))
+    pkg_origin_base(package, ...)
   } else if (package %in% available_packages(repos = repos)[, "Package"]) {
     pkg_origin_repo(package = package, repos = repos, ...)
   } else {
@@ -129,40 +129,69 @@ pkg_origin_archive <- function(path = NULL, ...) {
   pkg_origin(..., path = path, .class = "pkg_origin_archive")
 }
 
-pkg_deps <- function(x) {
+pkg_deps <- function(
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE,
+  db = available_packages(repos = repos)
+) {
   UseMethod("pkg_deps")
 }
 
 #' @export
-pkg_deps.default <- function(x) {
+pkg_deps.default <- function(
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE,
+  db = available_packages(repos = repos)
+) {
   NULL
 }
 
 #' @export
-pkg_deps.pkg_origin_local <- function(x) {
-  db <- available_packages(repos = x$repos)
-  row <- db[x$package, , drop = FALSE]
-  row[, DB_COLNAMES, drop = FALSE]
+pkg_deps.pkg_origin <- function(
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE,
+  db = available_packages(repos = repos)
+) {
+  pkg_dependencies(package(x), db = db, dependencies = dependencies)
 }
 
 #' @export
-pkg_deps.pkg_origin_local <- function(x) {
-  row <- as.data.frame(read.dcf(file.path(x$path, "DESCRIPTION")))
-  row <- row[, intersect(DB_COLNAMES, colnames(row)), drop = FALSE]
-  row[setdiff(DB_COLNAMES, colnames(row))] <- NA_character_
-  row
+pkg_deps.pkg_origin_local <- function(
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE,
+  db = available_packages(repos = repos)
+) {
+  # We need to temporarily switch the object to data.frame, as subsetting
+  # assignemnt for matrix does not have drop parameter and always simplifies
+  # one row matrices to vectors.
+  row <- read.dcf(file.path(x$source, "DESCRIPTION"))
+  rownames(row) <- package(x)
+  direct_deps <- pkg_dependencies(
+    packages = package(x),
+    dependencies = dependencies,
+    db = row
+  )
+  undirect_deps <- pkg_dependencies(
+    packages = direct_deps$name,
+    dependencies = dependencies,
+    db = db
+  )
+  rbind(direct_deps, undirect_deps)
 }
 
 #' @export
-pkg_deps.pkg_origin_archive <- function(x) {
-  path <- if (!file.exists(x$path)) {
-    fetch_package_source(x$path, path_sources())
-  } else {
-    x$path
-  }
-  utils::untar(path, exdir = dir)
-  x$path <- file.path(path, x$name)
-  pkg_deps.pkg_origin_local(x)
+pkg_deps.pkg_origin_archive <- function(
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE
+) {
+  # TODO: Implement it by fetching tarball, untarring it and dispatching
+  # TODO: to origin_local
+  pkg_deps.pkg_origin_local(x = x, repos = repos, dependencies = dependencies)
 }
 
 
@@ -173,6 +202,11 @@ install_params <- function(x) {
 #' @export
 install_params.pkg_origin <- function(x, output, ...) {
   stop(sprintf("Can't determine origin of package '%s'", x$name))
+}
+
+#' @export
+install_params.pkg_origin_unknown <- function(x, output, ...) {
+  list()  # no source identified, installation shall be skipped
 }
 
 #' @export
@@ -187,12 +221,26 @@ install_params.pkg_origin_repo <- function(x) {
 
 #' @export
 install_params.pkg_origin_local <- function(x) {
-  list(package = x$path, repos = NULL)
+  list(package = x$source, repos = NULL)
 }
 
 #' @export
 install_params.pkg_origin_archive <- function(x) {
   list(package = x$path, repos = NULL)
+}
+
+package_install_type <- function(x) {
+  UseMethod("package_install_type")
+}
+
+#' @export
+package_install_type.pkg_origin <- function(x, output, ...) {
+  getOption("pkgType")
+}
+
+#' @export
+package_install_type.pkg_origin_local <- function(x) {
+  "source"
 }
 
 check_path <- function(package_source, ...) {
@@ -217,44 +265,4 @@ check_path.pkg_origin_local <- function(x, ...) {
 #' @export
 check_path.pkg_origin_archive <- function(x, ...) {
   x$path
-}
-
-dep_tree <- function(x, ...) {
-  UseMethod("dep_tree")
-}
-
-#' @export
-dep_tree.check_task <- function(x, ...) {
-  dep_tree(x$origin, ...)
-}
-
-#' @export
-dep_tree.install_task <- function(x, ...) {
-  dep_tree(x$origin, ...)
-}
-
-#' @export
-dep_tree.pkg_origin <- function(
-  x,
-  ...,
-  db = available_packages(),
-  dependencies = TRUE
-) {
-  dep_tree(x$package, ..., db = db, dependencies = dependencies)
-}
-
-#' @export
-dep_tree.character <- function(
-  x,
-  ...,
-  db = available_packages(),
-  dependencies = TRUE
-) {
-  df <- pkg_dependencies(x, dependencies = dependencies, db = db, ...)
-  colmap <- c("package" = "from", "name" = "to")
-  rename <- match(names(df), names(colmap))
-  to_rename <- !is.na(rename)
-  names(df)[to_rename] <- colmap[rename[to_rename]]
-  df <- df[, c(which(to_rename), which(!to_rename)), drop = FALSE]
-  igraph::graph_from_data_frame(df)
 }

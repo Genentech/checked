@@ -36,6 +36,7 @@ Depends:
 Imports:
     callr,
     cli,
+    glue,
     igraph,
     jsonlite,
     memoise,
@@ -46,8 +47,9 @@ Imports:
     tools
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Suggests: 
+Suggests:
     testthat (>= 3.0.0),
+    visNetwork,
     withr
 Config/Needs/website:
     r-lib/asciicast

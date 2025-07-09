@@ -9,17 +9,18 @@ install_process <- R6::R6Class(
     initialize = function(
       pkgs,
       ...,
-      lib = .libPaths(),
+      lib = .libPaths()[[1]],
       libpaths = .libPaths(),
       available_packages_filters = getOption("available_packages_filters"),
       log
     ) {
+      if (!dir.exists(lib)) dir.create(lib, recursive = TRUE)
       private$package <- pkgs
       self$log <- log
       private$callr_r_bg(
         function(..., escalate_warning, available_packages_filters) {
           options(available_packages_filters = available_packages_filters)
-          tryCatch(
+          withCallingHandlers(
             utils::install.packages(...),
             warning = function(w) {
               if (escalate_warning(w)) stop(w$message)

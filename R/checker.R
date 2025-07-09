@@ -106,11 +106,14 @@ checker <- R6::R6Class(
       self$plan <- plan
       self$output <- output
       private$n <- n
-      private$lib.loc <- lib.loc
+      private$lib.loc <- c(
+        # Append checker designated library
+        path_checker_lib(output),
+        lib.loc
+      )
       private$repos <- repos
 
-      g <- task_graph_create(self$plan, repos)
-      self$graph <- task_graph_update_done(g, c(path_lib(output), lib.loc))
+      self$graph <- task_graph(self$plan, repos)
       private$restore_complete_checks()
     },
 
@@ -170,8 +173,9 @@ checker <- R6::R6Class(
         return(0L)
       }
 
-      next_node <- next_node_to_run(self$graph)
-      if (length(next_node) > 0) {
+      next_node <- private$get_next_node()
+
+      if (length(next_node) != 0) {
         process <- start_task(
           node = next_node,
           g = self$graph,
@@ -198,8 +202,8 @@ checker <- R6::R6Class(
     #'
     #' Checks whether all the scheduled tasks were successfully executed.
     is_done = function() {
-      is_check_node <- is_check(igraph::V(self$graph)$task)
-      checks <- igraph::V(self$graph)[is_check_node]
+      is_check_node <- is_check(V(self$graph)$task)
+      checks <- V(self$graph)[is_check_node]
       all(checks$status == STATUS$done)
     }
   ),
@@ -270,8 +274,8 @@ checker <- R6::R6Class(
     },
 
     restore_complete_checks = function() {
-      checks <- self$plan$alias
-      check_done <- vlapply(checks, function(check) {
+      checks <- V(self$graph)[is_check(V(self$graph)$task)]
+      check_done <- vlapply(checks$name, function(check) {
         file.exists(file.path(
           path_check_output(self$output, check),
           "result.json"
@@ -286,6 +290,18 @@ checker <- R6::R6Class(
 
     pop_process = function(name) {
       private$active[[name]] <- NULL
+    },
+    # With these approach we deviate slightly from always prioritizing check
+    # tasks across the entire graph in favor of prioritizing them on the given
+    # layer. We do that due to significant performance gain in graph searching.
+    get_next_node = function(force = FALSE) {
+      ready_nodes <- task_graph_which_ready(self$graph)
+      if (length(ready_nodes) == 0 || force) {
+        self$graph <- task_graph_update_check_ready(self$graph)
+        self$graph <- task_graph_update_install_ready(self$graph)
+        ready_nodes <- task_graph_which_ready(self$graph)
+      }
+      utils::head(ready_nodes, 1L)
     }
   )
 )

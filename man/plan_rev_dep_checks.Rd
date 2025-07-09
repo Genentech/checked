@@ -46,7 +46,6 @@ repository for which reverse dependencies should be identified.
 }
 \seealso{
 Other plan: 
-\code{\link{plan}},
-\code{\link{plan_checks}()}
+\code{\link{plan}}
 }
 \concept{plan}

@@ -89,5 +89,7 @@ cli_theme <- function(..., .envir = parent.frame()) {
 
 cli_wrap_lines <- function(text, w = cli::console_width()) {
   n <- cli::ansi_nchar(text)
-  cli::ansi_substring(text, seq_len(ceiling(n / w)) * w - w + 1, seq_len(ceiling(n / w)) * w)
+  cli::ansi_substring(
+    text, seq_len(ceiling(n / w)) * w - w + 1, seq_len(ceiling(n / w)) * w
+  )
 }

@@ -367,7 +367,7 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
   v <- igraph::V(checker$graph)
 
   # add newly started task status
-  is_running <- v$status > STATUS$pending & v$status < STATUS$done
+  is_running <- v$status > STATUS$ready & v$status < STATUS$done
   is_newly_done <- v$status >= STATUS$done & !v$name %in% reporter$buffer$node
   updated <- v[is_running | is_newly_done]
 
@@ -395,7 +395,7 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
 
   # report non-check tasks in status line
   to_report_bar <- is_install(updated$task) &
-    updated$status > STATUS$pending &
+    updated$status > STATUS$ready &
     updated$status < STATUS$done
 
   if (any(to_report_bar)) msg[length(msg) + 1L] <- "installing"

@@ -19,7 +19,6 @@ Create a task to run reverse dependency checks
 \seealso{
 Other tasks: 
 \code{\link{check_task}()},
-\code{\link{custom_install_task}()},
 \code{\link{install_task}()},
 \code{\link{task}()}
 }
