@@ -82,6 +82,11 @@ path_sources <- function() {
   normalizePath(p)
 }
 
+path_remotes <- function() {
+  dir_create(p <- file.path(tempdir(), "checked_remotes"))
+  normalizePath(p)
+}
+
 path_check_output <- function(path, check) {
   dir_create(p <- file.path(path, "checks"))
   normalizePath(file.path(p, check), mustWork = FALSE)

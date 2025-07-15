@@ -28,6 +28,12 @@ lib_path.pkg_origin_local <- function(x, ..., .class = c()) {
 }
 
 #' @export
+lib_path.pkg_origin_remote <- function(x, ..., .class = c()) {
+  x <- sanitize_pkg_origin_remote(x)
+  lib_path.pkg_origin_local(x)
+}
+
+#' @export
 format.lib_path <- function(x, ...) {
   "library"
 }

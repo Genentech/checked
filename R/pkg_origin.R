@@ -44,6 +44,11 @@ format.pkg_origin <- function(x, ...) {
 }
 
 #' @export
+format.pkg_origin_remote <- function(x, ...) {
+  format(class(x$remote)[[1]])
+}
+
+#' @export
 #' @rdname pkg_origin
 pkg_origin_repo <- function(package, repos, ...) {
   ap_pkg <- available_packages(repos = repos)[package, ]
@@ -121,6 +126,30 @@ pkg_origin_local <- function(path = NULL, ...) {
     ...,
     .class = "pkg_origin_local"
   )
+}
+
+#' @export
+#' @rdname pkg_origin
+pkg_origin_remote <- function(remote = NULL, ...) {
+  source <- get_remotes_package_source(remote)
+  package <- get_package_name(source)
+  version <- package_version(get_package_version(source))
+  
+  pkg_origin(
+    package = package,
+    version = version,
+    remote = remote,
+    source = source,
+    ...,
+    .class = "pkg_origin_remote"
+  )
+}
+
+sanitize_pkg_origin_remote <- function(x) {
+  if (is.null(x$source) || !dir.exists(x$source)) {
+    x$source <- get_remotes_package_source(xremote)
+  }
+  x
 }
 
 #' @export
@@ -240,6 +269,11 @@ package_install_type.pkg_origin <- function(x, output, ...) {
 
 #' @export
 package_install_type.pkg_origin_local <- function(x) {
+  "source"
+}
+
+#' @export
+package_install_type.pkg_origin_remote <- function(x) {
   "source"
 }
 

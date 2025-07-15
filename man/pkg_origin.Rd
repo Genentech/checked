@@ -8,6 +8,7 @@
 \alias{pkg_origin_base}
 \alias{pkg_origin_unknown}
 \alias{pkg_origin_local}
+\alias{pkg_origin_remote}
 \alias{pkg_origin_archive}
 \title{Package specification}
 \usage{
@@ -24,6 +25,8 @@ pkg_origin_base(package, ...)
 pkg_origin_unknown(package, ...)
 
 pkg_origin_local(path = NULL, ...)
+
+pkg_origin_remote(remote = NULL, ...)
 
 pkg_origin_archive(path = NULL, ...)
 }

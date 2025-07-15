@@ -6,19 +6,34 @@ vertex_df <- function(name, ...) {
   vertices
 }
 
-sequence_graph <- function(
+new_graph <- function(
   ...,
   vertex_attrs = list(...),
   edge_attrs = list(),
   name_by = vertex_attrs[[1]],
-  name = vcapply(name_by, as_vertex_name)
+  name = vcapply(name_by, as_vertex_name),
+  type = c("sequence", "star")
 ) {
+  type <- match.arg(type)
   vertices <- vertex_df(name = name, ...)
+  edges_orientation <- switch(
+    type,
+    sequence = -1L,
+    star = 1
+  )
   edges <- data.frame(
-    from = utils::head(vertices$name, -1L),
+    from = utils::head(vertices$name, edges_orientation),
     to = utils::tail(vertices$name, -1L)
   )
   igraph::graph_from_data_frame(edges, vertices = vertices)
+}
+
+sequence_graph <- function(...) {
+  new_graph(..., type = "sequence")
+}
+
+star_graph <- function(...) {
+  new_graph(..., type = "star")
 }
 
 #' Deduplicate attributes
