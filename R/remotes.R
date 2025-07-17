@@ -6,15 +6,25 @@ remotes_graph <- function(x, ...) {
 remotes_graph.task_graph <- function(x, ...) {
   vs <- V(x)
   remotes_subgraphs <- lapply(vs, remotes_graph, vs = vs)
-  
-  graph_dedup_attrs(igraph::union(x, remotes_subgraphs))
+
+  task_graph_class(
+    suppressWarningsRegex(
+      graph_dedup_attrs(
+        igraph::union(
+          x,
+          do.call(igraph::union, remotes_subgraphs)
+        )
+      ),
+      "Some, but not all graphs are named, not using vertex names",
+      fixed = TRUE
+    )
+  )
 }
 
 #' @export
 remotes_graph.integer <- function(x, ..., vs) {
   remotes_graph(vs[[x]])
 }
-
 
 #' @export
 remotes_graph.igraph.vs <- function(x, ...) {
@@ -32,19 +42,26 @@ remotes_graph.task <- function(x, ...) {
 remotes_graph.install_task <- function(x, ...) {
   remotes_tasks <- get_remotes_tasks(x)
   if (length(remotes_tasks) == 0) return(igraph::make_empty_graph())
-  
+
   g <- star_graph(
     task = c(
       list(x),
       remotes_tasks
     )
   )
-  
+
   # Recursively get remotes_tasks of remotes_tasks
   remotes_subgraphs <- lapply(remotes_tasks, remotes_graph)
-  
-  # TODO: To musze byc puste grafy a nie nulle
-  graph_dedup_attrs(igraph::union(g, remotes_subgraphs))
+  suppressWarningsRegex(
+    graph_dedup_attrs(
+      igraph::union(
+        g,
+        do.call(igraph::union, remotes_subgraphs)
+      )
+    ),
+    "Some, but not all graphs are named, not using vertex names",
+    fixed = TRUE
+  )
 }
 
 #' @export
@@ -66,20 +83,19 @@ get_remotes_tasks.task <- function(x) {
 
 #' @export
 get_remotes_tasks.pkg_origin_local <- function(x) {
-  pkgs <- remotes:::extra_deps(devtools::as.package(x$source), "remotes")
-  #pkgs <- pkgs[!vlapply(pkgs$remote, inherits, "cran_remote"), ]
-  
-  lapply(seq(length.out = NROW(pkgs)), function(i) {
+  pkgs <- .remotes$extra_deps(as.package.remotes(x$source), "remotes")
+
+  lapply(seq_len(NROW(pkgs)), function(i) {
     install_task(
-      pkg_origin_remote(remote = pkgs$remote[[i]])
+      pkg_origin_remotes(remote = pkgs$remote[[i]])
     )
   })
 }
 
 #' @export
-get_remotes_tasks.pkg_origin_remote <- function(x) {
-  x <- sanitize_pkg_origin_remote(x)
-  get_remotes_tasks.pkg_origin_local(x)
+get_remotes_tasks.pkg_origin_remotes <- function(x) {
+  x <- sanitize_pkg_origin_remotes(x)
+  NextMethod()
 }
 
 get_remotes_package_source <- function(remote) {
@@ -93,4 +109,8 @@ get_remotes_package_source <- function(remote) {
     recursive = TRUE
   )
   path
+}
+
+remotes_permitted <- function() {
+  options::opt("add_remotes") && requireNamespace("remotes", quietly = TRUE)
 }

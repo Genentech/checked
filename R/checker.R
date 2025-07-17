@@ -94,12 +94,10 @@ checker <- R6::R6Class(
       ),
       lib.loc = .libPaths(),
       repos = getOption("repos"),
-      restore = TRUE,
+      restore = options::opt("restore"),
       ...
     ) {
-      if (!restore) {
-        unlink(output, recursive = TRUE, force = TRUE)
-      }
+      check_past_output(output, restore, ask = interactive())
 
       dir_create(output)
 
@@ -314,4 +312,31 @@ print.checker <- function(x, ...) {
     print(x$plan, ...)
   }
   invisible(x)
+}
+
+check_past_output <- function(output, restore, ask = interactive()) {
+  if (dir.exists(output)) {
+    if (is.na(restore)) {
+      restore <- if (ask) {
+        switch(
+          restore_menu(),
+          "1" = TRUE,
+          "2" = FALSE
+        )
+      } else {
+        FALSE
+      }
+    }
+
+    if (!restore) {
+      unlink(output, recursive = TRUE, force = TRUE)
+    }
+  }
+}
+
+restore_menu <- function() {
+  utils::menu(
+    c("Yes", "No"),
+    title = "Do you want to restore previous results?"
+  )
 }

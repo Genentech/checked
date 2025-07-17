@@ -73,3 +73,14 @@ vcapply <- function(...) vapply(..., FUN.VALUE = character(1L))
 vlapply <- function(...) vapply(..., FUN.VALUE = logical(1L))
 viapply <- function(...) vapply(..., FUN.VALUE = integer(1L))
 vnapply <- function(...) vapply(..., FUN.VALUE = numeric(1L))
+
+suppressWarningsRegex <- function(expr, regex, ...) {
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      if (grepl(pattern = regex, x = conditionMessage(w), ...)) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
+}

@@ -48,6 +48,9 @@ start_task.install_task <- function(
     return(NULL)
   }
 
+  # install_parameters$package is a valid package name only for
+  # pkg_origin_local. Otherwise it's a path to the source package in which case
+  # is_package_installed returns FALSE (as it should)
   if (is_package_installed(install_parameters$package, libpaths)) {
     return(NULL)
   }

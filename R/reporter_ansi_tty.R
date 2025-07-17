@@ -236,7 +236,7 @@ report_task_ansi_tty.check_task <- function(reporter, g, v) {
 report_sleep.reporter_ansi_tty <- function(
   reporter,
   checker,
-  sleep = default_tty_tick_interval()
+  sleep = options::opt("tty_tick_interval")
 ) {
   Sys.sleep(sleep)
 }

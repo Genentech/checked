@@ -34,6 +34,7 @@ task_formats <- function(
   makeActiveBinding("source.type", env = environment(), function() {
     src_type <- class(task$origin)[[1]]
     src_type_str <- switch(src_type,
+      "pkg_origin_remotes" = source,
       "pkg_origin_local" = "local",
       "pkg_origin_repo" = source,
       "remote"

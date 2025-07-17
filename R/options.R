@@ -1,4 +1,57 @@
-default_tty_tick_interval <- function() {
-  # refresh interval in milliseconds
-  getOption(paste0(utils::packageName(), ".tty_tick_interval"), 100) / 1000
-}
+#' @import options
+options::define_options(
+  "tty refresh interval when reporting results in milliseconds",
+  tty_tick_interval = 0.1,
+
+  "`logical` indicating whether output directory should be unlinked before
+   running checks. If `FALSE`, an attempt will me made to restore previous
+   progress from the same `output`",
+  restore = NA,
+
+  "`logical` indicating whether origins inheriting from `pkg_origin_local`, 
+    should be scanned for packages in the `remotes` field and added while 
+    constrocuting a plan `task_grap`",
+  add_remotes = TRUE,
+
+  "named `character` vector of environment variables to use during
+   the R CMD check.",
+  check_envvars = c(
+    "_R_CHECK_FORCE_SUGGESTS_" = FALSE,
+    "_R_CHECK_RD_XREFS_" = FALSE,
+    "_R_CHECK_SYSTEM_CLOCK_" = FALSE,
+    "_R_CHECK_SUGGESTS_ONLY_" = TRUE
+  ),
+
+  "`character` vector of args passed to the R CMD build.",
+  check_build_args = c(
+    "--no-build-vignettes",
+    "--no-manual"
+  ),
+  envvar_fn = structure(
+    function(raw, ...) trimws(strsplit(raw, " ")[[1]]),
+    desc = "space-separated R CMD build flags"
+  ),
+
+  "`character` vector of args passed to the R CMD check.",
+  check_args = c(
+    "--timings",
+    "--ignore-vignettes",
+    "--no-manual"
+  ),
+  envvar_fn = structure(
+    function(raw, ...) trimws(strsplit(raw, " ")[[1]]),
+    desc = "space-separated R CMD check flags"
+  )
+)
+
+#' @eval options::as_roxygen_docs()
+#'
+#' @family documentation
+NULL
+
+#' Checked Options
+#' @eval options::as_params()
+#' @name options_params
+#'
+#' @family documentation
+NULL

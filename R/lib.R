@@ -2,8 +2,11 @@
 #'
 #' A description of where packages should be installed. This object provides
 #' necessary information to determine where a package should be installed.
+#' lib_path method creates default path handlers for given pkg origin while
+#' lib_path_x creates an actual object.
 #'
 #' @param x A [`pkg_origin()`] object
+#' @param ... Additional values
 #' @param .class An optional subclass, used primarily for dispatch.
 lib_path <- function(x, ..., .class = c()) {
   UseMethod("lib_path")
@@ -11,26 +14,33 @@ lib_path <- function(x, ..., .class = c()) {
 
 #' @export
 lib_path.default <- function(x, ..., .class = c()) {
-  structure(list(), class = c(.class, "lib_path_default"))
+  lib_path_default(.class = .class)
 }
 
 #' @export
 lib_path.pkg_origin_repo <- function(x, ..., .class = c()) {
-  lib_path.default(x, ..., .class = .class)
+  lib_path_default(.class = .class)
 }
 
 #' @export
 lib_path.pkg_origin_local <- function(x, ..., .class = c()) {
-  structure(
-    list(source = x$source),
-    class = c(.class, "lib_path_isolated")
-  )
+  lib_path_isolated(origin = x, .class = .class)
 }
 
 #' @export
-lib_path.pkg_origin_remote <- function(x, ..., .class = c()) {
-  x <- sanitize_pkg_origin_remote(x)
-  lib_path.pkg_origin_local(x)
+lib_path.pkg_origin_remotes <- function(x, ..., .class = c()) {
+  x <- sanitize_pkg_origin_remotes(x)
+  NextMethod()
+}
+
+#' @rdname lib_path
+lib_path_default <- function(.class = c()) {
+  structure(list(), class = c(.class, "lib_path_default"))
+}
+
+#' @rdname lib_path
+lib_path_isolated <- function(..., .class = c()) {
+  structure(list(...), class = c(.class, "lib_path_isolated"))
 }
 
 #' @export
@@ -75,11 +85,11 @@ lib.character <- function(x, ..., lib.loc = c()) {
 #' @export
 lib.lib_path_isolated <- function(
   x,
-  lib.root = tempdir(),
   ...,
+  lib.root = tempdir(),
   lib.loc = c()
 ) {
-  file.path(lib.root, hash(x$source))
+  file.path(lib.root, paste0(x$origin$package, "-", hash(x$origin, n = 8)))
 }
 
 #' Produce a Default Library Path

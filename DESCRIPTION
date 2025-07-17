@@ -40,6 +40,7 @@ Imports:
     igraph,
     jsonlite,
     memoise,
+    options,
     R6,
     rcmdcheck,
     rlang,
@@ -48,6 +49,7 @@ Imports:
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests:
+    remotes,
     testthat (>= 3.0.0),
     visNetwork,
     withr

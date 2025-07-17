@@ -106,6 +106,7 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
 
   g <- task_graph_sort(g)
 
+  # Restore the original (defined by the plan) order of primary tasks
   n_g <- length(V(g))
   x_ids <- as.numeric(V(g)[names(V(x))])
   g_ids <- numeric(n_g)
@@ -113,27 +114,16 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
   g_ids[g_ids == 0] <- setdiff(seq_along(V(g)), g_ids)
   g <- igraph::permute(g, g_ids)
 
+  task_graph_class(g)
+}
+
+task_graph_class <- function(g) {
   class(g) <- c("task_graph", class(g))
   g
 }
 
 dep_edges <- function(edges, dependencies = TRUE) {
   edges[edges$type %in% dependencies]
-}
-
-lib_node_tasks <- function(g, nodes) {
-  install_nodes <- igraph::adjacent_vertices(g, nodes, mode = "out")
-  lapply(install_nodes, function(nodes) {
-    nodes$task[is_install(nodes$task)]
-  })
-}
-
-lib_node_pkgs <- function(g, nodes) {
-  install_nodes <- igraph::adjacent_vertices(g, nodes, mode = "out")
-  lapply(install_nodes, function(nodes) {
-    tasks <- nodes$task[is_install(nodes$task)]
-    vcapply(tasks, function(task) task$origin$package)
-  })
 }
 
 #' Find Task Neighborhood
@@ -381,6 +371,7 @@ plot.task_graph <- function(x, ..., interactive = FALSE) {
     "pkg_origin_base" = "lightgray",
     "pkg_origin_unknown" = "red",
     "pkg_origin_local" = "blue",
+    "pkg_origin_remotes" = "orange",
     "red"
   )
 

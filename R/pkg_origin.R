@@ -44,7 +44,7 @@ format.pkg_origin <- function(x, ...) {
 }
 
 #' @export
-format.pkg_origin_remote <- function(x, ...) {
+format.pkg_origin_remotes <- function(x, ...) {
   format(class(x$remote)[[1]])
 }
 
@@ -130,24 +130,24 @@ pkg_origin_local <- function(path = NULL, ...) {
 
 #' @export
 #' @rdname pkg_origin
-pkg_origin_remote <- function(remote = NULL, ...) {
+pkg_origin_remotes <- function(remote = NULL, ...) {
   source <- get_remotes_package_source(remote)
   package <- get_package_name(source)
   version <- package_version(get_package_version(source))
-  
+
   pkg_origin(
     package = package,
     version = version,
     remote = remote,
     source = source,
     ...,
-    .class = "pkg_origin_remote"
+    .class = c("pkg_origin_remotes", "pkg_origin_local")
   )
 }
 
-sanitize_pkg_origin_remote <- function(x) {
+sanitize_pkg_origin_remotes <- function(x) {
   if (is.null(x$source) || !dir.exists(x$source)) {
-    x$source <- get_remotes_package_source(xremote)
+    x$source <- get_remotes_package_source(x$remote)
   }
   x
 }
@@ -213,6 +213,16 @@ pkg_deps.pkg_origin_local <- function(
 }
 
 #' @export
+pkg_deps.pkg_origin_remotes <- function(
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE
+) {
+  x <- sanitize_pkg_origin_remotes(x)
+  NextMethod()
+}
+
+#' @export
 pkg_deps.pkg_origin_archive <- function(
   x,
   repos = getOption("repos"),
@@ -254,6 +264,12 @@ install_params.pkg_origin_local <- function(x) {
 }
 
 #' @export
+install_params.pkg_origin_remotes <- function(x) {
+  x <- sanitize_pkg_origin_remotes(x)
+  NextMethod()
+}
+
+#' @export
 install_params.pkg_origin_archive <- function(x) {
   list(package = x$path, repos = NULL)
 }
@@ -269,11 +285,6 @@ package_install_type.pkg_origin <- function(x, output, ...) {
 
 #' @export
 package_install_type.pkg_origin_local <- function(x) {
-  "source"
-}
-
-#' @export
-package_install_type.pkg_origin_remote <- function(x) {
   "source"
 }
 
@@ -293,10 +304,16 @@ check_path.pkg_origin_repo <- function(x, output, ...) {
 
 #' @export
 check_path.pkg_origin_local <- function(x, ...) {
-  x$path
+  x$source
+}
+
+#' @export
+check_path.pkg_origin_remotes <- function(x, ...) {
+  x <- sanitize_pkg_origin_remotes(x)
+  NextMethod()
 }
 
 #' @export
 check_path.pkg_origin_archive <- function(x, ...) {
-  x$path
+  x$source
 }

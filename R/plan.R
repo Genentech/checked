@@ -129,11 +129,14 @@ plan_rev_dep_checks <- function(
   g <- igraph::add_edges(g, edges = edges, attr = list(type = DEP$Depends))
   E(g)$type <- DEP[E(g)$type]
 
-  class(g) <- c("task_graph", class(g))
+  g <- task_graph_class(g)
 
-  g
+  if (remotes_permitted()) {
+    remotes_graph(g)
+  } else {
+    g
+  }
 }
-
 
 plan_rev_dep_dev_check <- function(origin, revdep, repos) {
   rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
@@ -145,9 +148,9 @@ plan_rev_dep_dev_check <- function(origin, revdep, repos) {
     ),
     make_unique_task(seed = "dev", check_task(
       origin = rev_dep_origin,
-      env = DEFAULT_R_CMD_CHECK_ENVVARS,
-      args = DEFAULT_R_CMD_CHECK_ARGS,
-      build_args = DEFAULT_R_CMD_BUILD_ARGS
+      env = options::opt("check_envvars"),
+      args = options::opt("check_args"),
+      build_args = options::opt("check_build_args")
     )),
     install_task(origin = origin)
   ))
@@ -155,6 +158,10 @@ plan_rev_dep_dev_check <- function(origin, revdep, repos) {
 
 plan_rev_dep_release_check <- function(origin, revdep, repos) {
   rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
+  repo_root_origin <- try_pkg_origin_repo(
+    package = package(origin),
+    repos = repos
+  )
   sequence_graph(task = list(
     meta_task(
       origin = origin,
@@ -163,9 +170,13 @@ plan_rev_dep_release_check <- function(origin, revdep, repos) {
     ),
     make_unique_task(seed = "release", check_task(
       origin = rev_dep_origin,
-      env = DEFAULT_R_CMD_CHECK_ENVVARS,
-      args = DEFAULT_R_CMD_CHECK_ARGS,
-      build_args = DEFAULT_R_CMD_BUILD_ARGS
-    ))
+      env = options::opt("check_envvars"),
+      args = options::opt("check_args"),
+      build_args = options::opt("check_build_args")
+    )),
+    install_task(
+      origin = repo_root_origin,
+      lib = lib_path_isolated(origin = repo_root_origin)
+    )
   ))
 }

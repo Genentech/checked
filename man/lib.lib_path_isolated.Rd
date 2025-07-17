@@ -4,14 +4,14 @@
 \alias{lib.lib_path_isolated}
 \title{Produce an Isolated Library Path}
 \usage{
-\method{lib}{lib_path_isolated}(x, lib.root = tempdir(), ..., lib.loc = c())
+\method{lib}{lib_path_isolated}(x, ..., lib.root = tempdir(), lib.loc = c())
 }
 \arguments{
 \item{x}{A \code{lib_path_isolated} object.}
 
-\item{lib.root}{A root directory for the isolated library.}
-
 \item{...}{Additional arguments unused}
+
+\item{lib.root}{A root directory for the isolated library.}
 
 \item{name}{A name for the library, defaults to a random hash.}
 }
