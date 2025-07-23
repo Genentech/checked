@@ -11,7 +11,6 @@ exclusions:
       "tests/testthat/fixtures",
       "inst/",
       # TODO: These files need major refactor, skip until then
-      "R/results.R",
       "tests/"
   )
 

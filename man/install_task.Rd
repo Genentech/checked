@@ -39,7 +39,6 @@ Create a task to install a package and dependencies
 \seealso{
 Other tasks: 
 \code{\link{check_task}()},
-\code{\link{revdep_check_task}()},
 \code{\link{task}()}
 }
 \concept{tasks}
