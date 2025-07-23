@@ -219,5 +219,3 @@ plan_local_checks <- function(
     g
   }
 }
-
-plan_local_checks
