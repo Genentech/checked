@@ -21,9 +21,6 @@ task <- function(..., .subclass = NULL) {
 #'
 #' Meta tasks are tasks which are not intended to perform computation. They
 #' exist simply to provide relationships among computational tasks.
-#'
-#'
-# TODO: ADD META ROOT SUBCLASS
 meta_task <- function(..., .subclass = NULL) {
   task(..., .subclass = c(sprintf("%s_meta", .subclass), "meta"))
 }
