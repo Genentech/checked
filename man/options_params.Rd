@@ -13,7 +13,8 @@ are thrown. If "issues" then errors are emitted only on issues, whereas
 
 \item{results_keep}{character vector indicating which packages should be included in the results.
 "all" means that all packages are kept. If "issues" then only packages
-with issues identified are presented. (Defaults to \code{"all"}, overwritable using option 'checked.results_keep' or environment variable 'R_CHECKED_RESULTS_KEEP')}
+with issues identified, whereas "potential_issues" stands for keeping
+packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, overwritable using option 'checked.results_keep' or environment variable 'R_CHECKED_RESULTS_KEEP')}
 
 \item{add_remotes}{\code{logical} indicating whether origins inheriting from \code{pkg_origin_local},
 should be scanned for packages in the \code{remotes} field and added while

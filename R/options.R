@@ -11,7 +11,8 @@ options::define_options(
 
   "character vector indicating which packages should be included in the results.
    \"all\" means that all packages are kept. If \"issues\" then only packages 
-   with issues identified are presented.",
+   with issues identified, whereas \"potential_issues\" stands for keeping
+   packages with both \"issues\" and \"potential_issues\".",
   results_keep = "all",
 
   "`logical` indicating whether output directory should be unlinked before

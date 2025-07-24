@@ -24,7 +24,6 @@ Get R CMD check results
 }
 \seealso{
 Other results: 
-\code{\link{print.checked_results}()},
-\code{\link{results_to_file}()}
+\code{\link{print.checked_results}()}
 }
 \concept{results}

@@ -38,7 +38,8 @@ are thrown. If "issues" then errors are emitted only on issues, whereas
 \item{results_keep}{\describe{
 character vector indicating which packages should be included in the results.
 "all" means that all packages are kept. If "issues" then only packages
-with issues identified are presented.\item{default: }{\preformatted{"all"}}
+with issues identified, whereas "potential_issues" stands for keeping
+packages with both "issues" and "potential_issues".\item{default: }{\preformatted{"all"}}
 \item{option: }{checked.results_keep}
 \item{envvar: }{R_CHECKED_RESULTS_KEEP (evaluated if possible, raw string otherwise)}
 }}

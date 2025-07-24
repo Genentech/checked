@@ -95,8 +95,14 @@ results.rev_dep_check_meta_task <- function(x, checker_obj, ...) {
 }
 
 #' @export
-`[.checked_results` <- function(x, ...) {
-  structure(NextMethod(), class = class(x))
+results.local_check_meta_task <- function(x, checker_obj, ...) {
+  # x is a igraph.vs with rev_dep_dep_meta_task task
+  nh <- igraph::neighbors(checker_obj$graph, x, mode = "out")
+  structure(
+    lapply(nh$name, results_check, output = checker_obj$output),
+    names = nh$name,
+    class = "local_check_results"
+  )
 }
 
 results_revdep_check <- function(dev, release, output = NULL, ...) {
@@ -186,37 +192,6 @@ results_check <- function(x, output, ...) {
   )
 }
 
-#' Results to file
-#'
-#' Write \code{checked_results} object to the text file. When converting results
-#' to text, \code{\link[checked]{print.checked_results}} method is used.
-#'
-#'
-#' @param results \code{\link[checked]{results}} object.
-#' @param file A connection or character path.
-#' @inheritParams print.checked_results
-#'
-#' @family results
-#' @export
-results_to_file <- function(results, file, keep = "all", ...) {
-  text <- c()
-  for (i in seq_along(results)) {
-    df <- results_to_df(results[[i]], issues_type = keep)
-    if (keep == "all" || any(rowSums(df) > 0)) {
-      text <- c(
-        text,
-        utils::capture.output(print(results[i], keep = keep))
-      )
-    }
-  }
-
-  if (!any(nzchar(text))) {
-    text <- "No issues identified."
-  }
-
-  writeLines(text, file)
-}
-
 results_to_df <- function(results, ...) {
   if (length(results) == 0) {
     data.frame(
@@ -263,7 +238,7 @@ count.issues <- function(d, ...) {
 }
 
 #' @export
-count.potential_issues <- function(d, issues_type = "all", ...) {
+count.potential_issues <- function(d, issues_type = "potential_issues", ...) {
   if (issues_type == "issues") 0 else length(d$new)
 }
 
@@ -283,6 +258,7 @@ print.checked_results <- function(x, ...) {
   invisible(x)
 }
 
+#' @name print.checked_results
 #' @export
 print.rev_dep_dep_results <- function(
   x,
@@ -307,8 +283,24 @@ print.rev_dep_dep_results <- function(
 
 #' @name print.checked_results
 #' @export
-print.checked_results_revdep_check_task_spec <- function(x, ...) {
-  print.checked_results_check_task_spec(x, ...)
+print.local_check_results <- function(
+  x,
+  ...,
+  name = NULL,
+  keep = options::opt("results_keep")
+) {
+  cat(sprintf(
+    "# Local check results (%s) \n\n",
+    name
+  ))
+
+  x <- filter_results(x, keep = keep)
+
+  for (i in seq_along(x)) {
+    print(x[[i]], ...)
+    cat("\n")
+  }
+  invisible(x)
 }
 
 get_issue_header <- function(x) {
