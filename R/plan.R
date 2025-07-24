@@ -181,17 +181,16 @@ plan_local_checks <- function(
   local_checks_tasks <- lapply(
     path,
     function(x, repos) {
-      path <- try(check_path_is_pkg_source(x), silent = TRUE)
-      if (inherits(path, "try-error")) {
+      if (path_is_pkg(x)) {
         check_task(
-          origin = pkg_origin_repo(package = x, repos = repos),
+          origin = pkg_origin_local(x),
           env = options::opt("check_envvars"),
           args = options::opt("check_args"),
           build_args = options::opt("check_build_args")
         )
       } else {
         check_task(
-          origin = pkg_origin_local(x),
+          origin = pkg_origin_repo(package = x, repos = repos),
           env = options::opt("check_envvars"),
           args = options::opt("check_args"),
           build_args = options::opt("check_build_args")
