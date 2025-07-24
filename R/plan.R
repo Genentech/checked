@@ -155,29 +155,28 @@ plan_rev_dep_release_check <- function(origin, revdep, repos) {
 #' @param pacakge A path to either package, directory with packages or name
 #'  of the package (details)
 #' @param repos repository used to identify packages when name is provided.
-#' 
+#'
 #' @details
 #' `package` parameter has two different allowed values:
 #'  * Package - checked looks for a DESCRIPTION file in the provided path, if
 #'    found treats it like a source package.
-#'  * If the specified value does not correspond to a source package, the 
+#'  * If the specified value does not correspond to a source package, the
 #'    parameter is treated as the name and `repos` parameter is used to identify
 #'    the source.
-#' 
-#' 
+#'
 #'
 #' @family plan
 #' @export
 plan_local_checks <- function(
-    path,
-    repos = getOption("repos")
+  path,
+  repos = getOption("repos")
 ) {
-  
+
   task <- meta_task(
     origin = NULL,
     .subclass = "local_check"
   )
-  
+
   # build individual plans for each package value
   local_checks_tasks <- lapply(
     path,
@@ -201,18 +200,18 @@ plan_local_checks <- function(
     },
     repos = repos
   )
-  
+
   g <- star_graph(
     task = c(
       list(task),
       local_checks_tasks
     )
   )
-  
+
   E(g)$type <- rep(DEP$Depends, times = length(E(g)))
-  
+
   g <- task_graph_class(g)
-  
+
   if (remotes_permitted()) {
     remotes_graph(g)
   } else {
