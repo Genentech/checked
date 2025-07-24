@@ -21,36 +21,36 @@ results.checker <- function(
     error_on = options::opt("results_error_on"),
     ...) {
   error_on <- match.arg(error_on, c("never", "issues", "potential_issues"))
-  
+
   stopifnot(
     "checker object does not represnet a completed run" = x$is_done()
   )
-  
+
   vs <- V(x$graph)
   # Find root's of meta nodes
   meta_nodes <- vs[is_meta(vs$task)]
   root_meta_nodes_idx <- meta_nodes[
     igraph::ego_size(x$graph, nodes = meta_nodes, mode = "in") == 1
   ]
-  
+
   res <- structure(
     lapply(root_meta_nodes_idx, results, checker_obj = x),
     names = vs[root_meta_nodes_idx]$name,
     class = "checked_results"
   )
-  
+
   if (error_on != "never") {
     potential_errors <- vlapply(res, function(y) {
       df <- results_to_df(y, issues_type = error_on)
       any(rowSums(df) != 0)
     })
-    
+
     if (any(potential_errors)) {
       print(res)
       stop("Issues identified. Aborting.")
     }
   }
-  
+
   res
 }
 
@@ -86,7 +86,7 @@ results.rev_dep_check_meta_task <- function(x, checker_obj, ...) {
   # seeds are dev and release, sort alphanumerical to make sure dev is always
   # at the first index
   checks <- checks[order(seeds)]
-  
+
   results_revdep_check(
     dev = checks[[1]]$name,
     release = checks[[2]]$name,
@@ -106,7 +106,7 @@ results_revdep_check <- function(dev, release, output = NULL, ...) {
   } else {
     file.path(path_check_output(output, dev), "result.json")
   }
-  
+
   release_path <- if (is.null(output) || file.exists(release)) {
     release
   } else {
@@ -114,12 +114,12 @@ results_revdep_check <- function(dev, release, output = NULL, ...) {
   }
   dev_check <- rcmdcheck_from_json(dev_path)
   release_check <- rcmdcheck_from_json(release_path)
-  
+
   structure(
     lapply(CHECK_ISSUES_TYPES, function(i) {
       dev_check_i <- structure(
-        # If no issues identified, object is an empty list instead of a character
-        # vector. Changing it to empty character for consistency.
+        # If no issues identified, object is an empty list instead of
+        # a character vector. Changing it to empty character for consistency.
         if (is.list(dev_check[[i]])) character(0) else dev_check[[i]],
         names = get_issue_header(dev_check[[i]])
       )
@@ -127,7 +127,7 @@ results_revdep_check <- function(dev, release, output = NULL, ...) {
         if (is.list(release_check[[i]])) character(0) else release_check[[i]],
         names = get_issue_header(release_check[[i]])
       )
-      
+
       matching_headers_idx <- names(dev_check_i) %in% names(release_check_i)
       # Create temporary object with "See <path> for details" path
       # stripped out as well as all whitespaces. As they will always emit
@@ -135,12 +135,14 @@ results_revdep_check <- function(dev, release, output = NULL, ...) {
       dev_check_i_tmp <- strip_details_from_issue(dev_check_i)
       release_check_i_tmp <- strip_details_from_issue(release_check_i)
       matching_messages_idx <- dev_check_i_tmp %in% release_check_i_tmp
-      
+
       new_issues <- structure(
         unname(dev_check_i[!matching_headers_idx]),
         class = "issues"
       )
-      new_potential_issues <- dev_check_i[matching_headers_idx & !matching_messages_idx]
+      new_potential_issues <- dev_check_i[
+        matching_headers_idx & !matching_messages_idx
+      ]
       new_potential_issues <- structure(
         list(
           new = unname(new_potential_issues),
@@ -148,7 +150,7 @@ results_revdep_check <- function(dev, release, output = NULL, ...) {
         ),
         class = "potential_issues"
       )
-      
+
       list("issues" = new_issues, "potential_issues" = new_potential_issues)
     }),
     names = CHECK_ISSUES_TYPES,
@@ -164,18 +166,18 @@ results_check <- function(x, output, ...) {
   } else {
     file.path(path_check_output(output, x), "result.json")
   }
-  
+
   x_check <- rcmdcheck_from_json(x_path)
-  
+
   structure(
     lapply(CHECK_ISSUES_TYPES, function(i) {
       x_check_i <- x_check[[i]]
-      
+
       new_issues <- structure(
         unname(x_check_i),
         class = "issues"
       )
-      
+
       list("issues" = new_issues)
     }),
     names = CHECK_ISSUES_TYPES,
@@ -207,11 +209,11 @@ results_to_file <- function(results, file, keep = "all", ...) {
       )
     }
   }
-  
+
   if (!any(nzchar(text))) {
     text <- "No issues identified."
   }
-  
+
   writeLines(text, file)
 }
 
@@ -235,7 +237,7 @@ results_to_df <- function(results, ...) {
 
 filter_results <- function(x, keep, ...) {
   keep <- match.arg(keep, c("all", "issues", "potential_issues"))
-  
+
   if (keep != "all") {
     df <- results_to_df(x, issues_type = keep)
     issues <- rowSums(df) != 0
@@ -243,7 +245,7 @@ filter_results <- function(x, keep, ...) {
   } else {
     x
   }
-  
+
 }
 
 count <- function(d, ...) {
@@ -293,9 +295,9 @@ print.rev_dep_dep_results <- function(
     attr(x, "package"),
     name
   ))
-  
+
   x <- filter_results(x, keep = keep)
-    
+
   for (i in seq_along(x)) {
     print(x[[i]], ...)
     cat("\n")
@@ -318,25 +320,25 @@ get_issue_header <- function(x) {
 
 rcmdcheck_to_json <- function(rcheck, file = NULL) {
   stopifnot(inherits(rcheck, "rcmdcheck"))
-  
+
   json <- jsonlite::toJSON(
     unclass(rcheck),
     auto_unbox = TRUE,
     pretty = TRUE,
     force = TRUE # This is crucial to skip any environments in the rcheck object
   )
-  
+
   if (!is.null(file)) {
     jsonlite::write_json(json, file, auto_unbox = TRUE)
   }
-  
+
   json
 }
 
 
 rcmdcheck_from_json <- function(file) {
   stopifnot(file.exists(file))
-  
+
   parsed <- jsonlite::fromJSON(file)
   structure(
     if (is.character(parsed)) jsonlite::fromJSON(parsed) else parsed,
@@ -366,7 +368,7 @@ print.rcmdcheck_results <- function(x, ...) {
     } else {
       "OK"
     }
-    
+
     cat(sprintf("%s: %s", i, status), "\n")
     if (status != "OK") {
       if (!is.null(x[[i]]$issues)) print(x[[i]]$issues)
@@ -413,5 +415,5 @@ collapse_new_lines <- function(x) {
     x = x,
     pattern = "(\\n\\s*){2,}",
     replacement = "\n\n",
-  )  
+  )
 }
