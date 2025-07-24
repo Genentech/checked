@@ -26,6 +26,24 @@ tty refresh interval when reporting results in milliseconds\item{default: }{\pre
 \item{envvar: }{R_CHECKED_TTY_TICK_INTERVAL (evaluated if possible, raw string otherwise)}
 }}
 
+\item{results_error_on}{\describe{
+character vector indicating whether R error should be thrown when issues
+are discovered when generating results. "never" means that no errors
+are thrown. If "issues" then errors are emitted only on issues, whereas
+"potential issues" stands for error on both issues and potential issues.\item{default: }{\preformatted{"never"}}
+\item{option: }{checked.results_error_on}
+\item{envvar: }{R_CHECKED_RESULTS_ERROR_ON (evaluated if possible, raw string otherwise)}
+}}
+
+\item{results_keep}{\describe{
+character vector indicating which packages should be included in the results.
+"all" means that all packages are kept. If "issues" then only packages
+with issues identified, whereas "potential_issues" stands for keeping
+packages with both "issues" and "potential_issues".\item{default: }{\preformatted{"all"}}
+\item{option: }{checked.results_keep}
+\item{envvar: }{R_CHECKED_RESULTS_KEEP (evaluated if possible, raw string otherwise)}
+}}
+
 \item{restore}{\describe{
 \code{logical} indicating whether output directory should be unlinked before
 running checks. If \code{FALSE}, an attempt will me made to restore previous

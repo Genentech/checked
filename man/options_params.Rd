@@ -4,7 +4,17 @@
 \alias{options_params}
 \title{Checked Options}
 \arguments{
+\item{results_error_on}{character vector indicating whether R error should be thrown when issues
+are discovered when generating results. "never" means that no errors
+are thrown. If "issues" then errors are emitted only on issues, whereas
+"potential issues" stands for error on both issues and potential issues. (Defaults to \code{"never"}, overwritable using option 'checked.results_error_on' or environment variable 'R_CHECKED_RESULTS_ERROR_ON')}
+
 \item{check_args}{\code{character} vector of args passed to the R CMD check. (Defaults to \code{c("--timings", "--ignore-vignettes", "--no-manual")}, overwritable using option 'checked.check_args' or environment variable 'R_CHECKED_CHECK_ARGS')}
+
+\item{results_keep}{character vector indicating which packages should be included in the results.
+"all" means that all packages are kept. If "issues" then only packages
+with issues identified, whereas "potential_issues" stands for keeping
+packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, overwritable using option 'checked.results_keep' or environment variable 'R_CHECKED_RESULTS_KEEP')}
 
 \item{add_remotes}{\code{logical} indicating whether origins inheriting from \code{pkg_origin_local},
 should be scanned for packages in the \code{remotes} field and added while

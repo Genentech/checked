@@ -11,9 +11,7 @@ plan_rev_dep_checks(
 )
 }
 \arguments{
-\item{path}{path to the package source. Can be either a single source
-code directory or a directory containing multiple package source code
-directories.}
+\item{path}{path to the package source.}
 
 \item{repos}{repository used to identify reverse dependencies.}
 
@@ -25,19 +23,6 @@ mostly when checking whether adding new package would break tests of
 packages already in the repository and take the package as suggests
 dependency.}
 }
-\value{
-The check schedule \code{data.frame} with the following columns:
-\itemize{
-\item \code{alias}: The alias of the check to run. It also serves the purpose of
-providing a unique identifier and node name in the task graph.
-\item \code{version}: Version of the package to be checked.
-\item \code{package}: Object that inherits from \code{\link[=check_task]{check_task()}}.
-Defines how package to be checked can be acquired.
-\item \code{custom}:  Object that inherits from \code{\link[=custom_install_task]{custom_install_task()}}.
-Defines custom package, for instance only available from local source, that
-should be installed before checking the package.
-}
-}
 \description{
 Generates a plan for running reverse dependency check for certain
 source package. In such case \code{path} should be proivded with a directory
@@ -46,6 +31,6 @@ repository for which reverse dependencies should be identified.
 }
 \seealso{
 Other plan: 
-\code{\link{plan}}
+\code{\link{plan_local_checks}()}
 }
 \concept{plan}

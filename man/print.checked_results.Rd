@@ -2,37 +2,31 @@
 % Please edit documentation in R/results.R
 \name{print.checked_results}
 \alias{print.checked_results}
-\alias{print.checked_results_check_task}
-\alias{print.checked_results_revdep_check_task}
+\alias{print.rev_dep_dep_results}
+\alias{print.local_check_results}
 \title{Print checked results}
 \usage{
 \method{print}{checked_results}(x, ...)
 
-\method{print}{checked_results_check_task}(
-  x,
-  keep = Sys.getenv("CHECKED_RESULTS_KEEP", c("all", "issues", "potential_issues")[1]),
-  ...
-)
+\method{print}{rev_dep_dep_results}(x, ..., name = NULL, keep = options::opt("results_keep"))
 
-\method{print}{checked_results_revdep_check_task}(x, ...)
+\method{print}{local_check_results}(x, ..., name = NULL, keep = options::opt("results_keep"))
 }
 \arguments{
 \item{x}{an object to be printed.}
 
 \item{...}{other parameters.}
 
-\item{keep}{character vector indicating which packages should be included
-in the results. "all" means that all packages are kept. If "issues" then
-only packages with issues identified, whereas "potential_issues" stands for
-keeping packages with both "issues" and "potential_issues". Users can set
-the default value via env variable \code{CHECKED_RESULTS_KEEP}.}
+\item{keep}{character vector indicating which packages should be included in the results.
+"all" means that all packages are kept. If "issues" then only packages
+with issues identified, whereas "potential_issues" stands for keeping
+packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, overwritable using option 'checked.results_keep' or environment variable 'R_CHECKED_RESULTS_KEEP')}
 }
 \description{
 Print checked results
 }
 \seealso{
 Other results: 
-\code{\link{results}()},
-\code{\link{results_to_file}()}
+\code{\link{results}()}
 }
 \concept{results}

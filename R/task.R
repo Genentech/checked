@@ -21,7 +21,6 @@ task <- function(..., .subclass = NULL) {
 #'
 #' Meta tasks are tasks which are not intended to perform computation. They
 #' exist simply to provide relationships among computational tasks.
-#'
 meta_task <- function(..., .subclass = NULL) {
   task(..., .subclass = c(sprintf("%s_meta", .subclass), "meta"))
 }
@@ -138,22 +137,6 @@ is_check_task <- function(x) {
   inherits(x, "check_task")
 }
 
-#' Create a task to run reverse dependency checks
-#'
-#' @param revdep character indicating whether the task specification describes
-#' check associated with the development (new) or release (old) version of the
-#' for which reverse dependency check is run.
-#' @param ... Additional parameters passed to [`task()`]
-#'
-#' @family tasks
-#' @export
-revdep_check_task <- function(revdep, ...) {
-  task <- check_task(...)
-  task["revdep"] <- list(revdep)
-  class(task) <- c("revdep_check_task", class(task))
-  task
-}
-
 package <- function(x) {
   UseMethod("package")
 }
@@ -164,12 +147,7 @@ package.default <- function(x) {
 }
 
 #' @export
-package.check_task <- function(x) {
-  package(x$origin)
-}
-
-#' @export
-package.install_task <- function(x) {
+package.task <- function(x) {
   package(x$origin)
 }
 
