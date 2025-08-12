@@ -70,7 +70,7 @@ install_task <- function(
 
 #' @export
 lib.install_task <- function(x, ...) {
-  lib(x$lib, ...)
+  lib(x$lib, dir_hash = hash(x$origin, n = 8), name = package(x), ...)
 }
 
 is_type <- function(x, type) {

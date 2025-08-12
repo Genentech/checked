@@ -4,12 +4,12 @@
 \alias{lib.character}
 \title{Produce a Library from a Path}
 \usage{
-\method{lib}{character}(x, ..., lib.loc = c())
+\method{lib}{character}(x, ...)
 }
 \arguments{
 \item{x}{A \code{character} object}
 
-\item{..., lib.loc}{Additional arguments unused}
+\item{...}{Additional arguments unused}
 }
 \description{
 Produce a Library from a Path

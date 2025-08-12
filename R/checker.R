@@ -165,6 +165,9 @@ checker <- R6::R6Class(
         return(-1L)
       }
 
+      # force garbage collection to free memory from terminated processes
+      gc(verbose = FALSE, reset = FALSE, full = TRUE)
+
       # if all available processes are in use, terminate early
       n_active <- length(private$active)
       if (n_active >= private$n) {

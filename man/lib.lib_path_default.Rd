@@ -4,7 +4,7 @@
 \alias{lib.lib_path_default}
 \title{Produce a Default Library Path}
 \usage{
-\method{lib}{lib_path_default}(x, ..., lib.loc = c())
+\method{lib}{lib_path_default}(x, ..., lib.loc = .libPaths())
 }
 \arguments{
 \item{x}{A \code{lib_path_default} object.}

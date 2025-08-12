@@ -10,10 +10,10 @@ lib_path(x, ..., .class = c())
 
 lib_path_default(.class = c())
 
-lib_path_isolated(..., .class = c())
+lib_path_isolated(.class = c())
 }
 \arguments{
-\item{x}{A \code{\link[=pkg_origin]{pkg_origin()}} object}
+\item{x}{A \code{\link[=pkg_origin]{pkg_origin()}} object used for default dispatch.}
 
 \item{...}{Additional values}
 

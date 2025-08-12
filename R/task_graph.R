@@ -32,6 +32,11 @@ task_graph <- function(x, repos = getOption("repos"), ...) {
 #' @export
 task_graph.task <- function(x, repos = getOption("repos"), ...) {
   df <- pkg_deps(x$origin, repos = repos, dependencies = TRUE)
+  # Distinguish direct dependencies of the package form possible indirect
+  # in the same data.frame which could come from suggested loops. This ensures
+  # there is a separate node for the root task.
+  df$package[df$depth == "direct"] <-
+    paste(df$package[df$depth == "direct"], "root", sep = "-")
   colmap <- c("package" = "from", "name" = "to")
   rename <- match(names(df), names(colmap))
   to_rename <- !is.na(rename)
@@ -44,21 +49,13 @@ task_graph.task <- function(x, repos = getOption("repos"), ...) {
   V(g_dep)$task <- lapply(
     V(g_dep)$name,
     function(p) {
-      origin <- try_pkg_origin_repo(package = p, repos = repos)
-      install_task(origin = origin)
+      if (endsWith(p, "-root")) {
+        x
+      } else {
+        origin <- try_pkg_origin_repo(package = p, repos = repos)
+        install_task(origin = origin)
+      }
     }
-  )
-
-  # Add the root node
-  g_dep <- igraph::add_vertices(
-    g_dep, 1, attr = list(name = "root-vertex", task = list(x))
-  )
-
-  g_dep <- copy_edges_from_vertex(
-    g_dep,
-    v_to = "root-vertex",
-    v_from = package(x),
-    mode = "out"
   )
 
   V(g_dep)$name <- vcapply(V(g_dep)$task, as_vertex_name)
@@ -94,9 +91,8 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
     is_na <- is.na(E(subtree)$type)
     E(subtree)$type[is_na] <- DEP$Depends
 
-    subtree
+    deduplicate_task_graph(subtree)
   })
-
   # then merge all the full check task task trees into a single graph
   g <- graph_dedup_attrs(igraph::union(x, check_task_neighborhoods))
 
@@ -120,6 +116,27 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
 task_graph_class <- function(g) {
   class(g) <- c("task_graph", class(g))
   g
+}
+
+deduplicate_task_graph <- function(g) {
+  vs <- V(g)
+  for (i in vs) {
+    # Task graph is allowed to have multi-edges in which case neighbors
+    # would multiply the same nodes. Therefore we call unique.
+    children <- unique(igraph::neighbors(g, i, "out"))
+    children_names <- vcapply(children$task, package)
+    duplicated_names <- children_names[duplicated(children_names)]
+    for (p in duplicated_names) {
+      duplicated_nodes <- children[children_names == p]
+      g <- igraph::delete_edges(
+        g,
+        # Always keep lowest ID node
+        paste(vs$name[[i]], duplicated_nodes[-1]$name, sep = "|")
+      )
+    }
+  }
+  isolated <- which(igraph::degree(g) == 0)
+  igraph::delete_vertices(g, isolated)
 }
 
 dep_edges <- function(edges, dependencies = TRUE) {

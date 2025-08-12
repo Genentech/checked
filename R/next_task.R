@@ -57,7 +57,7 @@ start_task.install_task <- function(
 
   install_process$new(
     install_parameters$package,
-    lib = lib(task$lib, lib.loc = lib.loc, lib.root = path_libs(output)),
+    lib = lib(task, lib.loc = lib.loc, lib.root = path_libs(output)),
     libpaths = libpaths,
     repos = task$origin$repos,
     dependencies = FALSE,

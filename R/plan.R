@@ -143,7 +143,7 @@ plan_rev_dep_release_check <- function(origin, revdep, repos) {
     )),
     install_task(
       origin = repo_root_origin,
-      lib = lib_path_isolated(origin = repo_root_origin)
+      lib = lib_path_isolated()
     )
   ))
 }

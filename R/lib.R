@@ -5,7 +5,7 @@
 #' lib_path method creates default path handlers for given pkg origin while
 #' lib_path_x creates an actual object.
 #'
-#' @param x A [`pkg_origin()`] object
+#' @param x A [`pkg_origin()`] object used for default dispatch.
 #' @param ... Additional values
 #' @param .class An optional subclass, used primarily for dispatch.
 lib_path <- function(x, ..., .class = c()) {
@@ -24,7 +24,7 @@ lib_path.pkg_origin_repo <- function(x, ..., .class = c()) {
 
 #' @export
 lib_path.pkg_origin_local <- function(x, ..., .class = c()) {
-  lib_path_isolated(origin = x, .class = .class)
+  lib_path_isolated(.class = .class)
 }
 
 #' @export
@@ -39,8 +39,8 @@ lib_path_default <- function(.class = c()) {
 }
 
 #' @rdname lib_path
-lib_path_isolated <- function(..., .class = c()) {
-  structure(list(...), class = c(.class, "lib_path_isolated"))
+lib_path_isolated <- function(.class = c()) {
+  structure(list(), class = c(.class, "lib_path_isolated"))
 }
 
 #' @export
@@ -68,28 +68,34 @@ lib.NULL <- function(x, ..., lib.loc = c()) {
 #' Produce a Library from a Path
 #'
 #' @param x A `character` object
-#' @param ...,lib.loc Additional arguments unused
+#' @param ... Additional arguments unused
 #'
 #' @export
-lib.character <- function(x, ..., lib.loc = c()) {
+lib.character <- function(x, ...) {
   x
 }
 
 #' Produce an Isolated Library Path
 #'
 #' @param x A `lib_path_isolated` object.
-#' @param name A name for the library, defaults to a random hash.
-#' @param lib.root A root directory for the isolated library.
 #' @param ... Additional arguments unused
+#' @param lib.root A root directory for the isolated library.
+#' @param dir_hash unique identifier of the isolated library
 #'
 #' @export
 lib.lib_path_isolated <- function(
   x,
   ...,
   lib.root = tempdir(),
-  lib.loc = c()
+  dir_hash = hash(Sys.time(), n = 8),
+  name = ""
 ) {
-  file.path(lib.root, paste0(x$origin$package, "-", hash(x$origin, n = 8)))
+  dirname <- if (nzchar(name)) {
+    paste0(name, "-", dir_hash)
+  } else {
+    dir_hash
+  }
+  file.path(lib.root, dirname)
 }
 
 #' Produce a Default Library Path
@@ -102,7 +108,7 @@ lib.lib_path_isolated <- function(
 lib.lib_path_default <- function(
   x,
   ...,
-  lib.loc = c()
+  lib.loc = .libPaths()
 ) {
   # In most cases this assumes checker library was appended to the lib.loc
   lib.loc[[1]]

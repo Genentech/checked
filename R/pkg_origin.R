@@ -184,7 +184,11 @@ pkg_deps.pkg_origin <- function(
   dependencies = TRUE,
   db = available_packages(repos = repos)
 ) {
-  pkg_dependencies(package(x), db = db, dependencies = dependencies)
+  df <- pkg_dependencies(package(x), db = db, dependencies = dependencies)
+  # Packages here come from CRAN only hence we can assume that all entries
+  # with the name the same as the x are direct dependencies
+  df$depth <- ifelse(df$package == package(x), "direct", "indirect")
+  df
 }
 
 #' @export
@@ -195,21 +199,26 @@ pkg_deps.pkg_origin_local <- function(
   db = available_packages(repos = repos)
 ) {
   # We need to temporarily switch the object to data.frame, as subsetting
-  # assignemnt for matrix does not have drop parameter and always simplifies
+  # assignment for matrix does not have drop parameter and always simplifies
   # one row matrices to vectors.
   row <- read.dcf(file.path(x$source, "DESCRIPTION"))
+
   rownames(row) <- package(x)
   direct_deps <- pkg_dependencies(
     packages = package(x),
     dependencies = dependencies,
     db = row
   )
-  undirect_deps <- pkg_dependencies(
+  direct_deps$depth <- "direct"
+
+  indirect_deps <- pkg_dependencies(
     packages = direct_deps$name,
     dependencies = dependencies,
     db = db
   )
-  rbind(direct_deps, undirect_deps)
+  indirect_deps$depth <- "indirect"
+
+  rbind(direct_deps, indirect_deps)
 }
 
 #' @export
