@@ -25,6 +25,9 @@ new_graph <- function(
     from = utils::head(vertices$name, edges_orientation),
     to = utils::tail(vertices$name, -1L)
   )
+  if (length(edge_attrs) > 0) {
+    edges <- cbind(edges, edge_attrs)
+  }
   igraph::graph_from_data_frame(edges, vertices = vertices)
 }
 

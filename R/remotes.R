@@ -42,13 +42,27 @@ remotes_graph.task <- function(x, ...) {
 remotes_graph.install_task <- function(x, ...) {
   remotes_tasks <- get_remotes_tasks(x)
   if (length(remotes_tasks) == 0) return(igraph::make_empty_graph())
+  remotes_tasks_names <- vcapply(remotes_tasks, package)
 
+  x_deps <- pkg_deps(x$origin)
+  x_remotes_deps <- x_deps[
+    x_deps$package == package(x) & x_deps$name %in% remotes_tasks_names,
+  ]
+  
+  # Sort tasks according to same key
+  remotes_tasks <- remotes_tasks[order(remotes_tasks_names)]
+  remotes_tasks_types <- x_remotes_deps[order(x_remotes_deps$name), ]$type
+  
   g <- star_graph(
     task = c(
       list(x),
       remotes_tasks
-    )
+    ),
+    edge_attrs = list(type = remotes_tasks_types)
   )
+  
+  # Add edges types
+  
 
   # Recursively get remotes_tasks of remotes_tasks
   remotes_subgraphs <- lapply(remotes_tasks, remotes_graph)
