@@ -48,11 +48,11 @@ remotes_graph.install_task <- function(x, ...) {
   x_remotes_deps <- x_deps[
     x_deps$package == package(x) & x_deps$name %in% remotes_tasks_names,
   ]
-  
+
   # Sort tasks according to same key
   remotes_tasks <- remotes_tasks[order(remotes_tasks_names)]
   remotes_tasks_types <- x_remotes_deps[order(x_remotes_deps$name), ]$type
-  
+
   g <- star_graph(
     task = c(
       list(x),
@@ -60,9 +60,6 @@ remotes_graph.install_task <- function(x, ...) {
     ),
     edge_attrs = list(type = remotes_tasks_types)
   )
-  
-  # Add edges types
-  
 
   # Recursively get remotes_tasks of remotes_tasks
   remotes_subgraphs <- lapply(remotes_tasks, remotes_graph)
