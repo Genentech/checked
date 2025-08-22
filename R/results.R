@@ -4,7 +4,8 @@ CHECK_ISSUES_TYPES <- c("notes", "warnings", "errors")
 #'
 #' Get R CMD check results
 #'
-#' @param x [`checker`] object.
+#' @param x object which results should be presented.
+#' @param checker_obj [`checker`] object.
 #' @eval options::as_params("error_on" = "results_error_on")
 #' @param ... other parameters.
 #'
@@ -55,16 +56,20 @@ results.checker <- function(
 }
 
 #' @export
+#' @rdname results
 results.integer <- function(x, checker_obj, ...) {
   results(V(checker_obj$graph)[[x]], checker_obj = checker_obj)
 }
 
 #' @export
+#' @method results igraph.vs
+#' @rdname results
 results.igraph.vs <- function(x, ...) {
   UseMethod("results", structure(0L, class = class(x$task)))
 }
 
 #' @export
+#' @rdname results
 results.rev_dep_dep_meta_task <- function(x, checker_obj, ...) {
   # x is a igraph.vs with rev_dep_dep_meta_task task
   nh <- igraph::neighbors(checker_obj$graph, x, mode = "out")
@@ -77,6 +82,7 @@ results.rev_dep_dep_meta_task <- function(x, checker_obj, ...) {
 }
 
 #' @export
+#' @rdname results
 results.rev_dep_check_meta_task <- function(x, checker_obj, ...) {
   # x is a igraph.vs with rev_dep_dep_meta_task task
   checks <- igraph::neighbors(checker_obj$graph, x, mode = "out")
@@ -95,6 +101,7 @@ results.rev_dep_check_meta_task <- function(x, checker_obj, ...) {
 }
 
 #' @export
+#' @rdname results
 results.local_check_meta_task <- function(x, checker_obj, ...) {
   # x is a igraph.vs with rev_dep_dep_meta_task task
   nh <- igraph::neighbors(checker_obj$graph, x, mode = "out")
@@ -246,6 +253,7 @@ count.potential_issues <- function(d, issues_type = "potential_issues", ...) {
 #'
 #' @param x an object to be printed.
 #' @eval options::as_params("keep" = "results_keep")
+#' @param name character name of the `rev_dep_dep` package
 #' @param ... other parameters.
 #'
 #' @family results

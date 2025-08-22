@@ -17,6 +17,8 @@
 
 \item{...}{other parameters.}
 
+\item{name}{character name of the \code{rev_dep_dep} package}
+
 \item{keep}{character vector indicating which packages should be included in the results.
 "all" means that all packages are kept. If "issues" then only packages
 with issues identified, whereas "potential_issues" stands for keeping

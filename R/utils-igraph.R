@@ -46,6 +46,7 @@ star_graph <- function(...) {
 #' multiple graphs. Searches for suffixes and consolidates attributes,
 #' taking the attribute from the first non-NA value observed.
 #'
+#' @param g task_graph object
 graph_dedup_attrs <- function(g) {
   # pattern appended to duplicated attributes
   re <- "_\\d+$"

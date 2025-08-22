@@ -15,12 +15,13 @@
 #' @param repos `repos`, as expected by [`tools::package_dependencies()`] to
 #'   determine package relationships.
 #' @param ... params passed to helper methods.
-#' @return A `data.frame` that can be used to build [`igraph`] edges.
+#' @return A `data.frame` that can be used to build
+#'   [`igraph::make_graph`] edges.
 #'
 #' @examples
 #' \dontrun{
 #  # requires that source code directory is for a package with revdeps
-#' task_graph_create(plan_rev_dep_checks("."))
+#' task_graph(plan_rev_dep_checks("."))
 #' }
 #' @keywords internal
 #'
@@ -145,7 +146,7 @@ dep_edges <- function(edges, dependencies = TRUE) {
 
 #' Find Task Neighborhood
 #'
-#' @param g A task graph, as produced with [task_graph_create()]
+#' @param g A task graph, as produced with [task_graph()]
 #' @param nodes Names or nodes objects of packages whose neighborhoods
 #' should be calculated.
 #'
@@ -220,16 +221,15 @@ task_graph_sort <- function(g) {
 #'
 #' @details
 #' There are helpers defined for particular use cases that strictly rely on the
-#' [`task_graph_which_satisfied()`], they are:
+#' [`task_graph_which_ready()`], they are:
 #'
-#' * `task_graph_which_satisfied_strong()` - List vertices whose strong
+#' * `task_graph_update_check_ready()` - Updates check vertices whose all
 #'   dependencies are satisfied.
-#' * `task_graph_which_check_satisfied()` - List root vertices whose all
+#' * `task_graph_update_install_ready()` - Update install vertices whose all
 #'   dependencies are satisfied.
-#' * `task_graph_which_install_satisfied()` - List install vertices whose
-#'   dependencies are all satisfied
+#' * `task_graph_which_ready()` - List vertices whose wit ready status.
 #'
-#' @param g A dependency graph, as produced with [task_graph_create()].
+#' @param g A dependency graph, as produced with [task_graph()].
 #' @param v Names or nodes objects of packages whose satisfiability should be
 #' checked.
 #' @param dependencies Which dependencies types should be met for a node to be
@@ -388,7 +388,7 @@ plot.task_graph <- function(x, ..., interactive = FALSE) {
     "pkg_origin_base" = "lightgray",
     "pkg_origin_unknown" = "red",
     "pkg_origin_local" = "blue",
-    "pkg_origin_remotes" = "orange",
+    "pkg_origin_remote" = "orange",
     "red"
   )
 

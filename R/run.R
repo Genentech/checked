@@ -5,7 +5,7 @@
 #' plan is generated from the source code path. Otherwise a plan can be
 #' built separately and executed using [`run()`].
 #'
-#' @param checks `character` or `checker` If a `character` value is
+#' @param checker `character` or `checker` If a `character` value is
 #'   provided, it is first coerced into a `checker` using
 #'   [`new_rev_dep_checker()`].
 #' @param ... Additional arguments passed to [`new_rev_dep_checker()`]

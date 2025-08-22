@@ -27,6 +27,7 @@ start_task <- function(node, g, ...) {
 }
 
 #' @export
+#' @method start_task igraph.vs
 start_task.igraph.vs <- function(node, g, ...) {
   stopifnot(length(node) == 1L)
   UseMethod("start_task", node$task[[1]])

@@ -152,7 +152,7 @@ plan_rev_dep_release_check <- function(origin, revdep, repos) {
 #'
 #' Generates a plan for running R CMD check for a specified set of packages.
 #'
-#' @param pacakge A path to either package, directory with packages or name
+#' @param package A path to either package, directory with packages or name
 #'  of the package (details)
 #' @param repos repository used to identify packages when name is provided.
 #'
@@ -168,7 +168,7 @@ plan_rev_dep_release_check <- function(origin, revdep, repos) {
 #' @family plan
 #' @export
 plan_local_checks <- function(
-  path,
+  package,
   repos = getOption("repos")
 ) {
 
@@ -179,7 +179,7 @@ plan_local_checks <- function(
 
   # build individual plans for each package value
   local_checks_tasks <- lapply(
-    path,
+    package,
     function(x, repos) {
       if (path_is_pkg(x)) {
         check_task(

@@ -6,17 +6,20 @@
 \usage{
 fmt(..., g, nodes, task = NULL, .envir = parent.frame(), ansi = TRUE)
 }
+\arguments{
+\item{...}{params passed to \code{\link[cli:format_inline]{cli::format_inline}}.}
+
+\item{g}{task_graph object.}
+
+\item{nodes}{graph nodes to format.}
+
+\item{task}{task to format.}
+
+\item{.envir}{output environment.}
+
+\item{ansi}{logical whether ansi should be stripped.}
+}
 \description{
 Provided a task, allows for use of a handful of shorthand symbols which will
 use the task as a context for formatting task fields.
-}
-\examples{
-task <- install_task(origin = pkg_origin(
-  package = "pkg",
-  version = package_version("1.2.3"),
-  source = "../../Programming/options"
-))
-
-fmt(task = task, "{action} {package} ({version}) from {source}")
-
 }

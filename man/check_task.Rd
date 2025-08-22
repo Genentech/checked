@@ -27,7 +27,7 @@ set in the check process.}
 \item{...}{
   Arguments passed on to \code{\link[=task]{task}}
   \describe{
-    \item{\code{}}{}
+    \item{\code{.subclass}}{Additional subclasses.}
   }}
 }
 \description{

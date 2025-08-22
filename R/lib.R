@@ -28,8 +28,8 @@ lib_path.pkg_origin_local <- function(x, ..., .class = c()) {
 }
 
 #' @export
-lib_path.pkg_origin_remotes <- function(x, ..., .class = c()) {
-  x <- sanitize_pkg_origin_remotes(x)
+lib_path.pkg_origin_remote <- function(x, ..., .class = c()) {
+  x <- sanitize_pkg_origin_remote(x)
   NextMethod()
 }
 
@@ -51,38 +51,30 @@ format.lib_path <- function(x, ...) {
 #' Get Library Location
 #'
 #' @param x An object describing a library location
-#' @param lib.loc A set of library locations, used as defaults for objects
-#'   that may make use of them.
-#'
-lib <- function(x, ..., lib.loc = c()) {
+#' @param ... additional parameters passed to methods
+#' @param lib.loc Library paths, defaulting to [`.libPaths()`].
+#' @param lib.root A root directory for the isolated library.
+#' @param dir_hash unique identifier of the isolated library
+#' @param name human-readable subname of the isolated library
+lib <- function(x, ...) {
   UseMethod("lib")
 }
 
-#' Null Library Path
-#'
+#' @method lib NULL
 #' @export
-lib.NULL <- function(x, ..., lib.loc = c()) {
+#' @rdname lib
+lib.NULL <- function(x, ...) {
   character(0L)
 }
 
-#' Produce a Library from a Path
-#'
-#' @param x A `character` object
-#' @param ... Additional arguments unused
-#'
 #' @export
+#' @rdname lib
 lib.character <- function(x, ...) {
   x
 }
 
-#' Produce an Isolated Library Path
-#'
-#' @param x A `lib_path_isolated` object.
-#' @param ... Additional arguments unused
-#' @param lib.root A root directory for the isolated library.
-#' @param dir_hash unique identifier of the isolated library
-#'
 #' @export
+#' @rdname lib
 lib.lib_path_isolated <- function(
   x,
   ...,
@@ -98,13 +90,8 @@ lib.lib_path_isolated <- function(
   file.path(lib.root, dirname)
 }
 
-#' Produce a Default Library Path
-#'
-#' @param x A `lib_path_default` object.
-#' @param ... Additional arguments unused
-#' @param lib.loc Library paths, defaulting to [`.libPaths()`].
-#'
 #' @export
+#' @rdname lib
 lib.lib_path_default <- function(
   x,
   ...,

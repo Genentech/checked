@@ -3,11 +3,14 @@
 #' Create package specification list which consists of all the details required
 #' to identify and acquire source of the package.
 #'
-#' @param name name of the package.
+#' @param package name of the package.
 #' @param repos repository where package with given name should identified.
 #' @param path path to the source of the package (either bundled or not). URLs
 #' are acceptable.
-#' @param ... parameters passed to downstream constructors
+#' @param remote remote object from the `remotes` package used to identify
+#'   non-standard packages.
+#' @param .class Additional subclasses.
+#' @param ... parameters passed to downstream constructors.
 #'
 #' @family specs
 #' @export
@@ -16,6 +19,7 @@ pkg_origin <- function(package, ..., .class = c()) {
 }
 
 #' @export
+#' @rdname format
 format.pkg_origin_source <- function(x, ...) {
   if (is.null(x$source)) {
     character(0L)
@@ -27,6 +31,7 @@ format.pkg_origin_source <- function(x, ...) {
 }
 
 #' @export
+#' @rdname format
 format.pkg_origin_local <- function(x, ...) {
   simple_paths <- format_simplify_path(x$source)
   names(x$source) <- simple_paths
@@ -34,17 +39,20 @@ format.pkg_origin_local <- function(x, ...) {
 }
 
 #' @export
+#' @rdname format
 format.pkg_origin_base <- function(x, ...) {
   character(0L)
 }
 
 #' @export
+#' @rdname format
 format.pkg_origin <- function(x, ...) {
   format(x$source, ...)
 }
 
 #' @export
-format.pkg_origin_remotes <- function(x, ...) {
+#' @rdname format
+format.pkg_origin_remote <- function(x, ...) {
   format(class(x$remote)[[1]])
 }
 
@@ -87,8 +95,8 @@ try_pkg_origin_repo <- function(package, repos, ...) {
 #' @rdname pkg_origin
 pkg_origin_is_base <- function(package, ...) {
   is_base <- package == "R"
-  is_inst <- package %in% installed.packages()[, "Package"]
-  is_base[is_inst] <- installed.packages()[package[is_inst], "Priority"] == "base" # nolint
+  is_inst <- package %in% utils::installed.packages()[, "Package"]
+  is_base[is_inst] <- utils::installed.packages()[package[is_inst], "Priority"] == "base" # nolint
   is_base
 }
 
@@ -130,8 +138,8 @@ pkg_origin_local <- function(path = NULL, ...) {
 
 #' @export
 #' @rdname pkg_origin
-pkg_origin_remotes <- function(remote = NULL, ...) {
-  source <- get_remotes_package_source(remote)
+pkg_origin_remote <- function(remote = NULL, ...) {
+  source <- get_remote_package_source(remote)
   package <- get_package_name(source)
   version <- package_version(get_package_version(source))
 
@@ -141,13 +149,13 @@ pkg_origin_remotes <- function(remote = NULL, ...) {
     remote = remote,
     source = source,
     ...,
-    .class = c("pkg_origin_remotes", "pkg_origin_local")
+    .class = c("pkg_origin_remote", "pkg_origin_local")
   )
 }
 
-sanitize_pkg_origin_remotes <- function(x) {
+sanitize_pkg_origin_remote <- function(x) {
   if (is.null(x$source) || !dir.exists(x$source)) {
-    x$source <- get_remotes_package_source(x$remote)
+    x$source <- get_remote_package_source(x$remote)
   }
   x
 }
@@ -222,12 +230,13 @@ pkg_deps.pkg_origin_local <- function(
 }
 
 #' @export
-pkg_deps.pkg_origin_remotes <- function(
+pkg_deps.pkg_origin_remote <- function(
   x,
   repos = getOption("repos"),
-  dependencies = TRUE
+  dependencies = TRUE,
+  db = available_packages(repos = repos)
 ) {
-  x <- sanitize_pkg_origin_remotes(x)
+  x <- sanitize_pkg_origin_remote(x)
   NextMethod()
 }
 
@@ -235,7 +244,8 @@ pkg_deps.pkg_origin_remotes <- function(
 pkg_deps.pkg_origin_archive <- function(
   x,
   repos = getOption("repos"),
-  dependencies = TRUE
+  dependencies = TRUE,
+  db = available_packages(repos = repos)
 ) {
   # TODO: Implement it by fetching tarball, untarring it and dispatching
   # TODO: to origin_local
@@ -243,7 +253,7 @@ pkg_deps.pkg_origin_archive <- function(
 }
 
 
-install_params <- function(x) {
+install_params <- function(x, ...) {
   UseMethod("install_params")
 }
 
@@ -258,32 +268,32 @@ install_params.pkg_origin_unknown <- function(x, output, ...) {
 }
 
 #' @export
-install_params.pkg_origin_base <- function(x) {
+install_params.pkg_origin_base <- function(x, ...) {
   list()  # no installation needed, distributed with R
 }
 
 #' @export
-install_params.pkg_origin_repo <- function(x) {
+install_params.pkg_origin_repo <- function(x, ...) {
   list(package = x$package, repos = x$repos)
 }
 
 #' @export
-install_params.pkg_origin_local <- function(x) {
+install_params.pkg_origin_local <- function(x, ...) {
   list(package = x$source, repos = NULL)
 }
 
 #' @export
-install_params.pkg_origin_remotes <- function(x) {
-  x <- sanitize_pkg_origin_remotes(x)
+install_params.pkg_origin_remote <- function(x, ...) {
+  x <- sanitize_pkg_origin_remote(x)
   NextMethod()
 }
 
 #' @export
-install_params.pkg_origin_archive <- function(x) {
+install_params.pkg_origin_archive <- function(x, ...) {
   list(package = x$path, repos = NULL)
 }
 
-package_install_type <- function(x) {
+package_install_type <- function(x, ...) {
   UseMethod("package_install_type")
 }
 
@@ -293,11 +303,11 @@ package_install_type.pkg_origin <- function(x, output, ...) {
 }
 
 #' @export
-package_install_type.pkg_origin_local <- function(x) {
+package_install_type.pkg_origin_local <- function(x, ...) {
   "source"
 }
 
-check_path <- function(package_source, ...) {
+check_path <- function(x, ...) {
   UseMethod("check_path")
 }
 
@@ -317,8 +327,8 @@ check_path.pkg_origin_local <- function(x, ...) {
 }
 
 #' @export
-check_path.pkg_origin_remotes <- function(x, ...) {
-  x <- sanitize_pkg_origin_remotes(x)
+check_path.pkg_origin_remote <- function(x, ...) {
+  x <- sanitize_pkg_origin_remote(x)
   NextMethod()
 }
 

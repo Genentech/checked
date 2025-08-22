@@ -7,14 +7,14 @@
 run(checker, ..., reporter = reporter_default())
 }
 \arguments{
+\item{checker}{\code{character} or \code{checker} If a \code{character} value is
+provided, it is first coerced into a \code{checker} using
+\code{\link[=new_rev_dep_checker]{new_rev_dep_checker()}}.}
+
 \item{...}{Additional arguments passed to \code{\link[=new_rev_dep_checker]{new_rev_dep_checker()}}}
 
 \item{reporter}{A reporter to provide progress updates. Will default to the
 most expressive command-line reporter given your terminal capabilities.}
-
-\item{checks}{\code{character} or \code{checker} If a \code{character} value is
-provided, it is first coerced into a \code{checker} using
-\code{\link[=new_rev_dep_checker]{new_rev_dep_checker()}}.}
 }
 \description{
 \code{\link[=run]{run()}} provides a generic, and is the central interface for executing

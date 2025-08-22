@@ -1,8 +1,5 @@
-report_task <- function(reporter, g, v) {
-  UseMethod("report_task")
-}
-
 #' @export
+#' @method report_task reporter_ansi_tty
 report_task.reporter_ansi_tty <- function(reporter, g, v) {
   UseMethod("report_task_ansi_tty", v$task)
 }
@@ -78,7 +75,6 @@ format_status_line_ansi.default <- function(
   cli::ansi_substring(out, 1, width)
 }
 
-#' @export
 reporter_line <- function(label, status, style = NA_character_) {
   structure(
     list(label = label, status = status, style = style),
@@ -87,7 +83,7 @@ reporter_line <- function(label, status, style = NA_character_) {
 }
 
 #' @export
-format.reporter_line <- function(x, width = cli::console_width()) {
+format.reporter_line <- function(x, width = cli::console_width(), ...) {
   rule <- switch(x$style,
     "h1" = "\u2550",
     " "
@@ -114,7 +110,6 @@ format.reporter_line <- function(x, width = cli::console_width()) {
   out
 }
 
-#' @export
 reporter_cell <- function(
   content,
   justify = "left",
@@ -135,7 +130,8 @@ format.reporter_cell <- function(x,
   padding = attr(x, "padding") %||% c(0, 0),
   justify = attr(x, "justify") %||% "right",
   width = attr(x, "width") %||% cli::console_width(),
-  pad = " "
+  pad = " ",
+  ...
 ) {
   n <- width - sum(padding) - cli::ansi_nchar(x)
   paste0(
@@ -301,6 +297,7 @@ reporter_ansi_tty_get_label_nchar <- function(
 report_start_checks.reporter_ansi_tty <- function(
   reporter,
   checker,
+  ...,
   envir = parent.frame()
 ) {
   # store our current console width, used to trigger complete re-draw

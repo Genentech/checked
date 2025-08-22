@@ -12,7 +12,7 @@ new_rev_dep_checker(x, ...)
 \arguments{
 \item{...}{Additional arguments passed to \code{\link[=new_checker]{new_checker()}}}
 
-\item{x}{A file path, passed to \code{\link[=rev_dep_check_tasks_df]{rev_dep_check_tasks_df()}}}
+\item{x}{A file path, passed to \code{\link[=plan_rev_dep_checks]{plan_rev_dep_checks()}}}
 }
 \description{
 Instantiate a check design from a path or directory.

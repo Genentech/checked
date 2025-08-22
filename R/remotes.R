@@ -27,6 +27,7 @@ remotes_graph.integer <- function(x, ..., vs) {
 }
 
 #' @export
+#' @method remotes_graph igraph.vs
 remotes_graph.igraph.vs <- function(x, ...) {
   remotes_graph(x$task)
 }
@@ -40,34 +41,34 @@ remotes_graph.task <- function(x, ...) {
 
 #' @export
 remotes_graph.install_task <- function(x, ...) {
-  remotes_tasks <- get_remotes_tasks(x)
-  if (length(remotes_tasks) == 0) return(igraph::make_empty_graph())
-  remotes_tasks_names <- vcapply(remotes_tasks, package)
+  remote_tasks <- get_remote_tasks(x)
+  if (length(remote_tasks) == 0) return(igraph::make_empty_graph())
+  remote_tasks_names <- vcapply(remote_tasks, package)
 
   x_deps <- pkg_deps(x$origin)
-  x_remotes_deps <- x_deps[
-    x_deps$package == package(x) & x_deps$name %in% remotes_tasks_names,
+  x_remote_deps <- x_deps[
+    x_deps$package == package(x) & x_deps$name %in% remote_tasks_names,
   ]
 
   # Sort tasks according to same key
-  remotes_tasks <- remotes_tasks[order(remotes_tasks_names)]
-  remotes_tasks_types <- x_remotes_deps[order(x_remotes_deps$name), ]$type
+  remote_tasks <- remote_tasks[order(remote_tasks_names)]
+  remote_tasks_types <- x_remote_deps[order(x_remote_deps$name), ]$type
 
   g <- star_graph(
     task = c(
       list(x),
-      remotes_tasks
+      remote_tasks
     ),
-    edge_attrs = list(type = remotes_tasks_types)
+    edge_attrs = list(type = remote_tasks_types)
   )
 
-  # Recursively get remotes_tasks of remotes_tasks
-  remotes_subgraphs <- lapply(remotes_tasks, remotes_graph)
+  # Recursively get remote_tasks of remote_tasks
+  remote_subgraphs <- lapply(remote_tasks, remotes_graph)
   suppressWarningsRegex(
     graph_dedup_attrs(
       igraph::union(
         g,
-        do.call(igraph::union, remotes_subgraphs)
+        do.call(igraph::union, remote_subgraphs)
       )
     ),
     "Some, but not all graphs are named, not using vertex names",
@@ -78,38 +79,38 @@ remotes_graph.install_task <- function(x, ...) {
 #' @export
 remotes_graph.check_task <- remotes_graph.install_task
 
-get_remotes_tasks <- function(x) {
-  UseMethod("get_remotes_tasks")
+get_remote_tasks <- function(x) {
+  UseMethod("get_remote_tasks")
 }
 
 #' @export
-get_remotes_tasks.default <- function(x) {
+get_remote_tasks.default <- function(x) {
   NULL
 }
 
 #' @export
-get_remotes_tasks.task <- function(x) {
-  get_remotes_tasks(x$origin)
+get_remote_tasks.task <- function(x) {
+  get_remote_tasks(x$origin)
 }
 
 #' @export
-get_remotes_tasks.pkg_origin_local <- function(x) {
-  pkgs <- .remotes$extra_deps(as.package.remotes(x$source), "remotes")
+get_remote_tasks.pkg_origin_local <- function(x) {
+  pkgs <- .remotes()$extra_deps(as.package.remotes(x$source), "remotes")
 
   lapply(seq_len(NROW(pkgs)), function(i) {
     install_task(
-      pkg_origin_remotes(remote = pkgs$remote[[i]])
+      pkg_origin_remote(remote = pkgs$remote[[i]])
     )
   })
 }
 
 #' @export
-get_remotes_tasks.pkg_origin_remotes <- function(x) {
-  x <- sanitize_pkg_origin_remotes(x)
+get_remote_tasks.pkg_origin_remote <- function(x) {
+  x <- sanitize_pkg_origin_remote(x)
   NextMethod()
 }
 
-get_remotes_package_source <- function(remote) {
+get_remote_package_source <- function(remote) {
   path <- file.path(path_remotes(), hash(remote))
   if (dir.exists(path)) return(path)
   dir_create(path)

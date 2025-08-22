@@ -6,10 +6,8 @@
 #' Tasks can be nested, representing either a singular task, or a set of
 #' related tasks.
 #'
-#' @param alias task alias which also serves as unique identifier of the task.
-#' @param package \code{\link[checked]{package}} object
-#' @param tasks Optional additional tasks that are pre-requisites for running
-#'   this task.
+#' @param ... parameters passed to downstream constructors.
+#' @param .subclass Additional subclasses.
 #'
 #' @family tasks
 #' @export
@@ -21,17 +19,21 @@ task <- function(..., .subclass = NULL) {
 #'
 #' Meta tasks are tasks which are not intended to perform computation. They
 #' exist simply to provide relationships among computational tasks.
+#'
+#' @param ... Objects passed to specified class functions
+#' @param .subclass character name of the subclass. It will be appended with
+#'    "_meta" suffix.
 meta_task <- function(..., .subclass = NULL) {
   task(..., .subclass = c(sprintf("%s_meta", .subclass), "meta"))
 }
 
-make_unique_task <- function(task, seed = runif(1)) {
+make_unique_task <- function(task, seed = stats::runif(1)) {
   task$seed <- seed
   task
 }
 
-#' @family tasks
 #' @export
+#' @rdname lib
 lib.task <- function(x, ...) {
   character(0L)
 }
@@ -44,7 +46,7 @@ print.task <- function(x, ...) {
 
 #' Create a task to install a package and dependencies
 #'
-#' @param ... Additional parameters passed to [`task()`]
+#' @param origin [`pkg_origin()`] object.
 #' @param lib Any object that can be passed to [`lib()`] to generate a library
 #'   path.
 #' @inheritParams utils::install.packages
@@ -69,6 +71,7 @@ install_task <- function(
 }
 
 #' @export
+#' @rdname lib
 lib.install_task <- function(x, ...) {
   lib(x$lib, dir_hash = hash(x$origin, n = 8), name = package(x), ...)
 }
@@ -78,7 +81,9 @@ is_type <- function(x, type) {
 }
 
 #' @export
-is_type.default <- inherits
+is_type.default <- function(x, type) {
+  inherits(x, type)
+}
 
 #' @export
 is_type.list <- function(x, type) {
@@ -129,6 +134,7 @@ check_task <- function(build_args = NULL, args = NULL, env = NULL, ...) {
 }
 
 #' @export
+#' @rdname lib
 lib.check_task <- function(x, ...) {
   character(0L)  # no additional libraries needed for checking
 }

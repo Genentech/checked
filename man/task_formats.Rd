@@ -6,8 +6,17 @@
 \usage{
 task_formats(g = NULL, nodes = V(g), task = NULL, tasks = list(task))
 }
+\arguments{
+\item{g}{task_graph object.}
+
+\item{nodes}{graph nodes to format.}
+
+\item{task}{task to format.}
+
+\item{tasks}{currently unused.}
+}
 \description{
-This bit of code is intended for use with \code{\link[=cli_task]{cli_task()}}, and allows for us
+This bit of code is intended for use with \code{\link[=fmt]{fmt()}}, and allows for us
 to layer symbol bindings on top of the environment used for string
 interpolation which provide syntactic sugar for common formatting components.
 }

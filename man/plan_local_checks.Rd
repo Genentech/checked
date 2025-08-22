@@ -4,13 +4,13 @@
 \alias{plan_local_checks}
 \title{Plan R CMD Checks}
 \usage{
-plan_local_checks(path, repos = getOption("repos"))
+plan_local_checks(package, repos = getOption("repos"))
 }
 \arguments{
-\item{repos}{repository used to identify packages when name is provided.}
-
-\item{pacakge}{A path to either package, directory with packages or name
+\item{package}{A path to either package, directory with packages or name
 of the package (details)}
+
+\item{repos}{repository used to identify packages when name is provided.}
 }
 \description{
 Generates a plan for running R CMD check for a specified set of packages.

@@ -23,10 +23,12 @@ as.package.remotes <- function(x) {
 }
 
 
-.remotes <- if (requireNamespace("remotes", quietly = TRUE)) {
-  as.list(getNamespace("remotes"), all.names = TRUE)[c(
-    "extra_deps"
-  )]
-} else {
-  "remotes package not available"
+.remotes <- function() {
+  if (requireNamespace("remotes", quietly = TRUE)) {
+    as.list(getNamespace("remotes"), all.names = TRUE)[c(
+      "extra_deps"
+    )]
+  } else {
+    "remotes package not available"
+  }
 }

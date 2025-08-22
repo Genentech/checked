@@ -2,7 +2,7 @@
 #'
 #' Instantiate a check design from a path or directory.
 #'
-#' @param x A file path, passed to [`rev_dep_check_tasks_df()`]
+#' @param x A file path, passed to [`plan_rev_dep_checks()`]
 #' @param ... Additional arguments passed to [`new_checker()`]
 #'
 #' @family checks
@@ -52,7 +52,7 @@ checker <- R6::R6Class(
     #' @field graph (`igraph::igraph()`)\cr
     #' A dependency graph, storing information about which dependencies
     #' are required prior to execution of each check task.
-    #' Created with [`task_graph_create()`]
+    #' Created with [`task_graph()`]
     graph = NULL,
 
     #' @field plan (`data.frame()`)\cr

@@ -1,11 +1,12 @@
-#' @export
+# TODO: Refactor entire reporter
+
 report_initialize.reporter_basic_tty <- function(
   reporter,
-  design,
+  checker,
   envir = parent.frame()
 ) {
   # start with initialized-as-completed tasks
-  v <- igraph::V(design$graph)
+  v <- igraph::V(checker$graph)
   which_done <- v$status == STATUS$done
   done <- v[which_done]$status
   names(done) <- v$name[which_done]
@@ -18,9 +19,9 @@ report_initialize.reporter_basic_tty <- function(
 }
 
 #' @export
-report_status.reporter_basic_tty <- function(reporter, design, envir) {
+report_status.reporter_basic_tty <- function(reporter, checker, envir) {
   cli_theme()
-  g <- design$graph
+  g <- checker$graph
   tasks_names <- names(igraph::V(g))
   # skip if queued, but not started or already finished
   reported_statuses <- sapply(reporter$statuses, `[[`, 1)
@@ -94,9 +95,9 @@ report_status.reporter_basic_tty <- function(reporter, design, envir) {
 }
 
 #' @export
-report_finalize.reporter_basic_tty <- function(reporter, design) {
+report_finalize.reporter_basic_tty <- function(reporter, checker) {
   cli_theme()
-  report_status(reporter, design) # report completions of final processes
+  report_status(reporter, checker) # report completions of final processes
   time <- format_time(Sys.time() - reporter$time_start) # nolint (used via glue)
   cli::cli_text("Finished in {.time_taken {time}}")
 }
