@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils-cli.R
 \name{task_formats}
 \alias{task_formats}
-\title{task formatter bindings}
+\title{Task formatter bindings}
 \usage{
 task_formats(g = NULL, nodes = V(g), task = NULL, tasks = list(task))
 }

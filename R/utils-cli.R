@@ -1,4 +1,4 @@
-#' task formatter bindings
+#' Task formatter bindings
 #'
 #' This bit of code is intended for use with [`fmt()`], and allows for us
 #' to layer symbol bindings on top of the environment used for string

@@ -19,7 +19,6 @@ pkg_origin <- function(package, ..., .class = c()) {
 }
 
 #' @export
-#' @rdname format
 format.pkg_origin_source <- function(x, ...) {
   if (is.null(x$source)) {
     character(0L)
@@ -31,7 +30,6 @@ format.pkg_origin_source <- function(x, ...) {
 }
 
 #' @export
-#' @rdname format
 format.pkg_origin_local <- function(x, ...) {
   simple_paths <- format_simplify_path(x$source)
   names(x$source) <- simple_paths
@@ -39,19 +37,16 @@ format.pkg_origin_local <- function(x, ...) {
 }
 
 #' @export
-#' @rdname format
 format.pkg_origin_base <- function(x, ...) {
   character(0L)
 }
 
 #' @export
-#' @rdname format
 format.pkg_origin <- function(x, ...) {
   format(x$source, ...)
 }
 
 #' @export
-#' @rdname format
 format.pkg_origin_remote <- function(x, ...) {
   format(class(x$remote)[[1]])
 }
