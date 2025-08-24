@@ -4,7 +4,7 @@
 #' and [`pkgdepends::as_pkg_dependencies()`], following
 #' [`pkgdepends::as_pkg_dependencies()`] return type structure of a list
 #' including `$direct` and `$indirect` dependency types. Reimplemented to
-#' avoid dependence on [`pkgdepends`] compilation requirements.
+#' avoid dependence on `pkgdepends` compilation requirements.
 #'
 #' @param x A `logical` scalar, `character` string of `"all"`, `"most"`,
 #'   `"hard"` or `"soft"`, `NA` or a vector of dependency types.
@@ -56,10 +56,15 @@ as_pkg_dependencies <- function(x) {
 #' of recording the dependency type and relationships throughout the
 #' dependency tree.
 #'
+#' @inheritParams tools::package_dependencies
+#' @param dependencies A `logical` scalar, `character` string of
+#'   `"all"`, `"most"`, `"hard"` or `"soft"`, `NA` or a vector of dependency
+#'   types compatible with [`as_pkg_dependencies()`] function.
+#'
 pkg_dependencies <- function(
   packages,
   dependencies = TRUE,
-  db = available.packages(),
+  db = available_packages(),
   verbose = FALSE
 ) {
   dependencies <- as_pkg_dependencies(dependencies)

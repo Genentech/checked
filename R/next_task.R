@@ -27,6 +27,7 @@ start_task <- function(node, g, ...) {
 }
 
 #' @export
+#' @method start_task igraph.vs
 start_task.igraph.vs <- function(node, g, ...) {
   stopifnot(length(node) == 1L)
   UseMethod("start_task", node$task[[1]])
@@ -48,13 +49,16 @@ start_task.install_task <- function(
     return(NULL)
   }
 
+  # install_parameters$package is a valid package name only for
+  # pkg_origin_local. Otherwise it's a path to the source package in which case
+  # is_package_installed returns FALSE (as it should)
   if (is_package_installed(install_parameters$package, libpaths)) {
     return(NULL)
   }
 
   install_process$new(
     install_parameters$package,
-    lib = lib(task$lib, lib.loc = lib.loc, lib.root = path_libs(output)),
+    lib = lib(task, lib.loc = lib.loc, lib.root = path_libs(output)),
     libpaths = libpaths,
     repos = task$origin$repos,
     dependencies = FALSE,

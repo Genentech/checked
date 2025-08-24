@@ -1,35 +1,3 @@
-empty_checks_df <- data.frame(
-  alias = character(0),
-  version = character(0),
-  package = character(0),
-  custom = character(0)
-)
-
-#' Check Plan
-#'
-#' Plans are pre-specified sets of checks. Plans are simple `data.frame`s
-#' where each row defines a package for which `R CMD check`
-#' should be run.
-#'
-#' @param path path to the package source. Can be either a single source
-#'   code directory or a directory containing multiple package source code
-#'   directories.
-#'
-#' @return The check schedule `data.frame` with the following columns:
-#'
-#' * `alias`: The alias of the check to run. It also serves the purpose of
-#'   providing a unique identifier and node name in the task graph.
-#' * `version`: Version of the package to be checked.
-#' * `package`: Object that inherits from [`check_task()`].
-#'   Defines how package to be checked can be acquired.
-#' * `custom`:  Object that inherits from [`custom_install_task()`].
-#'   Defines custom package, for instance only available from local source, that
-#'   should be installed before checking the package.
-#'
-#' @family plan
-#' @name plan
-NULL
-
 #' Plan Reverse Dependency Checks
 #'
 #' Generates a plan for running reverse dependency check for certain
@@ -37,8 +5,7 @@ NULL
 #' path to the development version of the package and `repos` should be a
 #' repository for which reverse dependencies should be identified.
 #'
-#' @inherit plan
-#' @inheritParams plan
+#' @param path path to the package source.
 #' @param repos repository used to identify reverse dependencies.
 #' @param versions character vector indicating against which versions of the
 #'   package reverse dependency should be checked. `c("dev", "release")`
@@ -68,7 +35,7 @@ plan_rev_dep_checks <- function(
   )[[1]]
 
   if (length(revdeps) == 0) {
-    return(empty_checks_df)
+    return(igraph::make_empty_graph())
   }
 
   if ("release" %in% version_types && !package %in% ap[, "Package"]) {
@@ -83,7 +50,7 @@ plan_rev_dep_checks <- function(
   }
 
   if (length(version_types) == 0) {
-    return(empty_checks_df)
+    return(igraph::make_empty_graph())
   }
 
   # root meta task, indicating a reverse-dependency check plan
@@ -129,11 +96,14 @@ plan_rev_dep_checks <- function(
   g <- igraph::add_edges(g, edges = edges, attr = list(type = DEP$Depends))
   E(g)$type <- DEP[E(g)$type]
 
-  class(g) <- c("task_graph", class(g))
+  g <- task_graph_class(g)
 
-  g
+  if (remotes_permitted()) {
+    remotes_graph(g)
+  } else {
+    g
+  }
 }
-
 
 plan_rev_dep_dev_check <- function(origin, revdep, repos) {
   rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
@@ -145,9 +115,9 @@ plan_rev_dep_dev_check <- function(origin, revdep, repos) {
     ),
     make_unique_task(seed = "dev", check_task(
       origin = rev_dep_origin,
-      env = DEFAULT_R_CMD_CHECK_ENVVARS,
-      args = DEFAULT_R_CMD_CHECK_ARGS,
-      build_args = DEFAULT_R_CMD_BUILD_ARGS
+      env = options::opt("check_envvars"),
+      args = options::opt("check_args"),
+      build_args = options::opt("check_build_args")
     )),
     install_task(origin = origin)
   ))
@@ -155,6 +125,10 @@ plan_rev_dep_dev_check <- function(origin, revdep, repos) {
 
 plan_rev_dep_release_check <- function(origin, revdep, repos) {
   rev_dep_origin <- pkg_origin_repo(package = revdep, repos = repos)
+  repo_root_origin <- try_pkg_origin_repo(
+    package = package(origin),
+    repos = repos
+  )
   sequence_graph(task = list(
     meta_task(
       origin = origin,
@@ -163,9 +137,83 @@ plan_rev_dep_release_check <- function(origin, revdep, repos) {
     ),
     make_unique_task(seed = "release", check_task(
       origin = rev_dep_origin,
-      env = DEFAULT_R_CMD_CHECK_ENVVARS,
-      args = DEFAULT_R_CMD_CHECK_ARGS,
-      build_args = DEFAULT_R_CMD_BUILD_ARGS
-    ))
+      env = options::opt("check_envvars"),
+      args = options::opt("check_args"),
+      build_args = options::opt("check_build_args")
+    )),
+    install_task(
+      origin = repo_root_origin,
+      lib = lib_path_isolated()
+    )
   ))
+}
+
+#' Plan R CMD Checks
+#'
+#' Generates a plan for running R CMD check for a specified set of packages.
+#'
+#' @param package A path to either package, directory with packages or name
+#'  of the package (details)
+#' @param repos repository used to identify packages when name is provided.
+#'
+#' @details
+#' `package` parameter has two different allowed values:
+#'  * Package - checked looks for a DESCRIPTION file in the provided path, if
+#'    found treats it like a source package.
+#'  * If the specified value does not correspond to a source package, the
+#'    parameter is treated as the name and `repos` parameter is used to identify
+#'    the source.
+#'
+#'
+#' @family plan
+#' @export
+plan_local_checks <- function(
+  package,
+  repos = getOption("repos")
+) {
+
+  task <- meta_task(
+    origin = NULL,
+    .subclass = "local_check"
+  )
+
+  # build individual plans for each package value
+  local_checks_tasks <- lapply(
+    package,
+    function(x, repos) {
+      if (path_is_pkg(x)) {
+        check_task(
+          origin = pkg_origin_local(x),
+          env = options::opt("check_envvars"),
+          args = options::opt("check_args"),
+          build_args = options::opt("check_build_args")
+        )
+      } else {
+        check_task(
+          origin = pkg_origin_repo(package = x, repos = repos),
+          env = options::opt("check_envvars"),
+          args = options::opt("check_args"),
+          build_args = options::opt("check_build_args")
+        )
+      }
+    },
+    repos = repos
+  )
+
+  g <- star_graph(
+    task = c(
+      list(task),
+      local_checks_tasks
+    )
+  )
+
+  E(g)$type <- rep(DEP$Depends, times = length(E(g)))
+
+  g <- task_graph_class(g)
+
+  if (remotes_permitted()) {
+    remotes_graph(g)
+  } else {
+    g
+  }
 }

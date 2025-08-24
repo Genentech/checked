@@ -7,12 +7,9 @@
 task(..., .subclass = NULL)
 }
 \arguments{
-\item{alias}{task alias which also serves as unique identifier of the task.}
+\item{...}{parameters passed to downstream constructors.}
 
-\item{package}{\code{\link[checked]{package}} object}
-
-\item{tasks}{Optional additional tasks that are pre-requisites for running
-this task.}
+\item{.subclass}{Additional subclasses.}
 }
 \description{
 Create task specification list which consists of all the details required
@@ -25,7 +22,6 @@ related tasks.
 \seealso{
 Other tasks: 
 \code{\link{check_task}()},
-\code{\link{install_task}()},
-\code{\link{revdep_check_task}()}
+\code{\link{install_task}()}
 }
 \concept{tasks}

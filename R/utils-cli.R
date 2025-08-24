@@ -1,9 +1,13 @@
-#' task formatter bindings
+#' Task formatter bindings
 #'
-#' This bit of code is intended for use with [`cli_task()`], and allows for us
+#' This bit of code is intended for use with [`fmt()`], and allows for us
 #' to layer symbol bindings on top of the environment used for string
 #' interpolation which provide syntactic sugar for common formatting components.
 #'
+#' @param g task_graph object.
+#' @param nodes graph nodes to format.
+#' @param task task to format.
+#' @param tasks currently unused.
 task_formats <- function(
   g = NULL,
   nodes = V(g),
@@ -34,6 +38,7 @@ task_formats <- function(
   makeActiveBinding("source.type", env = environment(), function() {
     src_type <- class(task$origin)[[1]]
     src_type_str <- switch(src_type,
+      "pkg_origin_remote" = source,
       "pkg_origin_local" = "local",
       "pkg_origin_repo" = source,
       "remote"
@@ -84,15 +89,24 @@ task_formats <- function(
 #' Provided a task, allows for use of a handful of shorthand symbols which will
 #' use the task as a context for formatting task fields.
 #'
+#' @param ... params passed to [`cli::format_inline`].
+#' @param .envir output environment.
+#' @param ansi logical whether ansi should be stripped.
+#' @inheritParams task_formats
+#'
 #' @examples
 #' task <- install_task(origin = pkg_origin(
 #'   package = "pkg",
 #'   version = package_version("1.2.3"),
-#'   source = "../../Programming/options"
+#'   source = system.file(
+#'     "example_packages",
+#'     "exampleGood",
+#'     package = "checked"
+#'    )
 #' ))
 #'
-#' fmt(task = task, "{action} {package} ({version}) from {source}")
-#'
+#' # Examples for unexported functions are not supported
+#' # fmt(task = task, "{action} {package} ({version}) from {source}")
 fmt <- function(
   ...,
   g,

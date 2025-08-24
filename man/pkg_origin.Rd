@@ -8,6 +8,7 @@
 \alias{pkg_origin_base}
 \alias{pkg_origin_unknown}
 \alias{pkg_origin_local}
+\alias{pkg_origin_remote}
 \alias{pkg_origin_archive}
 \title{Package specification}
 \usage{
@@ -25,17 +26,24 @@ pkg_origin_unknown(package, ...)
 
 pkg_origin_local(path = NULL, ...)
 
+pkg_origin_remote(remote = NULL, ...)
+
 pkg_origin_archive(path = NULL, ...)
 }
 \arguments{
-\item{...}{parameters passed to downstream constructors}
+\item{package}{name of the package.}
+
+\item{...}{parameters passed to downstream constructors.}
+
+\item{.class}{Additional subclasses.}
 
 \item{repos}{repository where package with given name should identified.}
 
 \item{path}{path to the source of the package (either bundled or not). URLs
 are acceptable.}
 
-\item{name}{name of the package.}
+\item{remote}{remote object from the \code{remotes} package used to identify
+non-standard packages.}
 }
 \description{
 Create package specification list which consists of all the details required

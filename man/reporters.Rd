@@ -6,7 +6,7 @@
 \alias{reporter_ansi_tty2}
 \alias{reporter_basic_tty}
 \alias{reporter_default}
-\title{Check Design Runner Reporters}
+\title{Check checker Runner Reporters}
 \usage{
 reporter_ansi_tty()
 

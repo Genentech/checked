@@ -15,12 +15,13 @@
 #' @param repos `repos`, as expected by [`tools::package_dependencies()`] to
 #'   determine package relationships.
 #' @param ... params passed to helper methods.
-#' @return A `data.frame` that can be used to build [`igraph`] edges.
+#' @return A `data.frame` that can be used to build
+#'   [`igraph::make_graph`] edges.
 #'
 #' @examples
 #' \dontrun{
 #  # requires that source code directory is for a package with revdeps
-#' task_graph_create(plan_rev_dep_checks("."))
+#' task_graph(plan_rev_dep_checks("."))
 #' }
 #' @keywords internal
 #'
@@ -32,6 +33,11 @@ task_graph <- function(x, repos = getOption("repos"), ...) {
 #' @export
 task_graph.task <- function(x, repos = getOption("repos"), ...) {
   df <- pkg_deps(x$origin, repos = repos, dependencies = TRUE)
+  # Distinguish direct dependencies of the package form possible indirect
+  # in the same data.frame which could come from suggested loops. This ensures
+  # there is a separate node for the root task.
+  df$package[df$depth == "direct"] <-
+    paste(df$package[df$depth == "direct"], "root", sep = "-")
   colmap <- c("package" = "from", "name" = "to")
   rename <- match(names(df), names(colmap))
   to_rename <- !is.na(rename)
@@ -44,21 +50,13 @@ task_graph.task <- function(x, repos = getOption("repos"), ...) {
   V(g_dep)$task <- lapply(
     V(g_dep)$name,
     function(p) {
-      origin <- try_pkg_origin_repo(package = p, repos = repos)
-      install_task(origin = origin)
+      if (endsWith(p, "-root")) {
+        x
+      } else {
+        origin <- try_pkg_origin_repo(package = p, repos = repos)
+        install_task(origin = origin)
+      }
     }
-  )
-
-  # Add the root node
-  g_dep <- igraph::add_vertices(
-    g_dep, 1, attr = list(name = "root-vertex", task = list(x))
-  )
-
-  g_dep <- copy_edges_from_vertex(
-    g_dep,
-    v_to = "root-vertex",
-    v_from = package(x),
-    mode = "out"
   )
 
   V(g_dep)$name <- vcapply(V(g_dep)$task, as_vertex_name)
@@ -94,9 +92,8 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
     is_na <- is.na(E(subtree)$type)
     E(subtree)$type[is_na] <- DEP$Depends
 
-    subtree
+    deduplicate_task_graph(subtree)
   })
-
   # then merge all the full check task task trees into a single graph
   g <- graph_dedup_attrs(igraph::union(x, check_task_neighborhoods))
 
@@ -106,6 +103,7 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
 
   g <- task_graph_sort(g)
 
+  # Restore the original (defined by the plan) order of primary tasks
   n_g <- length(V(g))
   x_ids <- as.numeric(V(g)[names(V(x))])
   g_ids <- numeric(n_g)
@@ -113,32 +111,42 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
   g_ids[g_ids == 0] <- setdiff(seq_along(V(g)), g_ids)
   g <- igraph::permute(g, g_ids)
 
+  task_graph_class(g)
+}
+
+task_graph_class <- function(g) {
   class(g) <- c("task_graph", class(g))
   g
+}
+
+deduplicate_task_graph <- function(g) {
+  vs <- V(g)
+  for (i in vs) {
+    # Task graph is allowed to have multi-edges in which case neighbors
+    # would multiply the same nodes. Therefore we call unique.
+    children <- unique(igraph::neighbors(g, i, "out"))
+    children_names <- vcapply(children$task, package)
+    duplicated_names <- children_names[duplicated(children_names)]
+    for (p in duplicated_names) {
+      duplicated_nodes <- children[children_names == p]
+      g <- igraph::delete_edges(
+        g,
+        # Always keep lowest ID node
+        paste(vs$name[[i]], duplicated_nodes[-1]$name, sep = "|")
+      )
+    }
+  }
+  isolated <- which(igraph::degree(g) == 0)
+  igraph::delete_vertices(g, isolated)
 }
 
 dep_edges <- function(edges, dependencies = TRUE) {
   edges[edges$type %in% dependencies]
 }
 
-lib_node_tasks <- function(g, nodes) {
-  install_nodes <- igraph::adjacent_vertices(g, nodes, mode = "out")
-  lapply(install_nodes, function(nodes) {
-    nodes$task[is_install(nodes$task)]
-  })
-}
-
-lib_node_pkgs <- function(g, nodes) {
-  install_nodes <- igraph::adjacent_vertices(g, nodes, mode = "out")
-  lapply(install_nodes, function(nodes) {
-    tasks <- nodes$task[is_install(nodes$task)]
-    vcapply(tasks, function(task) task$origin$package)
-  })
-}
-
 #' Find Task Neighborhood
 #'
-#' @param g A task graph, as produced with [task_graph_create()]
+#' @param g A task graph, as produced with [task_graph()]
 #' @param nodes Names or nodes objects of packages whose neighborhoods
 #' should be calculated.
 #'
@@ -213,16 +221,15 @@ task_graph_sort <- function(g) {
 #'
 #' @details
 #' There are helpers defined for particular use cases that strictly rely on the
-#' [`task_graph_which_satisfied()`], they are:
+#' [`task_graph_which_ready()`], they are:
 #'
-#' * `task_graph_which_satisfied_strong()` - List vertices whose strong
+#' * `task_graph_update_check_ready()` - Updates check vertices whose all
 #'   dependencies are satisfied.
-#' * `task_graph_which_check_satisfied()` - List root vertices whose all
+#' * `task_graph_update_install_ready()` - Update install vertices whose all
 #'   dependencies are satisfied.
-#' * `task_graph_which_install_satisfied()` - List install vertices whose
-#'   dependencies are all satisfied
+#' * `task_graph_which_ready()` - List vertices whose wit ready status.
 #'
-#' @param g A dependency graph, as produced with [task_graph_create()].
+#' @param g A dependency graph, as produced with [task_graph()].
 #' @param v Names or nodes objects of packages whose satisfiability should be
 #' checked.
 #' @param dependencies Which dependencies types should be met for a node to be
@@ -381,6 +388,7 @@ plot.task_graph <- function(x, ..., interactive = FALSE) {
     "pkg_origin_base" = "lightgray",
     "pkg_origin_unknown" = "red",
     "pkg_origin_local" = "blue",
+    "pkg_origin_remote" = "orange",
     "red"
   )
 

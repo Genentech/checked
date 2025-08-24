@@ -13,6 +13,8 @@ install_task(
 )
 }
 \arguments{
+\item{origin}{\code{\link[=pkg_origin]{pkg_origin()}} object.}
+
 \item{type}{character, indicating the type of package to download and
     install.  Will be \code{"source"} except on Windows and some macOS
     builds: see the section on \sQuote{Binary packages} for those.
@@ -31,7 +33,12 @@ install_task(
 \item{lib}{Any object that can be passed to \code{\link[=lib]{lib()}} to generate a library
 path.}
 
-\item{...}{Additional parameters passed to \code{\link[=task]{task()}}}
+\item{...}{
+    further arguments to be passed to \code{\link[utils]{download.file}},
+    \code{\link[utils]{available.packages}}, or to the functions for binary
+    installs on macOS and Windows (which accept an argument \code{"lock"}:
+    see the section on \sQuote{Locking}).
+  }
 }
 \description{
 Create a task to install a package and dependencies
@@ -39,7 +46,6 @@ Create a task to install a package and dependencies
 \seealso{
 Other tasks: 
 \code{\link{check_task}()},
-\code{\link{revdep_check_task}()},
 \code{\link{task}()}
 }
 \concept{tasks}

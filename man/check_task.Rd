@@ -27,7 +27,7 @@ set in the check process.}
 \item{...}{
   Arguments passed on to \code{\link[=task]{task}}
   \describe{
-    \item{\code{}}{}
+    \item{\code{.subclass}}{Additional subclasses.}
   }}
 }
 \description{
@@ -36,7 +36,6 @@ Create a task to run \verb{R CMD check}
 \seealso{
 Other tasks: 
 \code{\link{install_task}()},
-\code{\link{revdep_check_task}()},
 \code{\link{task}()}
 }
 \concept{tasks}

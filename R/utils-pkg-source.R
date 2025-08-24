@@ -133,7 +133,7 @@ fetch_package_source <- function(archive_url, destdir) {
 
 get_package_source <- function(package, repos, db = NULL, destdir = NULL) {
   if (is.null(db)) {
-    db <- utils::available.packages(repos = repos)
+    db <- available_packages(repos = repos)
   }
   pkg <- db[package, ]
   archive_url <- sprintf(

@@ -2,7 +2,7 @@
 #'
 #' Instantiate a check design from a path or directory.
 #'
-#' @param x A file path, passed to [`rev_dep_check_tasks_df()`]
+#' @param x A file path, passed to [`plan_rev_dep_checks()`]
 #' @param ... Additional arguments passed to [`new_checker()`]
 #'
 #' @family checks
@@ -52,7 +52,7 @@ checker <- R6::R6Class(
     #' @field graph (`igraph::igraph()`)\cr
     #' A dependency graph, storing information about which dependencies
     #' are required prior to execution of each check task.
-    #' Created with [`task_graph_create()`]
+    #' Created with [`task_graph()`]
     graph = NULL,
 
     #' @field plan (`data.frame()`)\cr
@@ -94,12 +94,10 @@ checker <- R6::R6Class(
       ),
       lib.loc = .libPaths(),
       repos = getOption("repos"),
-      restore = TRUE,
+      restore = options::opt("restore"),
       ...
     ) {
-      if (!restore) {
-        unlink(output, recursive = TRUE, force = TRUE)
-      }
+      check_past_output(output, restore, ask = interactive())
 
       dir_create(output)
 
@@ -166,6 +164,9 @@ checker <- R6::R6Class(
       if (self$is_done()) {
         return(-1L)
       }
+
+      # force garbage collection to free memory from terminated processes
+      gc(verbose = FALSE, reset = FALSE, full = TRUE)
 
       # if all available processes are in use, terminate early
       n_active <- length(private$active)
@@ -314,4 +315,31 @@ print.checker <- function(x, ...) {
     print(x$plan, ...)
   }
   invisible(x)
+}
+
+check_past_output <- function(output, restore, ask = interactive()) {
+  if (dir.exists(output)) {
+    if (is.na(restore)) {
+      restore <- if (ask) {
+        switch(
+          restore_menu(),
+          "1" = TRUE,
+          "2" = FALSE
+        )
+      } else {
+        FALSE
+      }
+    }
+
+    if (!restore) {
+      unlink(output, recursive = TRUE, force = TRUE)
+    }
+  }
+}
+
+restore_menu <- function() {
+  utils::menu(
+    c("Yes", "No"),
+    title = "Do you want to restore previous results?"
+  )
 }

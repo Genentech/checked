@@ -4,13 +4,9 @@ CHECK_ISSUES_TYPES <- c("notes", "warnings", "errors")
 #'
 #' Get R CMD check results
 #'
-#' @param x [`checker`] object.
-#' @param error_on character vector indicating whether R error should be thrown
-#'   when issues are discovered when generating results. "never" means that no
-#'   errors are thrown. If "issues" then errors are emitted only on issues,
-#'   whereas "potential issues" stands for error on both issues and potential
-#'   issues. Users can set the default value via env variable
-#'   `CHECKED_RESULTS_ERROR_ON`.
+#' @param x object which results should be presented.
+#' @param checker_obj [`checker`] object.
+#' @eval options::as_params("error_on" = "results_error_on")
 #' @param ... other parameters.
 #'
 #' @family results
@@ -23,29 +19,24 @@ results <- function(x, ...) {
 #' @rdname results
 results.checker <- function(
     x,
-    error_on = Sys.getenv("CHECKED_RESULTS_ERROR_ON", c("never", "issues", "potential_issues")[1]),
+    error_on = options::opt("results_error_on"),
     ...) {
   error_on <- match.arg(error_on, c("never", "issues", "potential_issues"))
-  checks_nodes <- igraph::V(x$graph)[
-    igraph::vertex.attributes(x$graph)$type == "check" & igraph::vertex.attributes(x$graph)$status == STATUS$done
+
+  stopifnot(
+    "checker object does not represnet a completed run" = x$is_done()
+  )
+
+  vs <- V(x$graph)
+  # Find root's of meta nodes
+  meta_nodes <- vs[is_meta(vs$task)]
+  root_meta_nodes_idx <- meta_nodes[
+    igraph::ego_size(x$graph, nodes = meta_nodes, mode = "in") == 1
   ]
-  checks_classes <- vcapply(checks_nodes$spec, function(x) class(x)[[1]])
-  classes <- unique(checks_classes)
-  res <- lapply(classes, function(x) {
-    structure(
-      checks_nodes$spec[checks_classes == x],
-      class = paste0("list_", x)
-    )
-  })
 
   res <- structure(
-    lapply(res, function(y, output) {
-      structure(
-        results(y, output),
-        class = paste0("checked_results_", utils::head(class(y[[1]]), 1L))
-      )
-    }, output = x$output),
-    names = classes,
+    lapply(root_meta_nodes_idx, results, checker_obj = x),
+    names = vs[root_meta_nodes_idx]$name,
     class = "checked_results"
   )
 
@@ -65,68 +56,110 @@ results.checker <- function(
 }
 
 #' @export
-`[.checked_results` <- function(x, ...) {
-  structure(NextMethod(), class = class(x))
+#' @rdname results
+results.integer <- function(x, checker_obj, ...) {
+  results(V(checker_obj$graph)[[x]], checker_obj = checker_obj)
 }
 
 #' @export
-results.list_revdep_check_task <- function(x, output, ...) {
-  name <- vcapply(x, function(y) y$package$name)
-  revdep <- vcapply(x, `[[`, "revdep")
-  count <- table(name, revdep)
-  is_complete_pair <- vlapply(name, function(y) {
-    identical(unname(count[y, ]), c(1L, 1L))
-  })
+#' @method results igraph.vs
+#' @rdname results
+results.igraph.vs <- function(x, ...) {
+  UseMethod("results", structure(0L, class = class(x$task)))
+}
 
-  names_complete <- sort(unique(name[is_complete_pair]))
-
-  new <- lapply(names_complete, function(y) {
-    x[[which(name == y & revdep == "new")]]
-  })
-
-  old <- lapply(names_complete, function(y) {
-    x[[which(name == y & revdep == "old")]]
-  })
-
+#' @export
+#' @rdname results
+results.rev_dep_dep_meta_task <- function(x, checker_obj, ...) {
+  # x is a igraph.vs with rev_dep_dep_meta_task task
+  nh <- igraph::neighbors(checker_obj$graph, x, mode = "out")
   structure(
-    mapply(results, x = new, y = old, output = output, SIMPLIFY = FALSE),
-    names = names_complete
+    lapply(nh, results, checker_obj = checker_obj),
+    names = nh$name,
+    package = package(x$task),
+    class = "rev_dep_dep_results"
   )
 }
 
 #' @export
-results.revdep_check_task <- function(x, y, output, ...) {
-  new <- rcmdcheck_from_json(file.path(path_check_output(output, x$alias), "result.json"))
-  old <- rcmdcheck_from_json(file.path(path_check_output(output, y$alias), "result.json"))
+#' @rdname results
+results.rev_dep_check_meta_task <- function(x, checker_obj, ...) {
+  # x is a igraph.vs with rev_dep_dep_meta_task task
+  checks <- igraph::neighbors(checker_obj$graph, x, mode = "out")
+  seeds <- vcapply(checks, function(v) {
+    V(checker_obj$graph)[[v]]$task$seed
+  })
+  # seeds are dev and release, sort alphanumerical to make sure dev is always
+  # at the first index
+  checks <- checks[order(seeds)]
+
+  results_revdep_check(
+    dev = checks[[1]]$name,
+    release = checks[[2]]$name,
+    output = checker_obj$output
+  )
+}
+
+#' @export
+#' @rdname results
+results.local_check_meta_task <- function(x, checker_obj, ...) {
+  # x is a igraph.vs with rev_dep_dep_meta_task task
+  nh <- igraph::neighbors(checker_obj$graph, x, mode = "out")
+  structure(
+    lapply(nh$name, results_check, output = checker_obj$output),
+    names = nh$name,
+    class = "local_check_results"
+  )
+}
+
+results_revdep_check <- function(dev, release, output = NULL, ...) {
+  # Make it work either with full path or name of the package
+  dev_path <- if (is.null(output) || file.exists(dev)) {
+    dev
+  } else {
+    file.path(path_check_output(output, dev), "result.json")
+  }
+
+  release_path <- if (is.null(output) || file.exists(release)) {
+    release
+  } else {
+    file.path(path_check_output(output, release), "result.json")
+  }
+  dev_check <- rcmdcheck_from_json(dev_path)
+  release_check <- rcmdcheck_from_json(release_path)
 
   structure(
     lapply(CHECK_ISSUES_TYPES, function(i) {
-      new_i <- structure(
-        new[[i]],
-        names = get_issue_header(new[[i]])
+      dev_check_i <- structure(
+        # If no issues identified, object is an empty list instead of
+        # a character vector. Changing it to empty character for consistency.
+        if (is.list(dev_check[[i]])) character(0) else dev_check[[i]],
+        names = get_issue_header(dev_check[[i]])
       )
-      old_i <- structure(
-        old[[i]],
-        names = get_issue_header(old[[i]])
+      release_check_i <- structure(
+        if (is.list(release_check[[i]])) character(0) else release_check[[i]],
+        names = get_issue_header(release_check[[i]])
       )
 
-      matching_headers_idx <- names(new_i) %in% names(old_i)
+      matching_headers_idx <- names(dev_check_i) %in% names(release_check_i)
       # Create temporary object with "See <path> for details" path
       # stripped out as well as all whitespaces. As they will always emit
       # potential issues due to the path or screen differences
-      new_i_tmp <- strip_details_from_issue(new_i)
-      old_i_tmp <- strip_details_from_issue(old_i)
-      matching_messages_idx <- new_i_tmp %in% old_i_tmp
+      dev_check_i_tmp <- strip_details_from_issue(dev_check_i)
+      release_check_i_tmp <- strip_details_from_issue(release_check_i)
+      matching_messages_idx <- dev_check_i_tmp %in% release_check_i_tmp
 
       new_issues <- structure(
-        unname(new_i[!matching_headers_idx]),
+        unname(dev_check_i[!matching_headers_idx]),
         class = "issues"
       )
-      new_potential_issues <- new_i[matching_headers_idx & !matching_messages_idx]
+      new_potential_issues <- dev_check_i[
+        matching_headers_idx & !matching_messages_idx
+      ]
       new_potential_issues <- structure(
         list(
           new = unname(new_potential_issues),
-          old = unname(old_i[names(new_potential_issues)])
+          old = unname(release_check_i[names(new_potential_issues)])
         ),
         class = "potential_issues"
       )
@@ -134,71 +167,36 @@ results.revdep_check_task <- function(x, y, output, ...) {
       list("issues" = new_issues, "potential_issues" = new_potential_issues)
     }),
     names = CHECK_ISSUES_TYPES,
-    package = new$package,
-    class = "rcmdcheck_diff"
+    package = dev_check$package,
+    class = c("rcmdcheck_rev_dep_results", "rcmdcheck_results")
   )
 }
 
-#' @export
-results.list_check_task <- function(x, output, ...) {
-  alias <- vcapply(x, `[[`, "alias")
-  structure(
-    lapply(x, results, output = output),
-    names = alias
-  )
-}
+results_check <- function(x, output, ...) {
+  # Make it work either with full path or name of the package
+  x_path <- if (is.null(output) || file.exists(x)) {
+    x
+  } else {
+    file.path(path_check_output(output, x), "result.json")
+  }
 
-#' @export
-results.check_task <- function(x, output, ...) {
-  json_path <- file.path(path_check_output(output, x$alias), "result.json")
-  x <- rcmdcheck_from_json(json_path)
+  x_check <- rcmdcheck_from_json(x_path)
 
   structure(
     lapply(CHECK_ISSUES_TYPES, function(i) {
-      x_i <- x[[i]]
+      x_check_i <- x_check[[i]]
 
       new_issues <- structure(
-        unname(x_i),
+        unname(x_check_i),
         class = "issues"
       )
 
       list("issues" = new_issues)
     }),
     names = CHECK_ISSUES_TYPES,
-    package = x$package,
-    class = "rcmdcheck_diff"
+    package = x_check$package,
+    class = c("rcmdcheck_check_results", "rcmdcheck_results")
   )
-}
-
-#' Results to file
-#'
-#' Write \code{checked_results} object to the text file. When converting results
-#' to text, \code{\link[checked]{print.checked_results}} method is used.
-#'
-#'
-#' @param results \code{\link[checked]{results}} object.
-#' @param file A connection or character path.
-#' @inheritParams print.checked_results
-#'
-#' @family results
-#' @export
-results_to_file <- function(results, file, keep = "all", ...) {
-  text <- c()
-  for (i in seq_along(results)) {
-    df <- results_to_df(results[[i]], issues_type = keep)
-    if (keep == "all" || any(rowSums(df) > 0)) {
-      text <- c(
-        text,
-        utils::capture.output(print(results[i], keep = keep))
-      )
-    }
-  }
-
-  if (!any(nzchar(text))) {
-    text <- "No issues identified."
-  }
-
-  writeLines(text, file)
 }
 
 results_to_df <- function(results, ...) {
@@ -217,6 +215,19 @@ results_to_df <- function(results, ...) {
       row.names = names(results)
     )
   }
+}
+
+filter_results <- function(x, keep, ...) {
+  keep <- match.arg(keep, c("all", "issues", "potential_issues"))
+
+  if (keep != "all") {
+    df <- results_to_df(x, issues_type = keep)
+    issues <- rowSums(df) != 0
+    x[issues]
+  } else {
+    x
+  }
+
 }
 
 count <- function(d, ...) {
@@ -238,59 +249,38 @@ count.potential_issues <- function(d, issues_type = "potential_issues", ...) {
   if (issues_type == "issues") 0 else length(d$new)
 }
 
-#' @export
-summary.checker <- function(object, ...) {
-  summary(results(object), ...)
-}
-
-#' @export
-summary.checked_results <- function(object, ...) {
-  lapply(object, summary, ...)
-}
-
-#' @export
-summary.checked_results_revdep_check_task <- function(object, ...) {
-  summary.checked_results_check_task(object, ...)
-}
-
-#' @export
-summary.checked_results_check_task <- function(object, ...) {
-  results_to_df(object, ...)
-}
-
 #' Print checked results
 #'
 #' @param x an object to be printed.
-#' @param keep character vector indicating which packages should be included
-#' in the results. "all" means that all packages are kept. If "issues" then
-#' only packages with issues identified, whereas "potential_issues" stands for
-#' keeping packages with both "issues" and "potential_issues". Users can set
-#' the default value via env variable \code{CHECKED_RESULTS_KEEP}.
+#' @eval options::as_params("keep" = "results_keep")
+#' @param name character name of the `rev_dep_dep` package
 #' @param ... other parameters.
 #'
 #' @family results
 #' @export
 print.checked_results <- function(x, ...) {
   for (i in seq_along(x)) {
-    cat("#", tools::toTitleCase(strsplit(names(x)[i], "_")[[1]]), "\n\n")
-    print(x[[i]], ...)
-    cat("\n")
+    print(x[[i]], ..., name = names(x)[[i]])
+    cat("\n\n\n")
   }
   invisible(x)
 }
 
 #' @name print.checked_results
 #' @export
-print.checked_results_check_task <- function(
-    x,
-    keep = Sys.getenv("CHECKED_RESULTS_KEEP", c("all", "issues", "potential_issues")[1]),
-    ...) {
-  keep <- match.arg(keep, c("all", "issues", "potential_issues"))
-  if (keep != "all") {
-    df <- results_to_df(x, issues_type = keep)
-    issues <- rowSums(df) != 0
-    x <- x[issues]
-  }
+print.rev_dep_dep_results <- function(
+  x,
+  ...,
+  name = NULL,
+  keep = options::opt("results_keep")
+) {
+  cat(sprintf(
+    "# %s reverse dependency check results (%s) \n\n",
+    attr(x, "package"),
+    name
+  ))
+
+  x <- filter_results(x, keep = keep)
 
   for (i in seq_along(x)) {
     print(x[[i]], ...)
@@ -301,8 +291,24 @@ print.checked_results_check_task <- function(
 
 #' @name print.checked_results
 #' @export
-print.checked_results_revdep_check_task <- function(x, ...) {
-  print.checked_results_check_task(x, ...)
+print.local_check_results <- function(
+  x,
+  ...,
+  name = NULL,
+  keep = options::opt("results_keep")
+) {
+  cat(sprintf(
+    "# Local check results (%s) \n\n",
+    name
+  ))
+
+  x <- filter_results(x, keep = keep)
+
+  for (i in seq_along(x)) {
+    print(x[[i]], ...)
+    cat("\n")
+  }
+  invisible(x)
 }
 
 get_issue_header <- function(x) {
@@ -341,8 +347,19 @@ rcmdcheck_from_json <- function(file) {
 }
 
 #' @export
-print.rcmdcheck_diff <- function(x, ...) {
+print.rcmdcheck_rev_dep_results <- function(x, ...) {
   cat(sprintf("%s package R CMD check diff \n", attr(x, "package")))
+  NextMethod()
+}
+
+#' @export
+print.rcmdcheck_check_results <- function(x, ...) {
+  cat(sprintf("%s package R CMD check \n", attr(x, "package")))
+  NextMethod()
+}
+
+#' @export
+print.rcmdcheck_results <- function(x, ...) {
   for (i in CHECK_ISSUES_TYPES) {
     status <- if (length(x[[i]]$issues) > 0) {
       sprintf("NEW ISSUES [%s]", length(x[[i]]$issues))
@@ -381,10 +398,22 @@ print.potential_issues <- function(x, ...) {
 }
 
 strip_details_from_issue <- function(x) {
-  x <- gsub("See(.*?)for details", "See <path> for details", "", x)
-  gsub("[[:space:]]", "", x)
+  x <- gsub(
+    x = x,
+    pattern = "See(.*?)for details",
+    replacement = "See <path> for details"
+  )
+  gsub(
+    x = x,
+    pattern = "[[:space:]]",
+    replacement = ""
+  )
 }
 
 collapse_new_lines <- function(x) {
-  gsub("(\\n\\s*){2,}", "\n\n", x)  
+  gsub(
+    x = x,
+    pattern = "(\\n\\s*){2,}",
+    replacement = "\n\n",
+  )
 }

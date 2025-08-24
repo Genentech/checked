@@ -40,7 +40,7 @@ Other checks:
 \item{\code{graph}}{(\code{igraph::igraph()})\cr
 A dependency graph, storing information about which dependencies
 are required prior to execution of each check task.
-Created with \code{\link[=task_graph_create]{task_graph_create()}}}
+Created with \code{\link[=task_graph]{task_graph()}}}
 
 \item{\code{plan}}{(\code{data.frame()})\cr
 Checks task \code{data.frame} which is the source of all the checks.}
@@ -79,7 +79,7 @@ and installation order are embedded.
   output = file.path(tempdir(), paste(packageName(), Sys.Date(), sep = "-")),
   lib.loc = .libPaths(),
   repos = getOption("repos"),
-  restore = TRUE,
+  restore = options::opt("restore"),
   ...
 )}\if{html}{\out{</div>}}
 }

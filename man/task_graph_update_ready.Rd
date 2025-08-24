@@ -12,7 +12,7 @@ task_graph_update_ready(
 )
 }
 \arguments{
-\item{g}{A dependency graph, as produced with \code{\link[=task_graph_create]{task_graph_create()}}.}
+\item{g}{A dependency graph, as produced with \code{\link[=task_graph]{task_graph()}}.}
 
 \item{v}{Names or nodes objects of packages whose satisfiability should be
 checked.}
@@ -32,14 +32,13 @@ already has its dependencies done.
 }
 \details{
 There are helpers defined for particular use cases that strictly rely on the
-\code{\link[=task_graph_which_satisfied]{task_graph_which_satisfied()}}, they are:
+\code{\link[=task_graph_which_ready]{task_graph_which_ready()}}, they are:
 \itemize{
-\item \code{task_graph_which_satisfied_strong()} - List vertices whose strong
+\item \code{task_graph_update_check_ready()} - Updates check vertices whose all
 dependencies are satisfied.
-\item \code{task_graph_which_check_satisfied()} - List root vertices whose all
+\item \code{task_graph_update_install_ready()} - Update install vertices whose all
 dependencies are satisfied.
-\item \code{task_graph_which_install_satisfied()} - List install vertices whose
-dependencies are all satisfied
+\item \code{task_graph_which_ready()} - List vertices whose wit ready status.
 }
 }
 \keyword{internal}

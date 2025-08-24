@@ -2,16 +2,26 @@
 % Please edit documentation in R/lib.R
 \name{lib_path}
 \alias{lib_path}
+\alias{lib_path_default}
+\alias{lib_path_isolated}
 \title{Make a Library Location}
 \usage{
 lib_path(x, ..., .class = c())
+
+lib_path_default(.class = c())
+
+lib_path_isolated(.class = c())
 }
 \arguments{
-\item{x}{A \code{\link[=pkg_origin]{pkg_origin()}} object}
+\item{x}{A \code{\link[=pkg_origin]{pkg_origin()}} object used for default dispatch.}
+
+\item{...}{Additional values}
 
 \item{.class}{An optional subclass, used primarily for dispatch.}
 }
 \description{
 A description of where packages should be installed. This object provides
 necessary information to determine where a package should be installed.
+lib_path method creates default path handlers for given pkg origin while
+lib_path_x creates an actual object.
 }

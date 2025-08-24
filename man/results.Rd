@@ -3,35 +3,44 @@
 \name{results}
 \alias{results}
 \alias{results.checker}
+\alias{results.integer}
+\alias{results.igraph.vs}
+\alias{results.rev_dep_dep_meta_task}
+\alias{results.rev_dep_check_meta_task}
+\alias{results.local_check_meta_task}
 \title{Check results}
 \usage{
 results(x, ...)
 
-\method{results}{checker}(
-  x,
-  error_on = Sys.getenv("CHECKED_RESULTS_ERROR_ON", c("never", "issues",
-    "potential_issues")[1]),
-  ...
-)
+\method{results}{checker}(x, error_on = options::opt("results_error_on"), ...)
+
+\method{results}{integer}(x, checker_obj, ...)
+
+\method{results}{igraph.vs}(x, ...)
+
+\method{results}{rev_dep_dep_meta_task}(x, checker_obj, ...)
+
+\method{results}{rev_dep_check_meta_task}(x, checker_obj, ...)
+
+\method{results}{local_check_meta_task}(x, checker_obj, ...)
 }
 \arguments{
-\item{x}{\code{\link{checker}} object.}
+\item{x}{object which results should be presented.}
 
 \item{...}{other parameters.}
 
-\item{error_on}{character vector indicating whether R error should be thrown
-when issues are discovered when generating results. "never" means that no
-errors are thrown. If "issues" then errors are emitted only on issues,
-whereas "potential issues" stands for error on both issues and potential
-issues. Users can set the default value via env variable
-\code{CHECKED_RESULTS_ERROR_ON}.}
+\item{error_on}{character vector indicating whether R error should be thrown when issues
+are discovered when generating results. "never" means that no errors
+are thrown. If "issues" then errors are emitted only on issues, whereas
+"potential issues" stands for error on both issues and potential issues. (Defaults to \code{"never"}, overwritable using option 'checked.results_error_on' or environment variable 'R_CHECKED_RESULTS_ERROR_ON')}
+
+\item{checker_obj}{\code{\link{checker}} object.}
 }
 \description{
 Get R CMD check results
 }
 \seealso{
 Other results: 
-\code{\link{print.checked_results}()},
-\code{\link{results_to_file}()}
+\code{\link{print.checked_results}()}
 }
 \concept{results}

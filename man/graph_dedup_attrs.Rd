@@ -6,6 +6,9 @@
 \usage{
 graph_dedup_attrs(g)
 }
+\arguments{
+\item{g}{task_graph object}
+}
 \description{
 Primarily intended for cleaning up the result of an \code{\link[igraph:union]{igraph::union()}},
 which adds duplicated attributes when attributes of the same name exist in

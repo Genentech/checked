@@ -3,11 +3,14 @@
 #' Create package specification list which consists of all the details required
 #' to identify and acquire source of the package.
 #'
-#' @param name name of the package.
+#' @param package name of the package.
 #' @param repos repository where package with given name should identified.
 #' @param path path to the source of the package (either bundled or not). URLs
 #' are acceptable.
-#' @param ... parameters passed to downstream constructors
+#' @param remote remote object from the `remotes` package used to identify
+#'   non-standard packages.
+#' @param .class Additional subclasses.
+#' @param ... parameters passed to downstream constructors.
 #'
 #' @family specs
 #' @export
@@ -41,6 +44,11 @@ format.pkg_origin_base <- function(x, ...) {
 #' @export
 format.pkg_origin <- function(x, ...) {
   format(x$source, ...)
+}
+
+#' @export
+format.pkg_origin_remote <- function(x, ...) {
+  format(class(x$remote)[[1]])
 }
 
 #' @export
@@ -82,8 +90,8 @@ try_pkg_origin_repo <- function(package, repos, ...) {
 #' @rdname pkg_origin
 pkg_origin_is_base <- function(package, ...) {
   is_base <- package == "R"
-  is_inst <- package %in% installed.packages()[, "Package"]
-  is_base[is_inst] <- installed.packages()[package[is_inst], "Priority"] == "base" # nolint
+  is_inst <- package %in% utils::installed.packages()[, "Package"]
+  is_base[is_inst] <- utils::installed.packages()[package[is_inst], "Priority"] == "base" # nolint
   is_base
 }
 
@@ -125,6 +133,30 @@ pkg_origin_local <- function(path = NULL, ...) {
 
 #' @export
 #' @rdname pkg_origin
+pkg_origin_remote <- function(remote = NULL, ...) {
+  source <- get_remote_package_source(remote)
+  package <- get_package_name(source)
+  version <- package_version(get_package_version(source))
+
+  pkg_origin(
+    package = package,
+    version = version,
+    remote = remote,
+    source = source,
+    ...,
+    .class = c("pkg_origin_remote", "pkg_origin_local")
+  )
+}
+
+sanitize_pkg_origin_remote <- function(x) {
+  if (is.null(x$source) || !dir.exists(x$source)) {
+    x$source <- get_remote_package_source(x$remote)
+  }
+  x
+}
+
+#' @export
+#' @rdname pkg_origin
 pkg_origin_archive <- function(path = NULL, ...) {
   pkg_origin(..., path = path, .class = "pkg_origin_archive")
 }
@@ -155,7 +187,11 @@ pkg_deps.pkg_origin <- function(
   dependencies = TRUE,
   db = available_packages(repos = repos)
 ) {
-  pkg_dependencies(package(x), db = db, dependencies = dependencies)
+  df <- pkg_dependencies(package(x), db = db, dependencies = dependencies)
+  # Packages here come from CRAN only hence we can assume that all entries
+  # with the name the same as the x are direct dependencies
+  df$depth <- ifelse(df$package == package(x), "direct", "indirect")
+  df
 }
 
 #' @export
@@ -166,28 +202,45 @@ pkg_deps.pkg_origin_local <- function(
   db = available_packages(repos = repos)
 ) {
   # We need to temporarily switch the object to data.frame, as subsetting
-  # assignemnt for matrix does not have drop parameter and always simplifies
+  # assignment for matrix does not have drop parameter and always simplifies
   # one row matrices to vectors.
   row <- read.dcf(file.path(x$source, "DESCRIPTION"))
+
   rownames(row) <- package(x)
   direct_deps <- pkg_dependencies(
     packages = package(x),
     dependencies = dependencies,
     db = row
   )
-  undirect_deps <- pkg_dependencies(
+  direct_deps$depth <- "direct"
+
+  indirect_deps <- pkg_dependencies(
     packages = direct_deps$name,
     dependencies = dependencies,
     db = db
   )
-  rbind(direct_deps, undirect_deps)
+  indirect_deps$depth <- "indirect"
+
+  rbind(direct_deps, indirect_deps)
+}
+
+#' @export
+pkg_deps.pkg_origin_remote <- function(
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE,
+  db = available_packages(repos = repos)
+) {
+  x <- sanitize_pkg_origin_remote(x)
+  NextMethod()
 }
 
 #' @export
 pkg_deps.pkg_origin_archive <- function(
   x,
   repos = getOption("repos"),
-  dependencies = TRUE
+  dependencies = TRUE,
+  db = available_packages(repos = repos)
 ) {
   # TODO: Implement it by fetching tarball, untarring it and dispatching
   # TODO: to origin_local
@@ -195,7 +248,7 @@ pkg_deps.pkg_origin_archive <- function(
 }
 
 
-install_params <- function(x) {
+install_params <- function(x, ...) {
   UseMethod("install_params")
 }
 
@@ -210,26 +263,32 @@ install_params.pkg_origin_unknown <- function(x, output, ...) {
 }
 
 #' @export
-install_params.pkg_origin_base <- function(x) {
+install_params.pkg_origin_base <- function(x, ...) {
   list()  # no installation needed, distributed with R
 }
 
 #' @export
-install_params.pkg_origin_repo <- function(x) {
+install_params.pkg_origin_repo <- function(x, ...) {
   list(package = x$package, repos = x$repos)
 }
 
 #' @export
-install_params.pkg_origin_local <- function(x) {
+install_params.pkg_origin_local <- function(x, ...) {
   list(package = x$source, repos = NULL)
 }
 
 #' @export
-install_params.pkg_origin_archive <- function(x) {
+install_params.pkg_origin_remote <- function(x, ...) {
+  x <- sanitize_pkg_origin_remote(x)
+  NextMethod()
+}
+
+#' @export
+install_params.pkg_origin_archive <- function(x, ...) {
   list(package = x$path, repos = NULL)
 }
 
-package_install_type <- function(x) {
+package_install_type <- function(x, ...) {
   UseMethod("package_install_type")
 }
 
@@ -239,11 +298,11 @@ package_install_type.pkg_origin <- function(x, output, ...) {
 }
 
 #' @export
-package_install_type.pkg_origin_local <- function(x) {
+package_install_type.pkg_origin_local <- function(x, ...) {
   "source"
 }
 
-check_path <- function(package_source, ...) {
+check_path <- function(x, ...) {
   UseMethod("check_path")
 }
 
@@ -259,10 +318,16 @@ check_path.pkg_origin_repo <- function(x, output, ...) {
 
 #' @export
 check_path.pkg_origin_local <- function(x, ...) {
-  x$path
+  x$source
+}
+
+#' @export
+check_path.pkg_origin_remote <- function(x, ...) {
+  x <- sanitize_pkg_origin_remote(x)
+  NextMethod()
 }
 
 #' @export
 check_path.pkg_origin_archive <- function(x, ...) {
-  x$path
+  x$source
 }

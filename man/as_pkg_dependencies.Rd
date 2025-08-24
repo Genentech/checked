@@ -15,7 +15,7 @@ Implements conventions established by both \code{\link[tools:package_dependencie
 and \code{\link[pkgdepends:as_pkg_dependencies]{pkgdepends::as_pkg_dependencies()}}, following
 \code{\link[pkgdepends:as_pkg_dependencies]{pkgdepends::as_pkg_dependencies()}} return type structure of a list
 including \verb{$direct} and \verb{$indirect} dependency types. Reimplemented to
-avoid dependence on \code{\link{pkgdepends}} compilation requirements.
+avoid dependence on \code{pkgdepends} compilation requirements.
 }
 \note{
 locally defined and bespoke dispatch system to avoid registering

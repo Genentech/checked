@@ -6,10 +6,8 @@
 #' Tasks can be nested, representing either a singular task, or a set of
 #' related tasks.
 #'
-#' @param alias task alias which also serves as unique identifier of the task.
-#' @param package \code{\link[checked]{package}} object
-#' @param tasks Optional additional tasks that are pre-requisites for running
-#'   this task.
+#' @param ... parameters passed to downstream constructors.
+#' @param .subclass Additional subclasses.
 #'
 #' @family tasks
 #' @export
@@ -22,17 +20,20 @@ task <- function(..., .subclass = NULL) {
 #' Meta tasks are tasks which are not intended to perform computation. They
 #' exist simply to provide relationships among computational tasks.
 #'
+#' @param ... Objects passed to specified class functions
+#' @param .subclass character name of the subclass. It will be appended with
+#'    "_meta" suffix.
 meta_task <- function(..., .subclass = NULL) {
   task(..., .subclass = c(sprintf("%s_meta", .subclass), "meta"))
 }
 
-make_unique_task <- function(task, seed = runif(1)) {
+make_unique_task <- function(task, seed = stats::runif(1)) {
   task$seed <- seed
   task
 }
 
-#' @family tasks
 #' @export
+#' @rdname lib
 lib.task <- function(x, ...) {
   character(0L)
 }
@@ -45,7 +46,7 @@ print.task <- function(x, ...) {
 
 #' Create a task to install a package and dependencies
 #'
-#' @param ... Additional parameters passed to [`task()`]
+#' @param origin [`pkg_origin()`] object.
 #' @param lib Any object that can be passed to [`lib()`] to generate a library
 #'   path.
 #' @inheritParams utils::install.packages
@@ -70,8 +71,9 @@ install_task <- function(
 }
 
 #' @export
+#' @rdname lib
 lib.install_task <- function(x, ...) {
-  lib(x$lib, ...)
+  lib(x$lib, dir_hash = hash(x$origin, n = 8), name = package(x), ...)
 }
 
 is_type <- function(x, type) {
@@ -79,7 +81,9 @@ is_type <- function(x, type) {
 }
 
 #' @export
-is_type.default <- inherits
+is_type.default <- function(x, type) {
+  inherits(x, type)
+}
 
 #' @export
 is_type.list <- function(x, type) {
@@ -130,6 +134,7 @@ check_task <- function(build_args = NULL, args = NULL, env = NULL, ...) {
 }
 
 #' @export
+#' @rdname lib
 lib.check_task <- function(x, ...) {
   character(0L)  # no additional libraries needed for checking
 }
@@ -137,113 +142,6 @@ lib.check_task <- function(x, ...) {
 is_check_task <- function(x) {
   inherits(x, "check_task")
 }
-
-#' Create a task to run reverse dependency checks
-#'
-#' @param revdep character indicating whether the task specification describes
-#' check associated with the development (new) or release (old) version of the
-#' for which reverse dependency check is run.
-#' @param ... Additional parameters passed to [`task()`]
-#'
-#' @family tasks
-#' @export
-revdep_check_task <- function(revdep, ...) {
-  task <- check_task(...)
-  task["revdep"] <- list(revdep)
-  class(task) <- c("revdep_check_task", class(task))
-  task
-}
-
-# TODO:
-#   Convert plan to graph
-#
-#   This can probably be avoided if we were to build a task graph from
-#   the start. Plans may be better represented as declarative graphs, which
-#   are then hydrated into imparative graphs. Then the hierarchical
-#   relationships are already encoded in the graph and need not be
-#   rediscovered by building a dependency graph post-hoc.
-#
-as_desc <- function(x, ...) {
-  UseMethod("as_desc")
-}
-
-#' @export
-as_desc.default <- function(x, ...) {
-  NULL
-}
-
-#' @export
-as_desc.subtasks_task <- function(x, ...) {
-  descs <- list()
-  length(descs) <- length(x$tasks)
-
-  for (i in seq_along(x$tasks)) {
-    descs[[i]] <- as_desc(x$tasks[[i]], ...)
-  }
-
-  descs <- bind_descs(descs)
-
-  # if this subtask is also a task of itself, add to descriptions collection
-  # after substituting aliased package names in dependencies
-  task_desc <- NextMethod()
-  if (!is.null(task_desc)) {
-    descs <- bind_descs(list(task_desc, descs))
-    descs <- sub_desc_aliases(descs)
-  }
-
-  descs
-}
-
-#' @export
-as_desc.install_task <- function(x, ...) {
-  cbind(as_desc(x$origin), Task = hash(x))
-}
-
-#' @export
-as_desc.check_task <- function(x, ...) {
-  cbind(as_desc(x$origin), Task = hash(x))
-}
-
-#' @export
-as_desc.character <- function(x) {
-  desc <- read.dcf(x)
-  read.dcf(x, fields = unique(c(colnames(desc), names(DEP))))
-}
-
-#' @export
-as_desc.pkg_origin_local <- function(x) {
-  desc <- as_desc(file.path(x$source, "DESCRIPTION"))
-
-  # update the Package field, replacing actual name with an alias
-  desc <- cbind(desc, Alias = x$package)
-  rownames(desc) <- desc[, "Package"] <- hash(x)
-
-  desc
-}
-
-#' @export
-as_desc.pkg_origin_repo <- function(x) {
-  ap <- available_packages(repos = x$repos)
-  ap[x$package, , drop = FALSE]
-}
-
-flatten <- function(x) {
-  UseMethod("flatten")
-}
-
-#' @export
-flatten.default <- function(x) {
-  list(x)
-}
-
-#' @export
-flatten.subtasks_task <- function(x) {
-  unlist(recursive = FALSE, c(
-    list(list(x)),
-    lapply(x$tasks, function(xi) flatten(xi))
-  ))
-}
-
 
 package <- function(x) {
   UseMethod("package")
@@ -255,12 +153,7 @@ package.default <- function(x) {
 }
 
 #' @export
-package.check_task <- function(x) {
-  package(x$origin)
-}
-
-#' @export
-package.install_task <- function(x) {
+package.task <- function(x) {
   package(x$origin)
 }
 

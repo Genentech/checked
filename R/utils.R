@@ -18,6 +18,14 @@ as_vertex_name.task <- function(x, ...) {
   )
 }
 
+#' @export
+as_vertex_name.local_check_meta_task <- function(x, ...) {
+  paste0(
+    hash(x, ...),
+    gsub("\\s+", "-", fmt(task = x, "-{action}", ansi = FALSE))
+  )
+}
+
 hash <- function(x, n = 12) {
   substring(cli::hash_obj_sha256(x), 1, n)
 }
@@ -73,3 +81,14 @@ vcapply <- function(...) vapply(..., FUN.VALUE = character(1L))
 vlapply <- function(...) vapply(..., FUN.VALUE = logical(1L))
 viapply <- function(...) vapply(..., FUN.VALUE = integer(1L))
 vnapply <- function(...) vapply(..., FUN.VALUE = numeric(1L))
+
+suppressWarningsRegex <- function(expr, regex, ...) {
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      if (grepl(pattern = regex, x = conditionMessage(w), ...)) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
+}

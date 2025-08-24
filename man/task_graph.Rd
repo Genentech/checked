@@ -15,7 +15,8 @@ determine package relationships.}
 \item{...}{params passed to helper methods.}
 }
 \value{
-A \code{data.frame} that can be used to build \code{\link{igraph}} edges.
+A \code{data.frame} that can be used to build
+\code{\link[igraph:make_graph]{igraph::make_graph}} edges.
 }
 \description{
 Edges describe relationships between tasks. Often, this is a dependency
@@ -32,7 +33,7 @@ data.
 }
 \examples{
 \dontrun{
-task_graph_create(plan_rev_dep_checks("."))
+task_graph(plan_rev_dep_checks("."))
 }
 }
 \keyword{internal}

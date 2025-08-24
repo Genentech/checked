@@ -6,7 +6,6 @@ cli_type <- function(types, x) {
   structure(x, class = paste0("cli_", types))
 }
 
-#' @export
 format_simplify_path <- function(x, ..., full.path = FALSE) {
   if (full.path) {
     return(normalizePath(x, mustWork = FALSE))
@@ -15,7 +14,10 @@ format_simplify_path <- function(x, ..., full.path = FALSE) {
   wp <- path_parts(getwd())
   xp <- path_parts(normalizePath(x, mustWork = FALSE))
   min_len <- min(length(wp), length(xp))
-  first_diff <- Position(identity, head(wp, min_len) != head(xp, min_len))
+  first_diff <- Position(
+    identity,
+    utils::head(wp, min_len) != utils::head(xp, min_len)
+  )
 
   if (is.na(first_diff)) {
     parts <- utils::tail(xp, -min_len)
@@ -79,6 +81,11 @@ path_logs <- function(path) {
 
 path_sources <- function() {
   dir_create(p <- file.path(tempdir(), "checked_tmp"))
+  normalizePath(p)
+}
+
+path_remotes <- function() {
+  dir_create(p <- file.path(tempdir(), "checked_remotes"))
   normalizePath(p)
 }
 

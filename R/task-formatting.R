@@ -3,6 +3,11 @@ format.task <- function(x, ..., indent = 0L) {
   fmt(task = x, "{action} {package} {version} from {source}", ...)
 }
 
+#' @export
+format.local_check_meta_task <- function(x, ..., indent = 0L) {
+  fmt(task = x, "{action}", ...)
+}
+
 format_task_type <- function(x, ...) {
   UseMethod("format_task_type")
 }
@@ -22,7 +27,10 @@ format_task_type.rev_dep_check_meta_task <- function(x, ..., g = NULL) {
   fmt(task = x, "meta revdep {.pkg {x$revdep}} of")
 }
 
-
+#' @export
+format_task_type.local_check_meta_task <- function(x, ...) {
+  "meta checks"
+}
 
 format_task_name <- function(x, ...) {
   UseMethod("format_task_name")

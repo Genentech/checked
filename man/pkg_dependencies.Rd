@@ -7,9 +7,26 @@
 pkg_dependencies(
   packages,
   dependencies = TRUE,
-  db = available.packages(),
+  db = available_packages(),
   verbose = FALSE
 )
+}
+\arguments{
+\item{packages}{a character vector of package names.}
+
+\item{dependencies}{A \code{logical} scalar, \code{character} string of
+\code{"all"}, \code{"most"}, \code{"hard"} or \code{"soft"}, \code{NA} or a vector of dependency
+types compatible with \code{\link[=as_pkg_dependencies]{as_pkg_dependencies()}} function.}
+
+\item{db}{character matrix as from \code{\link{available.packages}()}
+    (with the default \code{NULL} the results of this call)
+    or data frame variants thereof.  Alternatively, a package database
+    like the one available from
+    \url{https://cran.r-project.org/web/packages/packages.rds}.
+  }
+
+\item{verbose}{logical indicating if output should monitor the package
+    search cycles.}
 }
 \description{
 Inspired by \code{tools::package_dependencies}, but with the added benefit

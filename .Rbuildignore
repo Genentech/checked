@@ -11,3 +11,4 @@
 ^codecov\.yml$
 ^README\.html$
 ^README_cache$
+^\.lintr
