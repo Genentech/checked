@@ -31,6 +31,7 @@ repository for which reverse dependencies should be identified.
 }
 \seealso{
 Other plan: 
-\code{\link{plan_local_checks}()}
+\code{\link{plan_local_checks}()},
+\code{\link{plan_local_install}()}
 }
 \concept{plan}
