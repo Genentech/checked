@@ -200,11 +200,47 @@ plan_local_checks <- function(
     repos = repos
   )
 
+  star_plan_template(c(
+    list(task),
+    local_checks_tasks
+  ))
+}
+
+
+#' Plan source package installation
+#'
+#' Generates a plan for running installing a package from source.
+#'
+#' @param package A path to package source.
+#' @param repos repository used to identify packages when name is provided.
+#' @param dependencies either character vector or logical value specifying
+#'  which dependencies should be installed.
+#'
+#'
+#' @family plan
+plan_local_install <- function(
+  package,
+  repos = getOption("repos")
+) {
+
+  m_task <- meta_task(
+    origin = NULL,
+    .subclass = "local_install"
+  )
+
+  i_task <- install_task(
+    origin = pkg_origin_local(package)
+  )
+
+  star_plan_template(list(
+    m_task,
+    i_task
+  ))
+}
+
+star_plan_template <- function(tasks) {
   g <- star_graph(
-    task = c(
-      list(task),
-      local_checks_tasks
-    )
+    task = tasks
   )
 
   E(g)$type <- rep(DEP$Depends, times = length(E(g)))

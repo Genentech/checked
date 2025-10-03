@@ -205,7 +205,14 @@ checker <- R6::R6Class(
     is_done = function() {
       is_check_node <- is_check(V(self$graph)$task)
       checks <- V(self$graph)[is_check_node]
-      all(checks$status == STATUS$done)
+      if (length(checks) > 0) {
+        all(checks$status == STATUS$done)
+      } else {
+        # If there is not a single check tasks, we need to make sure all
+        # the task finished
+        all(V(self$graph)$status == STATUS$done)
+      }
+
     }
   ),
   private = list(
