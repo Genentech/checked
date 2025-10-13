@@ -1,8 +1,8 @@
-# TODO: Refactor entire reporter
-
-report_initialize.reporter_basic_tty <- function(
+#' @export
+report_start_setup.reporter_basic_tty <- function(
   reporter,
   checker,
+  ...,
   envir = parent.frame()
 ) {
   # start with initialized-as-completed tasks
@@ -23,9 +23,7 @@ report_status.reporter_basic_tty <- function(reporter, checker, envir) {
   cli_theme()
   g <- checker$graph
   tasks_names <- names(igraph::V(g))
-  # skip if queued, but not started or already finished
-  reported_statuses <- sapply(reporter$statuses, `[[`, 1)
-  reported_done <- names(reported_statuses[reported_statuses == STATUS$done])
+  reported_done <- names(reporter$status[reporter$status == STATUS$done])
   tasks_not_started <-
     names(igraph::V(g)[igraph::V(g)$status <= STATUS$`ready`])
   tasks_to_report <-
@@ -40,7 +38,7 @@ report_status.reporter_basic_tty <- function(reporter, checker, envir) {
     p <- node$process
 
     # report stating of new checks
-    if (!identical(node$status, reporter$statuses[[node$name]])) {
+    if (!identical(node$status, reporter$status[[node$name]])) {
       status <- switch(as.character(node$status), # nolint (used via glue)
         "pending" = "queued",
         "in progress" = cli::cli_fmt(cli::cli_text("started")),
@@ -88,8 +86,8 @@ report_status.reporter_basic_tty <- function(reporter, checker, envir) {
       time <- Sys.time() - reporter$time_start # nolint (used via glue)
       type <- format_task_type(node$task) # nolint (used via glue)
       prefix <- cli::col_cyan("[{format_time(time)}][{type}] ")
-      cli::cli_text(prefix, "{.pkg {node$package}} {status}")
-      reporter$statuses[[node$name]] <- node$status
+      cli::cli_text(prefix, "{.pkg {package(node$task)}} {status}")
+      reporter$status[[node$name]] <- node$status
     }
   }
 }
