@@ -37,12 +37,7 @@ run.checker <- function(checker, ..., reporter = reporter_default()) {
 
   report_start_setup(reporter, checker)
   report_start_checks(reporter, checker)
-  while (checker$step()) {
-    if (length(checker$active_processes()) == 0 && !checker$is_done()) {
-      warning("some tasks not executed due to unsolved dependency requirements")
-      break
-    }
-
+  while (report_step(reporter, checker)) {
     report_status(reporter, checker)
     report_sleep(reporter, checker)
   }

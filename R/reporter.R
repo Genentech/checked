@@ -119,3 +119,8 @@ report_finalize <- function(reporter, checker) {
 report_task <- function(reporter, g, v) {
   UseMethod("report_task")
 }
+
+#' @rdname reporters-internal
+report_step <- function(reporter, checker) {
+  UseMethod("report_step")
+}

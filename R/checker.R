@@ -193,6 +193,10 @@ checker <- R6::R6Class(
         return(as.integer(success))
       }
 
+      if (length(private$active) == 0 && !self$is_done()) {
+        stop("some tasks not executed due to unsolved dependency requirements")
+      }
+
       finished <- (length(private$active) == 0) && self$is_done()
 
       -finished

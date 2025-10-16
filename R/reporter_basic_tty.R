@@ -5,14 +5,14 @@ report_start_setup.reporter_basic_tty <- function(
   ...,
   envir = parent.frame()
 ) {
-  # start with initialized-as-completed tasks
+  # start with all tasks initialized as pending
   v <- igraph::V(checker$graph)
-  which_done <- v$status == STATUS$done
-  done <- v[which_done]$status
-  names(done) <- v$name[which_done]
+  v_actionable <- v[is_actionable_task(v$task)]
 
   # named factor vector, names as task aliases and value of last reported status
-  reporter$status <- done
+  reporter$status <- rep(STATUS$pending, times = length(v_actionable))
+  names(reporter$status) <- v_actionable$name
+
   reporter$time_start <- Sys.time()
 
   cli::cli_text("<", utils::packageName(), "> Checks")
@@ -22,7 +22,7 @@ report_start_setup.reporter_basic_tty <- function(
 report_status.reporter_basic_tty <- function(reporter, checker, envir) {
   cli_theme()
   g <- checker$graph
-  tasks_names <- names(igraph::V(g))
+  tasks_names <- names(reporter$status)
   reported_done <- names(reporter$status[reporter$status == STATUS$done])
   tasks_not_started <-
     names(igraph::V(g)[igraph::V(g)$status <= STATUS$`ready`])
@@ -98,4 +98,9 @@ report_finalize.reporter_basic_tty <- function(reporter, checker) {
   report_status(reporter, checker) # report completions of final processes
   time <- format_time(Sys.time() - reporter$time_start) # nolint (used via glue)
   cli::cli_text("Finished in {.time_taken {time}}")
+}
+
+#' @export
+report_step.reporter_basic_tty <- function(reporter, checker) {
+  checker$start_next_task() >= 0
 }
