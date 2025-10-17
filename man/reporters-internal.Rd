@@ -6,9 +6,11 @@
 \alias{report_sleep.default}
 \alias{report_start_setup}
 \alias{report_start_checks}
+\alias{report_start_checks.default}
 \alias{report_status}
 \alias{report_finalize}
 \alias{report_task}
+\alias{report_step}
 \title{Reporter Internal Methods}
 \usage{
 report_sleep(reporter, checker, sleep)
@@ -19,11 +21,15 @@ report_start_setup(reporter, checker, ..., envir = parent.frame())
 
 report_start_checks(reporter, checker, ..., envir = parent.frame())
 
+\method{report_start_checks}{default}(reporter, checker, ..., envir = parent.frame())
+
 report_status(reporter, checker, envir = parent.frame())
 
 report_finalize(reporter, checker)
 
 report_task(reporter, g, v)
+
+report_step(reporter, checker)
 }
 \arguments{
 \item{reporter}{A object produced using \code{\link{reporters}}. Each reporter is a

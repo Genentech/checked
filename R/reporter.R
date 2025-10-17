@@ -101,6 +101,11 @@ report_start_checks <- function(reporter, checker, ..., envir = parent.frame()) 
 }
 
 #' @rdname reporters-internal
+report_start_checks.default <- function(reporter, checker, ..., envir = parent.frame()) { # nolint
+  NULL
+}
+
+#' @rdname reporters-internal
 report_status <- function(reporter, checker, envir = parent.frame()) {
   UseMethod("report_status")
 }
@@ -113,4 +118,9 @@ report_finalize <- function(reporter, checker) {
 #' @rdname reporters-internal
 report_task <- function(reporter, g, v) {
   UseMethod("report_task")
+}
+
+#' @rdname reporters-internal
+report_step <- function(reporter, checker) {
+  UseMethod("report_step")
 }

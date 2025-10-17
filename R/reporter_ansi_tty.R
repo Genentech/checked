@@ -62,14 +62,22 @@ format_status_line_ansi.check_process <- function(
 format_status_line_ansi.default <- function(
     process,
     ...,
+    status,
     width = getOption("width", 80L)) {
+
+  msg <- if (status == STATUS$done) {
+    "restored from system file."
+  } else {
+    "starting ..."
+  }
+
   out <- cli_table_row(
     status = "NONE",
     ok = 0,
     notes = 0,
     warnings = 0,
     errors = 0,
-    "restored from system file."
+    msg
   )
 
   cli::ansi_substring(out, 1, width)
@@ -224,7 +232,7 @@ report_task_ansi_tty.check_task <- function(reporter, g, v) {
       justify = "right",
       width = reporter$label_nchar
     ),
-    status = format_status_line_ansi(v$process)
+    status = format_status_line_ansi(v$process, status = v$status)
   )
 }
 
@@ -443,4 +451,9 @@ report_finalize.reporter_ansi_tty <- function(reporter, checker) {
   cli::cli_progress_done(.envir = reporter$cli)
   cat(ansi_line_erase()) # clear lingering progress bar output
   cli::ansi_show_cursor()
+}
+
+#' @export
+report_step.reporter_ansi_tty <- function(reporter, checker) {
+  checker$step()
 }
