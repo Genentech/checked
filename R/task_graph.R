@@ -315,12 +315,6 @@ task_graph_which_ready <- function(g) {
   nodes[statuses == STATUS["ready"]]
 }
 
-empty_edge <- data.frame(
-  dep = character(0),
-  root = character(0),
-  type = character(0)
-)
-
 task_graph_set_package_status <- function(g, v, status) {
   if (is.character(status)) status <- STATUS[[status]]
   igraph::set_vertex_attr(g, "status", v, status)
