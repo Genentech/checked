@@ -139,10 +139,6 @@ lib.check_task <- function(x, ...) {
   character(0L)  # no additional libraries needed for checking
 }
 
-is_check_task <- function(x) {
-  inherits(x, "check_task")
-}
-
 package <- function(x) {
   UseMethod("package")
 }

@@ -87,29 +87,3 @@ graph_dedup_attrs <- function(g) {
 
   g
 }
-
-complete_columns <- function(df, cols) {
-  n_gtz <- nrow(df) > 0
-  for (col in setdiff(cols, colnames(df))) df[[col]] <- NA[n_gtz]
-  df[, cols, drop = FALSE]
-}
-
-copy_edges_from_vertex <- function(g, v_to, v_from, mode = "all") {
-  for (e in igraph::incident(g, v_from, mode)) {
-    v_ends <- igraph::ends(g, e)
-    if (v_ends[1] == v_from) {
-      g <- igraph::add_edges(
-        g,
-        c(v_to, v_ends[2]),
-        attr = igraph::edge.attributes(g, e)
-      )
-    } else {
-      g <- igraph::add_edges(
-        g,
-        c(v_ends[1], v_to),
-        attr = igraph::edge.attributes(g, e)
-      )
-    }
-  }
-  g
-}
