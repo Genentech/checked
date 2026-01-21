@@ -164,6 +164,9 @@ checker <- R6::R6Class(
       if (self$is_done()) {
         return(-1L)
       }
+      
+      # force garbage collection to free memory from terminated processes
+      gc(verbose = FALSE, reset = FALSE, full = TRUE)
 
       # force garbage collection to free memory from terminated processes
       gc(verbose = FALSE, reset = FALSE, full = TRUE)
