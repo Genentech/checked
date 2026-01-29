@@ -65,14 +65,18 @@ format_status_line_ansi.default <- function(
     status,
     width = getOption("width", 80L)) {
 
-  msg <- if (status == STATUS$done) {
-    "restored from system file."
+  if (status == STATUS$done) {
+    msg <- "restored from system file."
+    status <- "NONE"
   } else {
-    "starting ..."
+    msg <- "starting ..."
+    status <- silent_spinner(list(
+      frames = c("\u2834", "\u2826", "\u2816", "\u2832")
+    ))$spin()
   }
 
   out <- cli_table_row(
-    status = "NONE",
+    status = status,
     ok = 0,
     notes = 0,
     warnings = 0,
@@ -254,7 +258,11 @@ report_start_setup.reporter_ansi_tty <- function(
 ) {
   if (cli_env_has_pb(reporter$cli)) return()
   reporter$cli <- new.env(parent = reporter)
-
+  
+  reporter$tty_height <- ansi_tty_height()
+  # Buffer is shorter than actual tty by one line due to progress bar existance
+  reporter$buffer_height <- reporter$tty_height - 1
+  
   # hide cursor when initializer enters, ensure its restored even if interrupted
   cli::ansi_hide_cursor()
   do.call(
@@ -319,9 +327,10 @@ report_start_checks.reporter_ansi_tty <- function(
   reporter$buffer_proto <- function(node = "") {
     df <- data.frame(
       # tracking columns
-      node = node, #   reporter node name
-      new = TRUE,  #   whether node is newly added (requires newlines)
-      updated = NA #   whether output needs to be updated
+      node = node,  #   reporter node name
+      new = TRUE,   #   whether node is newly added (requires newlines)
+      updated = NA, #   whether output needs to be updated
+      final = FALSE #   whether element is no longer a subject to change
     )
 
     # output columns
@@ -332,7 +341,7 @@ report_start_checks.reporter_ansi_tty <- function(
   # initialize our buffer of output
   reporter$buffer <- reporter$buffer_proto()[c(), ]
 
-  reporter$buffer_update <- function(node, lines) {
+  reporter$buffer_update <- function(node, lines, final = FALSE) {
     if (!node %in% reporter$buffer$node) {
       proto_df <- reporter$buffer_proto(node)[rep_len(1L, length(lines)), ]
       reporter$buffer <- rbind(reporter$buffer, proto_df)
@@ -340,6 +349,7 @@ report_start_checks.reporter_ansi_tty <- function(
 
     is_node <- which(reporter$buffer$node == node)
     reporter$buffer$updated[is_node] <- TRUE
+    reporter$buffer$final[is_node] <- final
     reporter$buffer$line[is_node] <- lines
   }
 
@@ -348,7 +358,8 @@ report_start_checks.reporter_ansi_tty <- function(
     node <- V(checker$graph)[node][[1]]
     to_report <- report_task(reporter, checker$graph, node)
     output <- vcapply(to_report, format)
-    reporter$buffer_update(node, output)
+    final <- node$status == STATUS$done
+    reporter$buffer_update(node, output, final = final)
   }
 
   extra <- list(message = "")
@@ -373,45 +384,22 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
 
   # add newly started task status
   is_running <- v$status > STATUS$ready & v$status < STATUS$done
-  is_newly_done <- v$status >= STATUS$done & !v$name %in% reporter$buffer$node
+  is_done <- v$status >= STATUS$done 
+  is_in_buffer <- v %in% reporter$buffer$node 
+  is_non_final_in_buffer <- vlapply(v, function(n) {
+    if (n %in% reporter$buffer$node) {
+      reporter$buffer$final[which(reporter$buffer$node == n)[[1]]]
+    } else {
+      FALSE
+    } 
+  })
+  is_newly_done <- is_done & !is_non_final_in_buffer
+
   updated <- v[is_running | is_newly_done]
-  
-  # Update failed tasks
-  failed_tasks <- design$failed_tasks()
-  failed_packages <-
-    failed_tasks[vlapply(failed_tasks, function(x) is_install(x$task))]
 
   # skip if no updates
   if (length(updated) <= 0L) {
     return()
-  }
-  
-  if (length(reporter$failed_packaged) != length(failed_packages)) {
-    # Add failed packages warning to the buffer
-    failures_buffer <- rev(unlist(lapply(failed_packages, function(x) {
-      list(
-        cli_wrap_lines(cli::cli_fmt(cli::cli_alert_danger(
-          sprintf("%s package installation had non-zero exit status", package(x$task[[1]]))
-        ))),
-        cli_wrap_lines(as.character(cli::style_dim(
-          sprintf("log: %s", x$process[[1]]$log)
-        )))
-      )
-    })))
-    
-    reporter$failures_buffer <- vcapply(seq_along(failures_buffer), function(i) {
-      paste0(
-        ansi_move_line_rel(i),
-        ansi_line_erase(),
-        failures_buffer[i],
-        ansi_move_line_rel(-i),
-        sep = ""
-      )
-    })
-    
-    # For performance store these value in the environment to redraw warnings
-    # buffer only when necessary
-    reporter$failed_packaged <- failed_packages
   }
 
   # print header if this is the first status line of the reporter
@@ -421,7 +409,8 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
       list(reporter_line(
         label = reporter_cell("", width = reporter$label_nchar),
         status = cli_table_row("S", "OK", "N", "W", "E", style = "title")
-      ))
+      )),
+      final = TRUE
     )
   }
 
@@ -446,33 +435,45 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
     reporter$buffer$updated <- TRUE
   }
 
+  # Get number of lines that are final and didn't update since the last pass
+  finalized_lines <- cumprod(!reporter$buffer$updated & reporter$buffer$final) == 1
+  # Finalized lines as well as lines that are in progress but would exceed
+  # the maximum height of the tty should be skipped from reporting until
+  # the number of finished tasks allows to fit new ones.
+  reportable_lines <- !finalized_lines
+  # Which max returns the position of first TRUE, then we allow folloiwng
+  # reporter$buffer_height lines to be reported at the time
+  if (sum(reportable_lines) > reporter$buffer_height) {
+    reportable_lines[
+      seq(which.max(reportable_lines) + reporter$buffer_height, length(reportable_lines))
+    ] <- FALSE
+  }
+
   # introduce newlines for newly added reporter rows
   buffer <- strrep(
-    "\n", sum(reporter$buffer$new)
+    "\n", sum(reporter$buffer$new & reportable_lines)
   )
+  reporter$buffer$new[reportable_lines] <- FALSE
 
   # for each not-yet finished task, report status
-  for (idx in which(reporter$buffer$updated)) {
+  for (idx in which(reporter$buffer$updated & reportable_lines)) {
     # derive reporter information
-    n_lines <- nrow(reporter$buffer) - idx + 1L
+    n_lines <- sum(reportable_lines) - idx + 1L + sum(finalized_lines)
 
-    # report status line
     buffer <- paste0(
       buffer,
-      #ansi_move_line_rel(n_lines + length(reporter$failures_buffer)),
       ansi_move_line_rel(n_lines),
       ansi_line_erase(),
       format(reporter$buffer$line[[idx]]),
-      #ansi_move_line_rel(-(n_lines + length(reporter$failures_buffer))),
       ansi_move_line_rel(-n_lines),
       sep = ""
     )
+    
+    reporter$buffer$updated[idx] <- FALSE
   }
 
   reporter$width <- cli::console_width()
-  reporter$buffer$updated <- FALSE
   cat(buffer)
-#  cat(reporter$failures_buffer)
 
   n_finished <- sum(v[is_check(v$task)]$status >= STATUS$done)
   cli::cli_progress_update(
@@ -484,14 +485,35 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
 
 #' @export
 report_finalize.reporter_ansi_tty <- function(reporter, checker) {
-  report_status(reporter, checker) # report completions of final processes
+  # iterate until buffer is fully processed
+  while (NROW(reporter$buffer) == 0 ||
+         !all(!reporter$buffer$updated & reporter$buffer$final)) {
+    report_status(reporter, checker) # report completions of final processes
+  }
   cli::cli_progress_done(.envir = reporter$cli)
   cat(ansi_line_erase()) # clear lingering progress bar output
+
+  # Display failures
+  failed_tasks <- checker$failed_tasks()
+  failed_packages <-
+    failed_tasks[vlapply(failed_tasks, function(x) is_install(x$task))]
+
+  failures_output <- unlist(lapply(failed_packages, function(x) {
+    list(
+      cli_wrap_lines(cli::cli_fmt(cli::cli_alert_danger(
+        sprintf("%s package installation had non-zero exit status", package(x$task[[1]]))
+      ))),
+      cli_wrap_lines(as.character(cli::style_dim(
+        sprintf("log: %s", x$process[[1]]$log)
+      )))
+    )
+  }))
+
+  cat(failures_output, "\n")
   cli::ansi_show_cursor()
 }
 
 #' @export
 report_step.reporter_ansi_tty <- function(reporter, checker) {
-  #checker$step()
   checker$start_next_task() >= 0
 }

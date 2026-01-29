@@ -41,6 +41,6 @@ run.checker <- function(checker, ..., reporter = reporter_default()) {
     report_status(reporter, checker)
     report_sleep(reporter, checker)
   }
-
+  
   invisible(checker)
 }
