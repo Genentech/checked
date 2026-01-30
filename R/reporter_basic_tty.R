@@ -102,9 +102,9 @@ report_finalize.reporter_basic_tty <- function(reporter, checker) {
 
 #' @export
 report_sleep.reporter_basic_tty <- function(
-    reporter,
-    checker,
-    sleep = 0
+  reporter,
+  checker,
+  sleep = 0
 ) {
   # Basci tty does not need sleep
   NULL

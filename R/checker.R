@@ -167,7 +167,7 @@ checker <- R6::R6Class(
         return(-1L)
       }
 
-      # force garbage collection every 20 loops 
+      # force garbage collection every 20 loops
       # to free memory from terminated processes
       if (private$task_loop_counter %% 20 == 0) {
         gc(verbose = FALSE, reset = FALSE, full = TRUE)
@@ -239,7 +239,7 @@ checker <- R6::R6Class(
 
     # failed tasks
     failed = list(),
-    
+
     # task loop counter
     task_loop_counter = 0,
 
@@ -303,7 +303,7 @@ checker <- R6::R6Class(
           "result.json"
         ))
       })
-      
+
       for (task in checks[check_done]) {
         private$finish_node(task)
       }

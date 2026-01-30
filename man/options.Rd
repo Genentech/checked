@@ -26,6 +26,13 @@ tty refresh interval when reporting results in milliseconds\item{default: }{\pre
 \item{envvar: }{R_CHECKED_TTY_TICK_INTERVAL (evaluated if possible, raw string otherwise)}
 }}
 
+\item{tty_default_height}{\describe{
+deafult tty height used for the ANSI reporter. Used only
+if correct values could not be acquired with system('tput lines')\item{default: }{\preformatted{50}}
+\item{option: }{checked.tty_default_height}
+\item{envvar: }{R_CHECKED_TTY_DEFAULT_HEIGHT (evaluated if possible, raw string otherwise)}
+}}
+
 \item{results_error_on}{\describe{
 character vector indicating whether R error should be thrown when issues
 are discovered when generating results. "never" means that no errors

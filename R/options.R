@@ -2,11 +2,11 @@
 options::define_options(
   "tty refresh interval when reporting results in milliseconds",
   tty_tick_interval = 0.1,
-  
+
   "deafult tty height used for the ANSI reporter. Used only
    if correct values could not be acquired with system('tput lines')",
   tty_default_height = 50,
-  
+
   "character vector indicating whether R error should be thrown when issues
    are discovered when generating results. \"never\" means that no errors
    are thrown. If \"issues\" then errors are emitted only on issues, whereas

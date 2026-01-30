@@ -213,9 +213,6 @@ plan_local_checks <- function(
 #'
 #' @param package A path to package source.
 #' @param repos repository used to identify packages when name is provided.
-#' @param dependencies either character vector or logical value specifying
-#'  which dependencies should be installed.
-#'
 #'
 #' @family plan
 plan_local_install <- function(

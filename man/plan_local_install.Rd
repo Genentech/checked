@@ -10,9 +10,6 @@ plan_local_install(package, repos = getOption("repos"))
 \item{package}{A path to package source.}
 
 \item{repos}{repository used to identify packages when name is provided.}
-
-\item{dependencies}{either character vector or logical value specifying
-which dependencies should be installed.}
 }
 \description{
 Generates a plan for running installing a package from source.

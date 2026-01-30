@@ -24,7 +24,7 @@ ansi_move_line_rel <- function(n) {
 #' Get the height of the ansi tty using 'tput lines' interface
 ansi_tty_height <- function() {
   tryCatch(
-    as.numeric(system('tput lines', intern = TRUE, ignore.stderr = TRUE)),
+    as.numeric(system("tput lines", intern = TRUE, ignore.stderr = TRUE)),
     warning = function(w) {
       options::opt("tty_default_height")
     }

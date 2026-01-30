@@ -30,6 +30,9 @@ the R CMD check. (Defaults to \verb{c(}\emph{R_CHECK_FORCE_SUGGESTS}\verb{= FALS
 \item{restore}{\code{logical} indicating whether output directory should be unlinked before
 running checks. If \code{FALSE}, an attempt will me made to restore previous
 progress from the same \code{output} (Defaults to \code{NA}, overwritable using option 'checked.restore' or environment variable 'R_CHECKED_RESTORE')}
+
+\item{tty_default_height}{deafult tty height used for the ANSI reporter. Used only
+if correct values could not be acquired with system('tput lines') (Defaults to \code{50}, overwritable using option 'checked.tty_default_height' or environment variable 'R_CHECKED_TTY_DEFAULT_HEIGHT')}
 }
 \description{
 Checked Options
