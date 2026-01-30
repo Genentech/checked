@@ -1,6 +1,6 @@
 Package: checked
 Title: Systematically Run R CMD Checks
-Version: 0.0.5.9000
+Version: 0.5.0.9000
 Authors@R:
     c(
       person(

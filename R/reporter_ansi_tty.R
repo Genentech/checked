@@ -384,7 +384,6 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
 
   # add newly started task status
   is_running <- v$status > STATUS$ready & v$status < STATUS$done
-  is_done <- v$status >= STATUS$done
   is_non_final_in_buffer <- vlapply(v, function(n) {
     if (n %in% reporter$buffer$node) {
       reporter$buffer$final[which(reporter$buffer$node == n)[[1]]]
@@ -498,18 +497,17 @@ report_finalize.reporter_ansi_tty <- function(reporter, checker) {
   failed_packages <-
     failed_tasks[vlapply(failed_tasks, function(x) is_install(x$task))]
 
-
-  failures_output <- unlist(lapply(failed_packages, function(x) {
-    list(cli_wrap_lines(cli::cli_fmt(cli::cli_alert_danger(
+  failures_output <- vcapply(failed_packages, function(x) {
+    paste0(cli_wrap_lines(cli::cli_fmt(cli::cli_alert_danger(
       sprintf(
         "%s package installation had non-zero exit status",
         package(x$task[[1]])
-      )
-    ))),
+      ),
+    ))), "\n",
     cli_wrap_lines(as.character(cli::style_dim(
       sprintf("log: %s", x$process[[1]]$log)
     ))))
-  }))
+  })
 
   cat(failures_output, "\n")
   cli::ansi_show_cursor()

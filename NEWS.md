@@ -1,4 +1,8 @@
-# checked 0.2.3 (dev)
+# checked 0.5.0
+
+* Entire package refactor
+
+# checked 0.2.3
 
 * Fix check processes hanging forever in some system configurations.
 
