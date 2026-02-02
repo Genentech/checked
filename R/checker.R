@@ -151,12 +151,11 @@ checker <- R6::R6Class(
     #' @return A integer value, coercible to logical to indicate whether a new
     #'   process was spawned, or `-1` if all tasks have finished.
     start_next_task = function() {
-      # Increase counter
-      private$task_loop_counter <- private$task_loop_counter + 1
       # finish any finished processes
       for (process in private$active) {
         if (!process$is_alive()) {
           process$finish()
+          private$gc_needed <- TRUE
         } else if (inherits(process, "check_process")) {
           # NOTE: check process never finishes unless we poll checks
           process$poll_output()
@@ -167,10 +166,9 @@ checker <- R6::R6Class(
         return(-1L)
       }
 
-      # force garbage collection every 20 loops
-      # to free memory from terminated processes
-      if (private$task_loop_counter %% 20 == 0) {
+      if (private$gc_needed) {
         gc(verbose = FALSE, reset = FALSE, full = TRUE)
+        private$gc_needed <- FALSE
       }
 
       # if all available processes are in use, terminate early
@@ -241,7 +239,7 @@ checker <- R6::R6Class(
     failed = list(),
 
     # task loop counter
-    task_loop_counter = 0,
+    gc_needed = FALSE,
 
     start_node = function(node) {
       task_graph_package_status(self$graph, node) <- STATUS$`in progress`
