@@ -384,6 +384,8 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
 
   # add newly started task status
   is_running <- v$status > STATUS$ready & v$status < STATUS$done
+
+  is_done <- v$status >= STATUS$done
   is_non_final_in_buffer <- vlapply(v, function(n) {
     if (n %in% reporter$buffer$node) {
       reporter$buffer$final[which(reporter$buffer$node == n)[[1]]]
@@ -392,7 +394,6 @@ report_status.reporter_ansi_tty <- function(reporter, checker, envir) {
     }
   })
   is_newly_done <- is_done & !is_non_final_in_buffer
-
   updated <- v[is_running | is_newly_done]
 
   # skip if no updates

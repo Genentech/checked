@@ -4,6 +4,13 @@
 \alias{options_params}
 \title{Checked Options}
 \arguments{
+\item{proactive_gc}{\code{logical}, indicating whether additional garbage collection should be
+performed before starting a new task, if at least one process recently
+finalized. This can cause the checker to orchestrate tasks slower but
+is recommended to be used for designs with many sub-processes required as
+native garbage collection can lag leading to memory issues. Disable only
+when maximum prefromance is required and memory is not the issue. (Defaults to \code{TRUE}, overwritable using option 'checked.proactive_gc' or environment variable 'R_CHECKED_PROACTIVE_GC')}
+
 \item{results_error_on}{character vector indicating whether R error should be thrown when issues
 are discovered when generating results. "never" means that no errors
 are thrown. If "issues" then errors are emitted only on issues, whereas

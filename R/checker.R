@@ -166,7 +166,7 @@ checker <- R6::R6Class(
         return(-1L)
       }
 
-      if (private$gc_needed) {
+      if (options::opt("proactive_gc") && private$gc_needed) {
         gc(verbose = FALSE, reset = FALSE, full = TRUE)
         private$gc_needed <- FALSE
       }
@@ -268,13 +268,14 @@ checker <- R6::R6Class(
       parent_nodes <- igraph::adjacent_vertices(self$graph, node, mode = "in")
       parent_nodes <- unlist(parent_nodes, use.names = FALSE)
       parent_nodes <- V(self$graph)[parent_nodes]
-meta_parent_nodes <- parent_nodes[is_meta(parent_nodes$task)]
-siblings_by_meta_parents <- igraph::adjacent_vertices(self$graph, meta_parent_nodes, "out")
-for (siblings in siblings_by_parent_nodes) {
-        # igraph::adjacent_vertices returns a list even if meta is ensured
-        # to be of length 1
-        if (!all(siblings[[1]]$status == STATUS$`done`)) next
-        task_graph_package_status(self$graph, meta) <- STATUS$`done`
+      meta_parent_nodes <- parent_nodes[is_meta(parent_nodes$task)]
+      for (meta in meta_parent_nodes) {
+        siblings_by_meta_parent <-
+          igraph::adjacent_vertices(self$graph, meta, "out")
+        for (siblings in siblings_by_meta_parent) {
+          if (!all(siblings$status == STATUS$`done`)) next
+          task_graph_package_status(self$graph, meta) <- STATUS$`done`
+        }
       }
     },
 
