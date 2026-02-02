@@ -270,9 +270,9 @@ checker <- R6::R6Class(
       parent_nodes <- igraph::adjacent_vertices(self$graph, node, mode = "in")
       parent_nodes <- unlist(parent_nodes, use.names = FALSE)
       parent_nodes <- V(self$graph)[parent_nodes]
-      meta_parent_nodes <- parent_nodes[is_meta(parent_nodes$task)]
-      for (meta in meta_parent_nodes) {
-        siblings <- igraph::adjacent_vertices(self$graph, meta, "out")
+meta_parent_nodes <- parent_nodes[is_meta(parent_nodes$task)]
+siblings_by_meta_parents <- igraph::adjacent_vertices(self$graph, meta_parent_nodes, "out")
+for (siblings in siblings_by_parent_nodes) {
         # igraph::adjacent_vertices returns a list even if meta is ensured
         # to be of length 1
         if (!all(siblings[[1]]$status == STATUS$`done`)) next
