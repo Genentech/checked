@@ -4,11 +4,14 @@
 \alias{ansi}
 \alias{ansi_line_erase}
 \alias{ansi_move_line_rel}
+\alias{ansi_tty_height}
 \title{Various utilities for formatting ANSI output}
 \usage{
 ansi_line_erase(n = "")
 
 ansi_move_line_rel(n)
+
+ansi_tty_height()
 }
 \arguments{
 \item{n}{The number of lines to move. Positive is up, negative is down.}
@@ -21,6 +24,8 @@ Various utilities for formatting ANSI output
 \item \code{ansi_line_erase()}: Erase the current line
 
 \item \code{ansi_move_line_rel()}: Offset the cursor by a relative number of lines
+
+\item \code{ansi_tty_height()}: Get the height of the ansi tty using 'tput lines' interface
 
 }}
 \keyword{internal}

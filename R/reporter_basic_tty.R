@@ -101,6 +101,16 @@ report_finalize.reporter_basic_tty <- function(reporter, checker) {
 }
 
 #' @export
+report_sleep.reporter_basic_tty <- function(
+  reporter,
+  checker,
+  sleep = 0
+) {
+  # Basci tty does not need sleep
+  NULL
+}
+
+#' @export
 report_step.reporter_basic_tty <- function(reporter, checker) {
   checker$start_next_task() >= 0
 }

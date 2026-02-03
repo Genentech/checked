@@ -19,3 +19,14 @@ ansi_line_erase <- function(n = "") {
 ansi_move_line_rel <- function(n) {
   paste0("\033[", abs(n), if (n > 0L) "F" else "E")
 }
+
+#' @describeIn ansi
+#' Get the height of the ansi tty using 'tput lines' interface
+ansi_tty_height <- function() {
+  tryCatch(
+    as.numeric(system("tput lines", intern = TRUE, ignore.stderr = TRUE)),
+    warning = function(w) {
+      options::opt("tty_default_height")
+    }
+  )
+}

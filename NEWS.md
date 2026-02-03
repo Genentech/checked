@@ -1,4 +1,8 @@
-# checked 0.2.3 (dev)
+# checked 0.5.0
+
+* Entire package refactor
+
+# checked 0.2.3
 
 * Fix check processes hanging forever in some system configurations.
 
@@ -20,6 +24,9 @@
   session filtering.
 
 * Prettify output by stripping excessive new lines.
+
+* Force garbage collection before scheduling task, to make sure any already
+  finished processes are removed from the memory.
 
 # checked 0.2.3
 

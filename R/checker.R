@@ -155,6 +155,7 @@ checker <- R6::R6Class(
       for (process in private$active) {
         if (!process$is_alive()) {
           process$finish()
+          private$gc_needed <- TRUE
         } else if (inherits(process, "check_process")) {
           # NOTE: check process never finishes unless we poll checks
           process$poll_output()
@@ -165,8 +166,10 @@ checker <- R6::R6Class(
         return(-1L)
       }
 
-      # force garbage collection to free memory from terminated processes
-      gc(verbose = FALSE, reset = FALSE, full = TRUE)
+      if (options::opt("proactive_gc") && private$gc_needed) {
+        gc(verbose = FALSE, reset = FALSE, full = TRUE)
+        private$gc_needed <- FALSE
+      }
 
       # if all available processes are in use, terminate early
       n_active <- length(private$active)
@@ -235,6 +238,9 @@ checker <- R6::R6Class(
     # failed tasks
     failed = list(),
 
+    # task loop counter
+    gc_needed = FALSE,
+
     start_node = function(node) {
       task_graph_package_status(self$graph, node) <- STATUS$`in progress`
       private$start_node_meta_parents(node)
@@ -264,9 +270,12 @@ checker <- R6::R6Class(
       parent_nodes <- V(self$graph)[parent_nodes]
       meta_parent_nodes <- parent_nodes[is_meta(parent_nodes$task)]
       for (meta in meta_parent_nodes) {
-        siblings <- igraph::adjacent_vertices(self$graph, meta, "out")
-        if (!all(siblings$status == STATUS$`done`)) next
-        task_graph_package_status(self$graph, meta) <- STATUS$`done`
+        siblings_by_meta_parent <-
+          igraph::adjacent_vertices(self$graph, meta, "out")
+        for (siblings in siblings_by_meta_parent) {
+          if (!all(siblings$status == STATUS$`done`)) next
+          task_graph_package_status(self$graph, meta) <- STATUS$`done`
+        }
       }
     },
 
@@ -293,11 +302,10 @@ checker <- R6::R6Class(
           "result.json"
         ))
       })
-      self$graph <- task_graph_set_package_status(
-        self$graph,
-        checks[check_done],
-        STATUS$done
-      )
+
+      for (task in checks[check_done]) {
+        private$finish_node(task)
+      }
     },
 
     pop_process = function(name) {
