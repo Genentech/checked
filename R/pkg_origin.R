@@ -212,14 +212,14 @@ pkg_deps.pkg_origin_local <- function(
     dependencies = dependencies,
     db = row
   )
-  direct_deps$depth <- "direct"
+  direct_deps$depth <- rep.int("direct", NROW(direct_deps))
 
   indirect_deps <- pkg_dependencies(
     packages = direct_deps$name,
     dependencies = dependencies,
     db = db
   )
-  indirect_deps$depth <- "indirect"
+  indirect_deps$depth <- rep.int("indirect", NROW(indirect_deps))
 
   rbind(direct_deps, indirect_deps)
 }

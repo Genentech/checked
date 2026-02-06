@@ -19,12 +19,12 @@ Instantiate a check design from a path or directory.
 }
 \seealso{
 Other checks: 
-\code{\link{check_dev_rev_deps}()},
+\code{\link{check_pkgs}()},
 \code{\link{check_rev_deps}()},
 \code{\link{checker}}
 
 Other checks: 
-\code{\link{check_dev_rev_deps}()},
+\code{\link{check_pkgs}()},
 \code{\link{check_rev_deps}()},
 \code{\link{checker}}
 }

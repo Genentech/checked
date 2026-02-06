@@ -68,6 +68,7 @@ pkg_dependencies <- function(
   verbose = FALSE
 ) {
   dependencies <- as_pkg_dependencies(dependencies)
+
   na_version <- package_version(NA_character_, strict = FALSE)
   proto_df <- data.frame(
     package = character(0L),
@@ -78,9 +79,9 @@ pkg_dependencies <- function(
   )
 
   depth <- 0L
-  out <- list()
+  out <- list(list(proto_df))
   while (length(packages) > 0L) {
-    depth <- depth + 1L
+    depth <- depth + 2L
     deptypes <- if (depth == 1L) dependencies$direct else dependencies$indirect
     # db does not need to have all the dependencies types.
     deptypes <- intersect(colnames(db), deptypes)

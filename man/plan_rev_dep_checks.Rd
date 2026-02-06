@@ -4,24 +4,12 @@
 \alias{plan_rev_dep_checks}
 \title{Plan Reverse Dependency Checks}
 \usage{
-plan_rev_dep_checks(
-  path,
-  repos = getOption("repos"),
-  versions = c("dev", "release")
-)
+plan_rev_dep_checks(path, repos = getOption("repos"))
 }
 \arguments{
 \item{path}{path to the package source.}
 
 \item{repos}{repository used to identify reverse dependencies.}
-
-\item{versions}{character vector indicating against which versions of the
-package reverse dependency should be checked. \code{c("dev", "release")}
-(default) stands for the classical reverse dependency check. \code{"dev"}
-checks only against development version of the package which is applicable
-mostly when checking whether adding new package would break tests of
-packages already in the repository and take the package as suggests
-dependency.}
 }
 \description{
 Generates a plan for running reverse dependency check for certain

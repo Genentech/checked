@@ -9,4 +9,4 @@
 library(testthat)
 library(checked)
 
-#test_check("checked")
+test_check("checked")

@@ -70,29 +70,29 @@ check_rev_deps <- function(
     output = output,
     lib.loc = lib.loc,
     repos = repos,
+    restore = restore
   )
 
   run(checks, ...)
   checks
 }
 
-#' Run reverse dependency checks against a development version only
+#' Check packages
 #'
-#' [`check_dev_rev_deps()`] works similarly to [`check_rev_deps()`] but it runs
-#' R CMD check only once for each package, with the development version of the
-#' package installed. It is advantageous to check whether adding a new package
-#' into a repository breaks existing packages that possibly take said package
-#' as a `Suggests` dependency.
+#' Runs classical `R CMD check` for the given source package. It
+#' first identifies and installs, in parallel, all dependencies required
+#' to check the package. Then, it runs `R CMD check` for each specified package.
 #'
 #' @inheritParams check_functions
 #' @inheritParams run
+#' @inheritParams plan_local_checks
 #'
 #' @inherit check_functions return
 #'
 #' @family checks
 #' @export
-check_dev_rev_deps <- function(
-  path,
+check_pkgs <- function(
+  package,
   n = 2L,
   output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
   lib.loc = .libPaths(),
@@ -101,7 +101,7 @@ check_dev_rev_deps <- function(
   ...
 ) {
   checks <- checker$new(
-    plan_rev_dep_checks(path = path, repos = repos, versions = "dev"),
+    plan_local_checks(package = package, repos = repos),
     n = n,
     output = output,
     lib.loc = lib.loc,

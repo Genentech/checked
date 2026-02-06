@@ -7,22 +7,13 @@
 #'
 #' @param path path to the package source.
 #' @param repos repository used to identify reverse dependencies.
-#' @param versions character vector indicating against which versions of the
-#'   package reverse dependency should be checked. `c("dev", "release")`
-#'   (default) stands for the classical reverse dependency check. `"dev"`
-#'   checks only against development version of the package which is applicable
-#'   mostly when checking whether adding new package would break tests of
-#'   packages already in the repository and take the package as suggests
-#'   dependency.
 #'
 #' @family plan
 #' @export
 plan_rev_dep_checks <- function(
   path,
-  repos = getOption("repos"),
-  versions = c("dev", "release")
+  repos = getOption("repos")
 ) {
-  version_types <- match.arg(versions, c("dev", "release"), several.ok = TRUE)
   path <- check_path_is_pkg_source(path)
   ap <- available_packages(repos = repos)
 
@@ -35,22 +26,7 @@ plan_rev_dep_checks <- function(
   )[[1]]
 
   if (length(revdeps) == 0) {
-    return(igraph::make_empty_graph())
-  }
-
-  if ("release" %in% version_types && !package %in% ap[, "Package"]) {
-    msg <- sprintf(
-      "Skipping 'release' checks. Package `%s` not found in repositories: \n",
-      package,
-      paste0(" * ", repos, collapse = "\n")
-    )
-
-    warning(msg, immediate. = TRUE)
-    version_types <- setdiff(version_types, "release")
-  }
-
-  if (length(version_types) == 0) {
-    return(igraph::make_empty_graph())
+    return(task_graph_class(igraph::make_empty_graph()))
   }
 
   # root meta task, indicating a reverse-dependency check plan
