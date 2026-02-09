@@ -23,6 +23,6 @@
       [][check] rev.both.ok started
       [][check] rev.both.ok finished with 1 NOTE ()
       [][check] rev.both.error started
-      [][check] rev.both.error finished with 1 WARNING ()
+      [][check] rev.both.error finished with 1 ERROR, 1 WARNING ()
       Finished in 
 

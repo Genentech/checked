@@ -151,7 +151,6 @@ checker <- R6::R6Class(
     #' @return A integer value, coercible to logical to indicate whether a new
     #'   process was spawned, or `-1` if all tasks have finished.
     start_next_task = function() {
-      # finish any finished processes
       for (process in private$active) {
         if (!process$is_alive()) {
           process$finish()

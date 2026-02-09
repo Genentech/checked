@@ -63,7 +63,6 @@ test_that("reporter_basic_tty works as expected for pkg.ok.error", {
       lines[!startsWith(lines, "ETA")]
     }
   )
-  options(pkgType = old)
 })
 
 test_that("reporter_ansi_tty works as expected for pkg.ok.error", {
