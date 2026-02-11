@@ -23,7 +23,9 @@ asciicast::init_knitr_engine(
   startup = bquote({
     options(repos = .(getOption("repos")))
   }),
-  echo_input = FALSE
+  echo_input = FALSE,
+  timeout = 300,
+  interactive = FALSE
 )
 ```
 
@@ -51,7 +53,7 @@ Running reverse dependency checks is as easy as
 
 ```r
 library(checked)
-x <- run("/home/dev/praise")
+x <- run("/home/dev/praise", n = 4)
 results(x)
 ```
 ```{r, echo = FALSE}
@@ -77,10 +79,11 @@ run("/home/dev/praise")
 ```
 ```{asciicast ansi-tty-example, cache = FALSE}
 #| asciicast_knitr_output = "svg",
-#| asciicast_at = "all",
 #| asciicast_cursor = FALSE,
-#| asciicast_speed = 2
-options(checked.tty_tick_interval = 200)
+#| asciicast_speed = 2,
+#| asciicast_timeout = 300,
+#| asciicast_at = "all"
+options(checked.tty_tick_interval = 0.01)
 checked::run("/tmp/praise")
 cat()
 ```

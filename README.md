@@ -14,26 +14,26 @@ checked
 
 # Running Checks
 
-Although `checked` is broadly capable of running arbitrary sets of `R
-CMD check` tasks, reverse dependency checking is one of the most common
-use cases where batch `R CMD check`s are needed.
+Although `checked` is broadly capable of running arbitrary sets of
+`R CMD check` tasks, reverse dependency checking is one of the most
+common use cases where batch `R CMD check`s are needed.
 
 Running reverse dependency checks is as easy as
 
 ``` r
 library(checked)
-x <- run("/home/dev/praise")
+x <- run("/home/dev/praise", n = 4)
 results(x)
 ```
 
-    #> # Revdep Check Task Spec 
+    #> # praise reverse dependency check results (1c999505a831-meta-revdeps-of-praise) 
     #> 
-    #> goodpractice package R CMD check diff 
+    #> testthat package R CMD check diff 
     #> notes: OK 
     #> warnings: OK 
     #> errors: OK 
     #> 
-    #> testthat package R CMD check diff 
+    #> goodpractice package R CMD check diff 
     #> notes: OK 
     #> warnings: OK 
     #> errors: OK
@@ -57,5 +57,5 @@ run("/home/dev/praise")
 
 <picture>
 <source media="(prefers-color-scheme: dark)" srcset="man/figures/README/ansi-tty-example-dark.svg">
-<img src="man/figures/README/ansi-tty-example.svg" width="100%" />
+<img src="man/figures/README/ansi-tty-example.svg" alt="" width="100%" />
 </picture>

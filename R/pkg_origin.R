@@ -73,8 +73,6 @@ pkg_origin_repo <- function(package, repos, ...) {
 }
 
 
-#' @export
-#' @rdname pkg_origin
 try_pkg_origin_repo <- function(package, repos, ...) {
   if (isTRUE(pkg_origin_is_base(package))) {
     pkg_origin_base(package, ...)
