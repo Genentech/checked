@@ -19,13 +19,14 @@ run <- function(checker, ..., reporter = reporter_default()) {
 
 #' @export
 run.character <- function(checker, ..., reporter = reporter_default()) {
+  checker <- new_rev_dep_checker(checker, ...)
   report_start_setup(
     reporter,
     checker,
     extra = list(message = "planning checks ...")
   )
 
-  run(new_rev_dep_checker(checker, ...), reporter = reporter)
+  run(checker, reporter = reporter)
 }
 
 #' @export
