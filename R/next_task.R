@@ -42,7 +42,7 @@ start_task.install_task <- function(
   ...
 ) {
   task <- node$task[[1]]
-  libpaths <- unique(c( 
+  libpaths <- unique(c(
     task_graph_libpaths(g, node, lib.loc = lib.loc, output = output),
     lib.loc
   ))
@@ -81,7 +81,7 @@ start_task.check_task <- function(
   ...
 ) {
   task <- node$task[[1]]
-  libpaths <- unique(c( 
+  libpaths <- unique(c(
     task_graph_libpaths(g, node, lib.loc = lib.loc, output = output),
     lib.loc
   ))
