@@ -149,6 +149,11 @@ package.default <- function(x) {
 }
 
 #' @export
+package.NULL <- function(x) {
+  ""
+}
+
+#' @export
 package.task <- function(x) {
   package(x$origin)
 }

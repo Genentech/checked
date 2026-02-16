@@ -3,7 +3,6 @@
 \name{pkg_origin}
 \alias{pkg_origin}
 \alias{pkg_origin_repo}
-\alias{try_pkg_origin_repo}
 \alias{pkg_origin_is_base}
 \alias{pkg_origin_base}
 \alias{pkg_origin_unknown}
@@ -15,8 +14,6 @@
 pkg_origin(package, ..., .class = c())
 
 pkg_origin_repo(package, repos, ...)
-
-try_pkg_origin_repo(package, repos, ...)
 
 pkg_origin_is_base(package, ...)
 

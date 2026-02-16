@@ -41,6 +41,10 @@ check_process <- R6::R6Class(
     checks = function() {
       self$poll_output()
       private$parsed_checks
+    },
+    results = function() {
+      private$cache_parsed_results()
+      private$parsed_results
     }
   ),
   public = list(
@@ -73,6 +77,8 @@ check_process <- R6::R6Class(
       # finalize only if the last subcheck has reported status.
       if (checks[length(checks)] != "") {
         self$save_results()
+        private$cache_parsed_results()
+        private$free_file_descriptors()
         if (is.function(f <- private$finish_callback)) f(self)
       }
     },
@@ -150,6 +156,14 @@ check_process <- R6::R6Class(
     save_results = function() {
       path <- file.path(private$check_dir, "result.json")
       try(rcmdcheck_to_json(self$parse_results(), path), silent = TRUE)
+    },
+    safe_parse_results = function() {
+      r <- try(self$parse_results(), silent = TRUE)
+      if (!inherits(r, "try-error")) {
+        r
+      } else {
+        NULL
+      }
     }
   ),
   private = list(
@@ -164,10 +178,21 @@ check_process <- R6::R6Class(
       "WARNING",
       "ERROR"
     )),
+    parsed_results = NULL,
     parsed_partial_check_output = "",
     throttle = NULL,
     spinners = NULL,
-    finish_callback = NULL
+    finish_callback = NULL,
+    cache_parsed_results = function() {
+      r <- self$safe_parse_results()
+      private$parsed_results <- r %||% private$parsed_results
+    },
+    free_file_descriptors = function() {
+      if (self$has_output_connection()) close(self$get_output_connection())
+      if (self$has_error_connection())  close(self$get_error_connection())
+      if (self$has_poll_connection())   close(self$get_poll_connection())
+      if (self$has_input_connection())   close(self$get_input_connection())
+    }
   )
 )
 

@@ -6,7 +6,8 @@
 #' 
 #' @param g `task_graph` object
 #' @param node Node(s) for which libpath should be constructed based on `g`
-#' @inheritParams lib_path
+#' @param output Path to the checked output directory
+#' @inheritParams lib
 
 task_graph_libpaths <- function(
   g,
@@ -39,6 +40,7 @@ task_graph_libpaths <- function(
 #' `check_process` `R6` object.
 #' 
 #' @inheritParams task_graph_libpaths
+#' @param ... additional params passed to downstream methods
 start_task <- function(node, g, ...) {
   UseMethod("start_task")
 }
@@ -60,7 +62,10 @@ start_task.install_task <- function(
   ...
 ) {
   task <- node$task[[1]]
-  libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc, output = output)
+  libpaths <- unique(c(
+    task_graph_libpaths(g, node, lib.loc = lib.loc, output = output),
+    lib.loc
+  ))
   install_parameters <- install_params(task$origin)
 
   if (any(inherits(task$origin, c("pkg_origin_base", "pkg_origin_unknown")))) {
@@ -68,7 +73,7 @@ start_task.install_task <- function(
   }
 
   # install_parameters$package is a valid package name only for
-  # pkg_origin_local. Otherwise it's a path to the source package in which case
+  # pkg_origin_repo. Otherwise it's a path to the source package in which case
   # is_package_installed returns FALSE (as it should)
   if (is_package_installed(install_parameters$package, libpaths)) {
     return(NULL)
@@ -97,7 +102,10 @@ start_task.check_task <- function(
   ...
 ) {
   task <- node$task[[1]]
-  libpaths <- task_graph_libpaths(g, node, lib.loc = lib.loc, output = output)
+  libpaths <- unique(c(
+    task_graph_libpaths(g, node, lib.loc = lib.loc, output = output),
+    lib.loc
+  ))
   path <- check_path(task$origin, output = path_sources())
 
   check_process$new(
