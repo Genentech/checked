@@ -6,7 +6,8 @@ test_that("check_pkgs works as expected", {
       file.path(examples_path, c("exampleGood", "exampleBad")),
       n = 2L,
       repos = "https://cran.r-project.org/",
-      reporter = NULL
+      reporter = NULL,
+      lib.loc = .libPaths()
     )
   )
   
@@ -26,8 +27,24 @@ test_that("check_pkgs works as expected", {
   expect_length(r[[1]][[1]]$notes$issues, 1L)
   expect_length(r[[1]][[1]]$notes$potential_issues$new, 0L)
   expect_length(r[[1]][[1]]$notes$potential_issues$old, 0L)
-  
+
   expect_length(r[[1]][[1]]$warnings$issues, 3L)
   expect_length(r[[1]][[1]]$warnings$potential_issues$new, 0L)
   expect_length(r[[1]][[1]]$warnings$potential_issues$old, 0L)
+
+  expect_length(r[[1]][[1]]$errors$issues, 0L)
+  expect_length(r[[1]][[1]]$errors$potential_issues$new, 0L)
+  expect_length(r[[1]][[1]]$errors$potential_issues$old, 0L)
+
+  expect_length(r[[1]][[2]]$notes$issues, 0L)
+  expect_length(r[[1]][[2]]$notes$potential_issues$new, 0L)
+  expect_length(r[[1]][[2]]$notes$potential_issues$old, 0L)
+
+  expect_length(r[[1]][[2]]$warnings$issues, 0L)
+  expect_length(r[[1]][[2]]$warnings$potential_issues$new, 0L)
+  expect_length(r[[1]][[2]]$warnings$potential_issues$old, 0L)
+
+  expect_length(r[[1]][[2]]$errors$issues, 0L)
+  expect_length(r[[1]][[2]]$errors$potential_issues$new, 0L)
+  expect_length(r[[1]][[2]]$errors$potential_issues$old, 0L)
 })

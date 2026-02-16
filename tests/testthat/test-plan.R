@@ -6,7 +6,7 @@ test_that("rev_dep_check_tasks_df works with deafult params", {
   expect_silent(
     plan <- plan_rev_dep_checks(
       test_path("fixtures", "DALEXtra"),
-      repos = "https://cran.r-project.org/"
+      repos = "https://packagemanager.posit.co/cran/2026-02-01"
     )
   )
 

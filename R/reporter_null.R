@@ -17,3 +17,8 @@ report_finalize.NULL <- function(...) {}
 report_step.NULL <- function(reporter, checker) {
   checker$start_next_task() >= 0
 }
+
+#' @export
+report_sleep.NULL <- function(reporter, checker, sleep = 0) {
+  Sys.sleep(sleep)
+}

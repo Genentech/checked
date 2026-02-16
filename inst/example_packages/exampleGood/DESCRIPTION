@@ -10,7 +10,7 @@ Authors@R:
 Description: What the package does (one paragraph).
 Imports:
     methods,
-    DBI
+    R6
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
