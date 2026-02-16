@@ -201,7 +201,11 @@ task_graph_sort <- function(g) {
 
   # use only strong dependencies to prioritize by topology (leafs first)
   strong_edges <- dep_edges(E(g), check_dependencies("strong"))
-  g_strong <- igraph::subgraph.edges(g, strong_edges, delete.vertices = FALSE)
+  g_strong <- igraph::subgraph_from_edges(
+    g,
+    strong_edges,
+    delete.vertices = FALSE
+  )
   topo <- igraph::topo_sort(g_strong, mode = "out")
   priority_topo <- integer(length(g))
   priority_topo[match(topo$name, V(g)$name)] <- rev(seq_along(topo))

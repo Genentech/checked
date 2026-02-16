@@ -29,7 +29,7 @@ while (!orchestrator$is_done()) {
 }
 \seealso{
 Other checks: 
-\code{\link{check_dev_rev_deps}()},
+\code{\link{check_pkgs}()},
 \code{\link{check_rev_deps}()},
 \code{\link{new_checker}()}
 }

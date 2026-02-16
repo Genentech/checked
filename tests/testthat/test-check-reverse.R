@@ -48,54 +48,58 @@ test_that("check_rev_deps works for package with one breaking change", {
   expect_true(is.list(r))
   expect_named(r)
   expect_length(r, 1L)
-  expect_length(r$revdep_check_task, 2L)
+  expect_length(r[[1]], 2L)
+
+  expect_s3_class(r[[1]], "rev_dep_dep_results")
+  expect_s3_class(r[[1]][[1]], "rcmdcheck_rev_dep_results")
+  expect_s3_class(r[[1]][[2]], "rcmdcheck_rev_dep_results")
 
   # rev.both.error
-  expect_length(r$revdep_check_task$rev.both.error$notes$issues, 0L)
-  expect_length(r$revdep_check_task$rev.both.error$notes$potential_issues$new, 0L)
-  expect_length(r$revdep_check_task$rev.both.error$notes$potential_issues$old, 0L)
+  expect_length(r[[1]][[2]]$notes$issues, 0L)
+  expect_length(r[[1]][[2]]$notes$potential_issues$new, 0L)
+  expect_length(r[[1]][[2]]$notes$potential_issues$old, 0L)
 
-  expect_length(r$revdep_check_task$rev.both.error$warnings$issues, 1L)
+  expect_length(r[[1]][[2]]$warnings$issues, 1L)
   expect_true(
     grepl("Namespace in Imports field not imported from",
-          r$revdep_check_task$rev.both.error$warnings$issues),
+          r[[1]][[2]]$warnings$issues),
     grepl("Missing or unexported object",
-          r$revdep_check_task$rev.both.error$warnings$issues)
+          r[[1]][[2]]$warnings$issues)
   )
-  expect_length(r$revdep_check_task$rev.both.error$warnings$potential_issues$new, 0L)
-  expect_length(r$revdep_check_task$rev.both.error$warnings$potential_issues$old, 0L)
+  expect_length(r[[1]][[2]]$warnings$potential_issues$new, 0L)
+  expect_length(r[[1]][[2]]$warnings$potential_issues$old, 0L)
 
-  expect_length(r$revdep_check_task$rev.both.error$errors$issues, 1L)
+  expect_length(r[[1]][[2]]$errors$issues, 1L)
   expect_true(
     grepl("Running the tests in",
-          r$revdep_check_task$rev.both.error$errors$issues),
+          r[[1]][[2]]$errors$issues),
     grepl("is not an exported object from",
-          r$revdep_check_task$rev.both.error$errors$issues)
+          r[[1]][[2]]$errors$issues)
   )
-  expect_length(r$revdep_check_task$rev.both.error$errors$potential_issues$new, 0L)
-  expect_length(r$revdep_check_task$rev.both.error$errors$potential_issues$old, 0L)
+  expect_length(r[[1]][[2]]$errors$potential_issues$new, 0L)
+  expect_length(r[[1]][[2]]$errors$potential_issues$old, 0L)
 
 
   # rev.both.ok
 
-  expect_length(r$revdep_check_task$rev.both.ok$notes$issues, 0L)
-  expect_length(r$revdep_check_task$rev.both.ok$notes$potential_issues$new, 0L)
-  expect_length(r$revdep_check_task$rev.both.ok$notes$potential_issues$old, 0L)
+  expect_length(r[[1]][[1]]$notes$issues, 0L)
+  expect_length(r[[1]][[1]]$notes$potential_issues$new, 0L)
+  expect_length(r[[1]][[1]]$notes$potential_issues$old, 0L)
 
-  expect_length(r$revdep_check_task$rev.both.ok$warnings$issues, 0L)
-  expect_length(r$revdep_check_task$rev.both.ok$warnings$potential_issues$new, 0L)
-  expect_length(r$revdep_check_task$rev.both.ok$warnings$potential_issues$old, 0L)
+  expect_length(r[[1]][[1]]$warnings$issues, 0L)
+  expect_length(r[[1]][[1]]$warnings$potential_issues$new, 0L)
+  expect_length(r[[1]][[1]]$warnings$potential_issues$old, 0L)
 
-  expect_length(r$revdep_check_task$rev.both.ok$errors$issues, 0L)
-  expect_length(r$revdep_check_task$rev.both.ok$errors$potential_issues$new, 0L)
-  expect_length(r$revdep_check_task$rev.both.ok$errors$potential_issues$old, 0L)
+  expect_length(r[[1]][[1]]$errors$issues, 0L)
+  expect_length(r[[1]][[1]]$errors$potential_issues$new, 0L)
+  expect_length(r[[1]][[1]]$errors$potential_issues$old, 0L)
 })
 
-test_that("check_rev_deps works for a package without release version", {
+test_that("check_rev_deps works for a package without a version in repos", {
 
   # Ensure source installation to make sure test works also on mac and windows
   withr::with_options(list(pkgType = "source"), {
-    expect_warning(design <- check_rev_deps(
+    expect_no_error(design <- check_rev_deps(
       file.path(sources_new, "pkg.suggests"),
       n = 2L,
       repos = repo,
@@ -106,26 +110,33 @@ test_that("check_rev_deps works for a package without release version", {
   r <- results(design)
   expect_s3_class(r, "checked_results")
   expect_true(is.list(r))
+  expect_length(
+    list.dirs(file.path(design$output, "checks"), recursive = FALSE),
+    2
+  )
   expect_named(r)
   expect_length(r, 1L)
-  expect_length(r$check_task, 1L)
+  expect_length(r[[1]], 1L)
 
-  expect_length(r$check_task$`pkg.none (dev)`$notes$issues, 0L)
-  expect_length(r$check_task$`pkg.none (dev)`$notes$potential_issues$new, 0L)
-  expect_length(r$check_task$`pkg.none (dev)`$notes$potential_issues$old, 0L)
+  expect_s3_class(r[[1]], "rev_dep_dep_results")
+  expect_s3_class(r[[1]][[1]], "rcmdcheck_rev_dep_results")
 
-  expect_length(r$check_task$`pkg.none (dev)`$warnings$issues, 0L)
-  expect_length(r$check_task$`pkg.none (dev)`$warnings$potential_issues$new, 0L)
-  expect_length(r$check_task$`pkg.none (dev)`$warnings$potential_issues$old, 0L)
+  expect_length(r[[1]][[1]]$notes$issues, 0L)
+  expect_length(r[[1]][[1]]$notes$potential_issues$new, 0L)
+  expect_length(r[[1]][[1]]$notes$potential_issues$old, 0L)
+
+  expect_length(r[[1]][[1]]$warnings$issues, 0L)
+  expect_length(r[[1]][[1]]$warnings$potential_issues$new, 0L)
+  expect_length(r[[1]][[1]]$warnings$potential_issues$old, 0L)
 
 
-  expect_length(r$check_task$`pkg.none (dev)`$errors$issues, 1L)
+  expect_length(r[[1]][[1]]$errors$issues, 1L)
   expect_true(
-    grepl("Running the tests in",
-          r$check_task$`pkg.none (dev)`$errors$issues),
-    grepl("\"hello world\" is not TRUE",
-          r$check_task$`pkg.none (dev)`$errors$issues)
+    grepl("Running the tests in", r[[1]][[1]]$errors$issues)
   )
-  expect_length(r$check_task$`pkg.none (dev)`$errors$potential_issues$new, 0L)
-  expect_length(r$check_task$`pkg.none (dev)`$errors$potential_issues$old, 0L)
+  expect_true(
+    grepl("Reverse suggested deps detected", r[[1]][[1]]$errors$issues)
+  )
+  expect_length(r[[1]][[1]]$errors$potential_issues$new, 0L)
+  expect_length(r[[1]][[1]]$errors$potential_issues$old, 0L)
 })

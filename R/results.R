@@ -227,7 +227,6 @@ filter_results <- function(x, keep, ...) {
   } else {
     x
   }
-
 }
 
 count <- function(d, ...) {

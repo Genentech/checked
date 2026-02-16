@@ -12,7 +12,7 @@ install_process <- R6::R6Class(
       lib = .libPaths()[[1]],
       libpaths = .libPaths(),
       available_packages_filters = getOption("available_packages_filters"),
-      log
+      log = NULL
     ) {
       if (!dir.exists(lib)) dir.create(lib, recursive = TRUE)
       private$package <- pkgs
@@ -53,6 +53,7 @@ install_process <- R6::R6Class(
     },
     finish = function() {
       private$time_finish <- Sys.time()
+      private$free_file_descriptors()
       if (is.function(f <- private$finish_callback)) f(self)
     },
     get_r_exit_status = function() {
@@ -81,6 +82,12 @@ install_process <- R6::R6Class(
 
       private$options <- options
       super$initialize(options = options)
+    },
+    free_file_descriptors = function() {
+      if (self$has_output_connection()) close(self$get_output_connection())
+      if (self$has_error_connection())  close(self$get_error_connection())
+      if (self$has_poll_connection())   close(self$get_poll_connection())
+      if (self$has_input_connection())   close(self$get_input_connection())
     }
   )
 )

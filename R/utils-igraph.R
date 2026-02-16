@@ -59,11 +59,11 @@ graph_dedup_attrs <- function(g) {
   for (i in seq_along(v_dup_attrs)) {
     attr_name <- names(v_dup_attrs[i])
     attr_value <- igraph::vertex_attr(g, v_dup_attrs[[i]][[1L]])
-    g <- igraph::remove.vertex.attribute(g, v_dup_attrs[[i]][[1L]])
+    g <- igraph::delete_vertex_attr(g, v_dup_attrs[[i]][[1L]])
     for (attr_dup_name in v_dup_attrs[[i]][-1L]) {
       is_na <- is.na(attr_value)
       attr_value[is_na] <- igraph::vertex_attr(g, attr_dup_name)[is_na]
-      g <- igraph::remove.vertex.attribute(g, attr_dup_name)
+      g <- igraph::delete_vertex_attr(g, attr_dup_name)
     }
     g <- igraph::set_vertex_attr(g, attr_name, value = attr_value)
   }
@@ -76,11 +76,11 @@ graph_dedup_attrs <- function(g) {
   for (i in seq_along(e_dup_attrs)) {
     attr_name <- names(e_dup_attrs[i])
     attr_value <- igraph::edge_attr(g, e_dup_attrs[[i]][[1L]])
-    g <- igraph::remove.edge.attribute(g, e_dup_attrs[[i]][[1L]])
+    g <- igraph::delete_edge_attr(g, e_dup_attrs[[i]][[1L]])
     for (attr_dup_name in e_dup_attrs[[i]][-1L]) {
       is_na <- is.na(attr_value)
       attr_value[is_na] <- igraph::edge_attr(g, attr_dup_name)[is_na]
-      g <- igraph::remove.edge.attribute(g, attr_dup_name)
+      g <- igraph::delete_edge_attr(g, attr_dup_name)
     }
     g <- igraph::set_edge_attr(g, attr_name, value = attr_value)
   }

@@ -25,9 +25,7 @@ format_simplify_path <- function(x, ..., full.path = FALSE) {
       parts <- "."
     }
     do.call(file.path, as.list(parts))
-  }
-
-  if (first_diff > min_len) {
+  } else if (first_diff > min_len) {
     parts <- utils::tail(xp, -first_diff + 1)
     do.call(file.path, as.list(parts))
   } else if (first_diff <= min_len) {

@@ -499,15 +499,24 @@ report_finalize.reporter_ansi_tty <- function(reporter, checker) {
     failed_tasks[vlapply(failed_tasks, function(x) is_install(x$task))]
 
   failures_output <- vcapply(failed_packages, function(x) {
-    paste0(cli_wrap_lines(cli::cli_fmt(cli::cli_alert_danger(
-      sprintf(
-        "%s package installation had non-zero exit status",
-        package(x$task[[1]])
-      ),
-    ))), "\n",
-    cli_wrap_lines(as.character(cli::style_dim(
-      sprintf("log: %s", x$process[[1]]$log)
-    ))))
+    msg <- paste0(
+      cli_wrap_lines(cli::cli_fmt(cli::cli_alert_danger(
+        sprintf(
+          "%s package installation had non-zero exit status",
+          package(x$task[[1]])
+        )
+      ))),
+      collapse = "\n"
+    )
+    log <- paste0(
+      cli_wrap_lines(cli::cli_fmt(cli::cli_alert_danger(
+        sprintf("log: %s", x$process[[1]]$log)
+      ))),
+      collapse = "\n"
+    )
+    paste0(
+      msg, "\n", log
+    )
   })
 
   cat(failures_output, "\n")
