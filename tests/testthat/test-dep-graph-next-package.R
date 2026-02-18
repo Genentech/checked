@@ -7,7 +7,7 @@ test_that("dep_graph_next_package finds next installable package", {
                           A -+ F -+ D
   )
   # nolint end, styler: on
-  
+
   # initialize graph characteristics to mock dep graph
   E(g)$type <- "Depends"
   V(g)$root <- V(g)$name == "A"

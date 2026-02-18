@@ -27,9 +27,9 @@ test_that("reporter_basic_tty works as expected for pkg.none", {
     repos = repo,
     restore = FALSE
   )
-  
+
   reporter <- reporter_basic_tty()
-  
+
   expect_snapshot(
     run(design, reporter = reporter),
     # We remove the last line as it reports the time which can change
@@ -45,16 +45,16 @@ test_that("reporter_basic_tty works as expected for pkg.ok.error", {
     file.path(sources_new, "pkg.ok.error"),
     repos = repo
   )
-  
+
   design <- checker$new(
     plan,
     n = 1L,
     repos = repo,
     restore = FALSE
   )
-  
+
   reporter <- reporter_basic_tty()
-  
+
   expect_snapshot(
     run(design, reporter = reporter),
     # We remove the last line as it reports the time which can change
@@ -70,7 +70,7 @@ test_that("reporter_ansi_tty works as expected for pkg.ok.error", {
     file.path(sources_new, "pkg.ok.error"),
     repos = repo
   )
-  
+
   design <- checker$new(
     plan,
     n = 1L,
@@ -78,7 +78,7 @@ test_that("reporter_ansi_tty works as expected for pkg.ok.error", {
     restore = FALSE
   )
   reporter <- reporter_ansi_tty()
-  
+
   expect_no_error(suppressMessages(
     capture.output(
       run(design, reporter = reporter)

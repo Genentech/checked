@@ -1,3 +1,7 @@
+# We need to define it as variable instead of direct default parameter
+# to comply with CRAN LaTeX requirements
+DEFAULT_ROW_SYMBOL <- list(bar = "\u2502")
+
 #' Internal Utilities for Command-line Output
 #'
 #' Various helper functions for consistent cli output, including theming and
@@ -23,7 +27,7 @@ cli_table_row <- function(
   errors = "E",
   msg = "",
   style = c("row", "title", "header"),
-  symbols = list(bar = "\u2502")
+  symbols = DEFAULT_ROW_SYMBOL
 ) {
   style <- match.arg(style)
 

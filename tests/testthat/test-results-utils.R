@@ -1,6 +1,6 @@
 test_that("results_to_df works as expected", {
   examples_path <- system.file("example_packages", package = "checked")
-  
+
   expect_no_error(
     plan <- check_pkgs(
       file.path(examples_path, c("exampleGood", "exampleBad")),
@@ -9,7 +9,7 @@ test_that("results_to_df works as expected", {
       reporter = NULL
     )
   )
-  
+
   r <- results(plan)
   df <- results_to_df(r[[1]])
   expect_equal(NROW(df), 2)
