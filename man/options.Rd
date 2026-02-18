@@ -93,7 +93,7 @@ the R CMD check.\item{default: }{\preformatted{c(`_R_CHECK_FORCE_SUGGESTS_` = FA
 }}
 
 \item{check_args}{\describe{
-\code{character} vector of args passed to the R CMD check.\item{default: }{\preformatted{c("--timings", "--ignore-vignettes", "--no-manual")}}
+\code{character} vector of args passed to the R CMD check.\item{default: }{\preformatted{c("--timings", "--ignore-vignettes", "--no-manual", "--as-cran")}}
 \item{option: }{checked.check_args}
 \item{envvar: }{R_CHECKED_CHECK_ARGS (space-separated R CMD check flags)}
 }}

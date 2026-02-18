@@ -60,7 +60,8 @@ options::define_options(
   check_args = c(
     "--timings",
     "--ignore-vignettes",
-    "--no-manual"
+    "--no-manual",
+    "--as-cran"
   ),
   envvar_fn = structure(
     function(raw, ...) trimws(strsplit(raw, " ")[[1]]),
