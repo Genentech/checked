@@ -1,9 +1,9 @@
 #' Libpaths from task graph
-#' 
+#'
 #' Function that traverses over the task dependency task to acquire libpaths
 #' for given nodes. It ensures that when runing a node, a libpath is
 #' constructed which has all the required packages on it.
-#' 
+#'
 #' @param g `task_graph` object
 #' @param node Node(s) for which libpath should be constructed based on `g`
 #' @param output Path to the checked output directory
@@ -34,11 +34,11 @@ task_graph_libpaths <- function(
 }
 
 #' Start a new task
-#' 
+#'
 #' Starts task based on the `task` object encapsulated in the `node` taken
 #' from then `task_graph` `g`. It returns an `install_process` or
 #' `check_process` `R6` object.
-#' 
+#'
 #' @inheritParams task_graph_libpaths
 #' @param ... additional params passed to downstream methods
 start_task <- function(node, g, ...) {
