@@ -96,11 +96,11 @@ reporter_line <- function(label, status, style = NA_character_) {
 
 #' @export
 format.reporter_line <- function(x, width = cli::console_width(), ...) {
-  rule <- switch(x$style,
+  rule <- switch(
+    x$style,
     "h1" = "\u2550",
     " "
   )
-
   label <- format(x$label, pad = rule)
 
   status <- switch(
@@ -138,7 +138,8 @@ reporter_cell <- function(
 }
 
 #' @export
-format.reporter_cell <- function(x,
+format.reporter_cell <- function(
+  x,
   padding = attr(x, "padding") %||% c(0, 0),
   justify = attr(x, "justify") %||% "right",
   width = attr(x, "width") %||% cli::console_width(),

@@ -39,7 +39,8 @@ report_status.reporter_basic_tty <- function(reporter, checker, envir) {
 
     # report stating of new checks
     if (!identical(node$status, reporter$status[[node$name]])) {
-      status <- switch(as.character(node$status), # nolint (used via glue)
+      status <- switch( # nolint
+        as.character(node$status), # nolint (used via glue)
         "pending" = "queued",
         "in progress" = cli::cli_fmt(cli::cli_text("started")),
         "done" = {

@@ -23,8 +23,13 @@ install_process <- R6::R6Class(
           withCallingHandlers(
             utils::install.packages(...),
             warning = function(w) {
-              if (escalate_warning(w)) stop(w$message)
-              else warning(w)
+              if (escalate_warning(w)) {
+                print(w$message)
+                stop(w$message)
+              } else {
+                print(w$message)
+                warning(w)
+              }
             }
           )
         },
@@ -98,7 +103,9 @@ is_install_failure_warning <- function(w) {
     "(dependenc|package).*(is|are) not available",
     "installation of package.*had non-zero exit status",
     "installation of one or more packages failed",
-    "cannot open compressed file"
+    "cannot open compressed file",
+    "(C|c)ouldn't connect to server",
+    "Timeout.*was reached"
   )
 
   re <- paste0("(", paste0(patterns, collapse = "|"), ")")

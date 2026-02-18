@@ -114,10 +114,12 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
   task_graph_class(g)
 }
 
+
 task_graph_class <- function(g) {
   class(g) <- c("task_graph", class(g))
   g
 }
+
 
 deduplicate_task_graph <- function(g) {
   vs <- V(g)
@@ -451,18 +453,15 @@ plot_interactive_task_graph <- function(
   edge = igraph::as_data_frame(g, what = "edges")
 ) {
   vertex$title <- gsub("<|>", "", vcapply(vertex$task, format))
-  edge_titles <- paste0(
-    edge$type,
-    ifelse(vlapply(edge$version, is.na),
-      "",
-      paste0(
-        "(",
-        ifelse(is.na(edge$op), "", paste0(edge$op, " ")),
-        format(edge$version),
-        ")"
-      )
+  edge_titles <- paste0(edge$type, ifelse(
+    vlapply(edge$version, is.na),
+    "",
+    paste0(
+      "(",
+      ifelse(is.na(edge$op), "", paste0(edge$op, " ")),
+      format(edge$version), ")"
     )
-  )
+  ))
 
   if (length(edge_titles) > 0) edge$title <- edge_titles
   vertex$id <- seq_len(nrow(vertex))

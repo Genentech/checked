@@ -21,14 +21,22 @@ test_that("dep_graph_next_package finds next installable package", {
   V(g)["D"]$status <- STATUS[["in progress"]]
   V(g)["C"]$status <- STATUS[["done"]]
   g <- task_graph_update_ready(g)
+<<<<<<< HEAD
   ready_nodes <- V(g)[V(g)$status == STATUS$ready]
   expect_equal(names(ready_nodes), "B")
+=======
+  expect_equal(names(task_graph_which_ready(g)), "B")
+>>>>>>> 3615af88add43ec6f6d21ee450e4c8433c467911
 
   # if the order is reversed, now "F" and "E" should be next
   V(g)$status <- STATUS[["pending"]]
   V(g)["D"]$status <- STATUS[["done"]]
   V(g)["C"]$status <- STATUS[["in progress"]]
   g <- task_graph_update_ready(g)
+<<<<<<< HEAD
   ready_nodes <- V(g)[V(g)$status == STATUS$ready]
   expect_equal(names(ready_nodes), c("F", "E"))
+=======
+  expect_equal(names(task_graph_which_ready(g)), c("F", "E"))
+>>>>>>> 3615af88add43ec6f6d21ee450e4c8433c467911
 })
