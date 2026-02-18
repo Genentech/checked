@@ -14,7 +14,7 @@ cli_table_row(
   errors = "E",
   msg = "",
   style = c("row", "title", "header"),
-  symbols = list(bar = "│")
+  symbols = DEFAULT_ROW_SYMBOL
 )
 
 cli_theme(..., .envir = parent.frame())
