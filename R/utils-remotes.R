@@ -9,7 +9,7 @@
 #' edits to further reduce `devtools` dependencies.
 #'
 #' @param x A package object to coerce
-#'
+#' @keywords internal
 as.package.remotes <- function(x) {
   if (inherits(x, "package")) {
     return(x)

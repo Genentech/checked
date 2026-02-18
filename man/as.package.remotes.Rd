@@ -20,3 +20,4 @@ Function required for communicating with the \code{remotes} package interface
 Code inspired by \code{devtools} \code{load_pkg_description} with very minor
 edits to further reduce \code{devtools} dependencies.
 }
+\keyword{internal}

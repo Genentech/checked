@@ -109,7 +109,7 @@ test_that("check_rev_deps works for a package without a version in repos", {
   expect_true(is.list(r))
   expect_length(
     list.dirs(file.path(design$output, "checks"), recursive = FALSE),
-    2
+    4
   )
   expect_named(r)
   expect_length(r, 1L)
@@ -132,7 +132,7 @@ test_that("check_rev_deps works for a package without a version in repos", {
     grepl("Running the tests in", r[[1]][[1]]$errors$issues)
   )
   expect_true(
-    grepl("there is no package called", r[[1]][[1]]$errors$issues)
+    grepl("Reverse suggested deps detected", r[[1]][[1]]$errors$issues)
   )
   expect_length(r[[1]][[1]]$errors$potential_issues$new, 0L)
   expect_length(r[[1]][[1]]$errors$potential_issues$old, 0L)
@@ -154,7 +154,7 @@ test_that("check_rev_deps works for a package without a version in repos", {
     grepl("Running the tests in", r[[1]][[2]]$errors$issues)
   )
   expect_true(
-    grepl("Reverse suggested deps detected", r[[1]][[2]]$errors$issues)
+    grepl("there is no package called", r[[1]][[2]]$errors$issues)
   )
   expect_length(r[[1]][[2]]$errors$potential_issues$new, 0L)
   expect_length(r[[1]][[2]]$errors$potential_issues$old, 0L)
