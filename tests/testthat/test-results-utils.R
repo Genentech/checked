@@ -11,6 +11,7 @@ test_that("results_to_df works as expected", {
   )
 
   r <- results(plan)
+  stop(r)
   df <- results_to_df(r[[1]])
   expect_equal(NROW(df), 2)
   expect_equal(names(df), c("notes", "warnings", "errors"))

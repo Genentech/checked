@@ -24,27 +24,39 @@ test_that("check_pkgs works as expected", {
 
   expect_s3_class(r[[1]], "local_check_results")
 
-  expect_length(r[[1]][[1]]$notes$issues, 1L)
-  expect_length(r[[1]][[1]]$notes$potential_issues$new, 0L)
-  expect_length(r[[1]][[1]]$notes$potential_issues$old, 0L)
+  # exampleBad
+  example_bad_i <- which(grepl("check-exampleBad", names(r[[1]]), fixed = TRUE))
+  expect_true(length(example_bad_i) == 1)
+  r_example_bad <- r[[1]][[example_bad_i]]
+  expect_s3_class(r_example_bad, "rcmdcheck_check_results")
+  
+  expect_length(r_example_bad$notes$issues, 1L)
+  expect_length(r_example_bad$notes$potential_issues$new, 0L)
+  expect_length(r_example_bad$notes$potential_issues$old, 0L)
 
-  expect_length(r[[1]][[1]]$warnings$issues, 3L)
-  expect_length(r[[1]][[1]]$warnings$potential_issues$new, 0L)
-  expect_length(r[[1]][[1]]$warnings$potential_issues$old, 0L)
+  expect_length(r_example_bad$warnings$issues, 3L)
+  expect_length(r_example_bad$warnings$potential_issues$new, 0L)
+  expect_length(r_example_bad$warnings$potential_issues$old, 0L)
 
-  expect_length(r[[1]][[1]]$errors$issues, 0L)
-  expect_length(r[[1]][[1]]$errors$potential_issues$new, 0L)
-  expect_length(r[[1]][[1]]$errors$potential_issues$old, 0L)
+  expect_length(r_example_bad$errors$issues, 0L)
+  expect_length(r_example_bad$errors$potential_issues$new, 0L)
+  expect_length(r_example_bad$errors$potential_issues$old, 0L)
 
-  expect_length(r[[1]][[2]]$notes$issues, 0L)
-  expect_length(r[[1]][[2]]$notes$potential_issues$new, 0L)
-  expect_length(r[[1]][[2]]$notes$potential_issues$old, 0L)
+  # exampleGood
+  example_good_i <- which(grepl("check-exampleGood", names(r[[1]]), fixed = TRUE))
+  expect_true(length(example_good_i) == 1)
+  r_example_good <- r[[1]][[example_good_i]]
+  expect_s3_class(r_example_good, "rcmdcheck_check_results")
+  
+  expect_length(r_example_good$notes$issues, 0L)
+  expect_length(r_example_good$notes$potential_issues$new, 0L)
+  expect_length(r_example_good$notes$potential_issues$old, 0L)
 
-  expect_length(r[[1]][[2]]$warnings$issues, 0L)
-  expect_length(r[[1]][[2]]$warnings$potential_issues$new, 0L)
-  expect_length(r[[1]][[2]]$warnings$potential_issues$old, 0L)
+  expect_length(r_example_good$warnings$issues, 0L)
+  expect_length(r_example_good$warnings$potential_issues$new, 0L)
+  expect_length(r_example_good$warnings$potential_issues$old, 0L)
 
-  expect_length(r[[1]][[2]]$errors$issues, 0L)
-  expect_length(r[[1]][[2]]$errors$potential_issues$new, 0L)
-  expect_length(r[[1]][[2]]$errors$potential_issues$old, 0L)
+  expect_length(r_example_good$errors$issues, 0L)
+  expect_length(r_example_good$errors$potential_issues$new, 0L)
+  expect_length(r_example_good$errors$potential_issues$old, 0L)
 })

@@ -49,48 +49,55 @@ test_that("check_rev_deps works for package with one breaking change", {
   expect_named(r)
   expect_length(r, 1L)
   expect_length(r[[1]], 2L)
-
   expect_s3_class(r[[1]], "rev_dep_dep_results")
-  expect_s3_class(r[[1]][[1]], "rcmdcheck_rev_dep_results")
-  expect_s3_class(r[[1]][[2]], "rcmdcheck_rev_dep_results")
 
   # rev.both.error
-  expect_length(r[[1]][[2]]$notes$issues, 0L)
-  expect_length(r[[1]][[2]]$notes$potential_issues$new, 0L)
-  expect_length(r[[1]][[2]]$notes$potential_issues$old, 0L)
+  both_error_i <- which(grepl("rev.both.error", names(r[[1]]), fixed = TRUE))
+  expect_true(length(both_error_i) == 1)
+  r_both_error <- r[[1]][[both_error_i]]
+  expect_s3_class(r_both_error, "rcmdcheck_rev_dep_results")
 
-  expect_length(r[[1]][[2]]$warnings$issues, 1L)
+  expect_length(r_both_error$notes$issues, 0L)
+  expect_length(r_both_error$notes$potential_issues$new, 0L)
+  expect_length(r_both_error$notes$potential_issues$old, 0L)
+
+  expect_length(r_both_error$warnings$issues, 1L)
   expect_true(
     grepl("Namespace in Imports field not imported from",
-          r[[1]][[2]]$warnings$issues),
+          r_both_error$warnings$issues),
     grepl("Missing or unexported object",
-          r[[1]][[2]]$warnings$issues)
+          r_both_error$warnings$issues)
   )
-  expect_length(r[[1]][[2]]$warnings$potential_issues$new, 0L)
-  expect_length(r[[1]][[2]]$warnings$potential_issues$old, 0L)
+  expect_length(r_both_error$warnings$potential_issues$new, 0L)
+  expect_length(r_both_error$warnings$potential_issues$old, 0L)
 
-  expect_length(r[[1]][[2]]$errors$issues, 1L)
+  expect_length(r_both_error$errors$issues, 1L)
   expect_true(
     grepl("Running the tests in",
-          r[[1]][[2]]$errors$issues),
+          r_both_error$errors$issues),
     grepl("is not an exported object from",
-          r[[1]][[2]]$errors$issues)
+          r_both_error$errors$issues)
   )
-  expect_length(r[[1]][[2]]$errors$potential_issues$new, 0L)
-  expect_length(r[[1]][[2]]$errors$potential_issues$old, 0L)
+  expect_length(r_both_error$errors$potential_issues$new, 0L)
+  expect_length(r_both_error$errors$potential_issues$old, 0L)
 
   # rev.both.ok
-  expect_length(r[[1]][[1]]$notes$issues, 0L)
-  expect_length(r[[1]][[1]]$notes$potential_issues$new, 0L)
-  expect_length(r[[1]][[1]]$notes$potential_issues$old, 0L)
+  both_ok_i <- which(grepl("rev.both.ok", names(r[[1]]), fixed = TRUE))
+  expect_true(length(both_ok_i) == 1)
+  r_both_ok <- r[[1]][[both_ok_i]]
+  expect_s3_class(r_both_ok, "rcmdcheck_rev_dep_results")
 
-  expect_length(r[[1]][[1]]$warnings$issues, 0L)
-  expect_length(r[[1]][[1]]$warnings$potential_issues$new, 0L)
-  expect_length(r[[1]][[1]]$warnings$potential_issues$old, 0L)
+  expect_length(r_both_ok$notes$issues, 0L)
+  expect_length(r_both_ok$notes$potential_issues$new, 0L)
+  expect_length(r_both_ok$notes$potential_issues$old, 0L)
 
-  expect_length(r[[1]][[1]]$errors$issues, 0L)
-  expect_length(r[[1]][[1]]$errors$potential_issues$new, 0L)
-  expect_length(r[[1]][[1]]$errors$potential_issues$old, 0L)
+  expect_length(r_both_ok$warnings$issues, 0L)
+  expect_length(r_both_ok$warnings$potential_issues$new, 0L)
+  expect_length(r_both_ok$warnings$potential_issues$old, 0L)
+
+  expect_length(r_both_ok$errors$issues, 0L)
+  expect_length(r_both_ok$errors$potential_issues$new, 0L)
+  expect_length(r_both_ok$errors$potential_issues$old, 0L)
 })
 
 test_that("check_rev_deps works for a package without a version in repos", {
@@ -117,45 +124,53 @@ test_that("check_rev_deps works for a package without a version in repos", {
   expect_s3_class(r[[1]], "rev_dep_dep_results")
 
   # pkg.none.broken
-  expect_s3_class(r[[1]][[1]], "rcmdcheck_rev_dep_results")
+  none_broken_i <- which(grepl("pkg.none.broken-", names(r[[1]]), fixed = TRUE))
+  expect_true(length(none_broken_i) == 1)
+  r_none_broken <- r[[1]][[none_broken_i]]
+  expect_s3_class(r_none_broken, "rcmdcheck_rev_dep_results")
 
-  expect_length(r[[1]][[1]]$notes$issues, 0L)
-  expect_length(r[[1]][[1]]$notes$potential_issues$new, 0L)
-  expect_length(r[[1]][[1]]$notes$potential_issues$old, 0L)
+  expect_length(r_none_broken$notes$issues, 0L)
+  expect_length(r_none_broken$notes$potential_issues$new, 0L)
+  expect_length(r_none_broken$notes$potential_issues$old, 0L)
 
-  expect_length(r[[1]][[1]]$warnings$issues, 0L)
-  expect_length(r[[1]][[1]]$warnings$potential_issues$new, 0L)
-  expect_length(r[[1]][[1]]$warnings$potential_issues$old, 0L)
+  expect_length(r_none_broken$warnings$issues, 0L)
+  expect_length(r_none_broken$warnings$potential_issues$new, 0L)
+  expect_length(r_none_broken$warnings$potential_issues$old, 0L)
 
-  expect_length(r[[1]][[1]]$errors$issues, 1L)
+  expect_length(r_none_broken$errors$issues, 1L)
   expect_true(
-    grepl("Running the tests in", r[[1]][[1]]$errors$issues)
+    grepl("Running the tests in", r_none_broken$errors$issues)
   )
   expect_true(
-    grepl("Reverse suggested deps detected", r[[1]][[1]]$errors$issues)
+    grepl("there is no package called", r_none_broken$errors$issues)
   )
-  expect_length(r[[1]][[1]]$errors$potential_issues$new, 0L)
-  expect_length(r[[1]][[1]]$errors$potential_issues$old, 0L)
+  expect_length(r_none_broken$errors$potential_issues$new, 0L)
+  expect_length(r_none_broken$errors$potential_issues$old, 0L)
 
 
   # pkg.none
-  expect_s3_class(r[[1]][[2]], "rcmdcheck_rev_dep_results")
+  none_i <- which(grepl("pkg.none-", names(r[[1]])))
+  expect_true(length(none_i) == 1)
+  r_none <- r[[1]][[none_i]]
+  expect_s3_class(r_none, "rcmdcheck_rev_dep_results")
+  
+  expect_s3_class(r_none, "rcmdcheck_rev_dep_results")
 
-  expect_length(r[[1]][[2]]$notes$issues, 0L)
-  expect_length(r[[1]][[2]]$notes$potential_issues$new, 0L)
-  expect_length(r[[1]][[2]]$notes$potential_issues$old, 0L)
+  expect_length(r_none$notes$issues, 0L)
+  expect_length(r_none$notes$potential_issues$new, 0L)
+  expect_length(r_none$notes$potential_issues$old, 0L)
 
-  expect_length(r[[1]][[2]]$warnings$issues, 0L)
-  expect_length(r[[1]][[2]]$warnings$potential_issues$new, 0L)
-  expect_length(r[[1]][[2]]$warnings$potential_issues$old, 0L)
+  expect_length(r_none$warnings$issues, 0L)
+  expect_length(r_none$warnings$potential_issues$new, 0L)
+  expect_length(r_none$warnings$potential_issues$old, 0L)
 
-  expect_length(r[[1]][[2]]$errors$issues, 1L)
+  expect_length(r_none$errors$issues, 1L)
   expect_true(
-    grepl("Running the tests in", r[[1]][[2]]$errors$issues)
+    grepl("Running the tests in", r_none$errors$issues)
   )
   expect_true(
-    grepl("there is no package called", r[[1]][[2]]$errors$issues)
+    grepl("Reverse suggested deps detected", r_none$errors$issues)
   )
-  expect_length(r[[1]][[2]]$errors$potential_issues$new, 0L)
-  expect_length(r[[1]][[2]]$errors$potential_issues$old, 0L)
+  expect_length(r_none$errors$potential_issues$new, 0L)
+  expect_length(r_none$errors$potential_issues$old, 0L)
 })
