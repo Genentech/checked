@@ -73,10 +73,10 @@ test_that("check_rev_deps works for package with one breaking change", {
 
   expect_length(r_both_error$errors$issues, 1L)
   expect_true(
-    grepl("Running the tests in",
-          r_both_error$errors$issues),
-    grepl("is not an exported object from",
-          r_both_error$errors$issues)
+    grepl("Running the tests in", r_both_error$errors$issues)
+  )
+  expect_true(
+    grepl("is not an exported object from", r_both_error$errors$issues)
   )
   expect_length(r_both_error$errors$potential_issues$new, 0L)
   expect_length(r_both_error$errors$potential_issues$old, 0L)
@@ -152,8 +152,6 @@ test_that("check_rev_deps works for a package without a version in repos", {
   none_i <- which(grepl("pkg.none-", names(r[[1]])))
   expect_true(length(none_i) == 1)
   r_none <- r[[1]][[none_i]]
-  expect_s3_class(r_none, "rcmdcheck_rev_dep_results")
-  
   expect_s3_class(r_none, "rcmdcheck_rev_dep_results")
 
   expect_length(r_none$notes$issues, 0L)
