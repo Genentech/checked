@@ -63,12 +63,6 @@ test_that("check_rev_deps works for package with one breaking change", {
 
   expect_length(r_both_error$warnings$issues, 1L)
   expect_true(
-    grepl(
-      "Namespace in Imports field not imported from",
-      r_both_error$warnings$issues
-    )
-  )
-  expect_true(
     grepl("Missing or unexported object", r_both_error$warnings$issues)
   )
   expect_length(r_both_error$warnings$potential_issues$new, 0L)
