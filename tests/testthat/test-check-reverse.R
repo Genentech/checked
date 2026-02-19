@@ -65,6 +65,7 @@ test_that("check_rev_deps works for package with one breaking change", {
   expect_true(
     grepl("Missing or unexported object", r_both_error$warnings$issues)
   )
+  stop(r_both_error$warnings)
   expect_length(r_both_error$warnings$potential_issues$new, 0L)
   expect_length(r_both_error$warnings$potential_issues$old, 0L)
 
@@ -126,6 +127,7 @@ test_that("check_rev_deps works for a package without a version in repos", {
   r_none_broken <- r[[1]][[none_broken_i]]
   expect_s3_class(r_none_broken, "rcmdcheck_rev_dep_results")
 
+  stop(r_none_broken$notes)
   expect_length(r_none_broken$notes$issues, 0L)
   expect_length(r_none_broken$notes$potential_issues$new, 0L)
   expect_length(r_none_broken$notes$potential_issues$old, 0L)
@@ -168,4 +170,11 @@ test_that("check_rev_deps works for a package without a version in repos", {
   )
   expect_length(r_none$errors$potential_issues$new, 0L)
   expect_length(r_none$errors$potential_issues$old, 0L)
+
+  # Plot works
+  expect_no_error(plot(design$graph))
+  expect_no_error(
+    g_i <- plot(design$graph, interactive = TRUE)
+  )
+  expect_s3_class(g_i, "visNetwork")
 })
