@@ -25,4 +25,8 @@ necessary information to determine where a package should be installed.
 lib_path method creates default path handlers for given pkg origin while
 lib_path_x creates an actual object.
 }
-\keyword{specs}
+\seealso{
+Other specs: 
+\code{\link{pkg_origin}()}
+}
+\concept{specs}

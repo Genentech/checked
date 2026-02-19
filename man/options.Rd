@@ -81,7 +81,8 @@ constrocuting a plan \code{task_grap}\item{default: }{\preformatted{TRUE}}
 \item{check_envvars}{\describe{
 named \code{character} vector of environment variables to use during
 the R CMD check.\item{default: }{\preformatted{c(`_R_CHECK_FORCE_SUGGESTS_` = FALSE, `_R_CHECK_RD_XREFS_` = FALSE, 
-    `_R_CHECK_SYSTEM_CLOCK_` = FALSE, `_R_CHECK_SUGGESTS_ONLY_` = TRUE)}}
+    `_R_CHECK_SYSTEM_CLOCK_` = FALSE, `_R_CHECK_SUGGESTS_ONLY_` = TRUE, 
+    `_R_CHECK_CRAN_INCOMING_=` = TRUE)}}
 \item{option: }{checked.check_envvars}
 \item{envvar: }{R_CHECKED_CHECK_ENVVARS (evaluated if possible, raw string otherwise)}
 }}

@@ -43,7 +43,8 @@ options::define_options(
     "_R_CHECK_FORCE_SUGGESTS_" = FALSE,
     "_R_CHECK_RD_XREFS_" = FALSE,
     "_R_CHECK_SYSTEM_CLOCK_" = FALSE,
-    "_R_CHECK_SUGGESTS_ONLY_" = TRUE
+    "_R_CHECK_SUGGESTS_ONLY_" = TRUE,
+    "_R_CHECK_CRAN_INCOMING_=" = TRUE
   ),
 
   "`character` vector of args passed to the R CMD build.",
