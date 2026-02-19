@@ -15,3 +15,4 @@ which adds duplicated attributes when attributes of the same name exist in
 multiple graphs. Searches for suffixes and consolidates attributes,
 taking the attribute from the first non-NA value observed.
 }
+\keyword{internal}

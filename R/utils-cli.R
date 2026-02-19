@@ -8,6 +8,8 @@
 #' @param nodes graph nodes to format.
 #' @param task task to format.
 #' @param tasks currently unused.
+#' 
+#' @keywords internal
 task_formats <- function(
   g = NULL,
   nodes = V(g),
@@ -107,6 +109,8 @@ task_formats <- function(
 #'
 #' # Examples for unexported functions are not supported
 #' # fmt(task = task, "{action} {package} ({version}) from {source}")
+#' 
+#' @keywords internal
 fmt <- function(
   ...,
   g,

@@ -23,6 +23,9 @@ task <- function(..., .subclass = NULL) {
 #' @param ... Objects passed to specified class functions
 #' @param .subclass character name of the subclass. It will be appended with
 #'    "_meta" suffix.
+#'    
+#' @family tasks
+#' @export
 meta_task <- function(..., .subclass = NULL) {
   task(..., .subclass = c(sprintf("%s_meta", .subclass), "meta"))
 }

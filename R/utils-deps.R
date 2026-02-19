@@ -61,6 +61,7 @@ as_pkg_dependencies <- function(x) {
 #'   `"all"`, `"most"`, `"hard"` or `"soft"`, `NA` or a vector of dependency
 #'   types compatible with [`as_pkg_dependencies()`] function.
 #'
+#' @keywords internal
 pkg_dependencies <- function(
   packages,
   dependencies = TRUE,

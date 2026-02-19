@@ -8,7 +8,8 @@
 #' @param node Node(s) for which libpath should be constructed based on `g`
 #' @param output Path to the checked output directory
 #' @inheritParams lib
-
+#' 
+#' @keywords internal
 task_graph_libpaths <- function(
   g,
   node = NULL,
@@ -41,6 +42,8 @@ task_graph_libpaths <- function(
 #'
 #' @inheritParams task_graph_libpaths
 #' @param ... additional params passed to downstream methods
+#' 
+#' @keywords internal
 start_task <- function(node, g, ...) {
   UseMethod("start_task")
 }

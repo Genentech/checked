@@ -23,3 +23,4 @@ fmt(..., g, nodes, task = NULL, .envir = parent.frame(), ansi = TRUE)
 Provided a task, allows for use of a handful of shorthand symbols which will
 use the task as a context for formatting task fields.
 }
+\keyword{internal}

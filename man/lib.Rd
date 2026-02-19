@@ -49,3 +49,4 @@ lib(x, ...)
 \description{
 Get Library Location
 }
+\keyword{internal}

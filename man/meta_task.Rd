@@ -16,3 +16,10 @@ meta_task(..., .subclass = NULL)
 Meta tasks are tasks which are not intended to perform computation. They
 exist simply to provide relationships among computational tasks.
 }
+\seealso{
+Other tasks: 
+\code{\link{check_task}()},
+\code{\link{install_task}()},
+\code{\link{task}()}
+}
+\concept{tasks}

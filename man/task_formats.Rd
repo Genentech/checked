@@ -20,3 +20,4 @@ This bit of code is intended for use with \code{\link[=fmt]{fmt()}}, and allows 
 to layer symbol bindings on top of the environment used for string
 interpolation which provide syntactic sugar for common formatting components.
 }
+\keyword{internal}

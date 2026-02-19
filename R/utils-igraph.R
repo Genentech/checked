@@ -47,6 +47,8 @@ star_graph <- function(...) {
 #' taking the attribute from the first non-NA value observed.
 #'
 #' @param g task_graph object
+#' 
+#' @keywords internal
 graph_dedup_attrs <- function(g) {
   # pattern appended to duplicated attributes
   re <- "_\\d+$"

@@ -8,6 +8,8 @@
 #' @param x A [`pkg_origin()`] object used for default dispatch.
 #' @param ... Additional values
 #' @param .class An optional subclass, used primarily for dispatch.
+#' 
+#' @keywords specs
 lib_path <- function(x, ..., .class = c()) {
   UseMethod("lib_path")
 }
@@ -56,6 +58,8 @@ format.lib_path <- function(x, ...) {
 #' @param lib.root A root directory for the isolated library.
 #' @param dir_hash unique identifier of the isolated library
 #' @param name human-readable subname of the isolated library
+#' 
+#' @keywords internal
 lib <- function(x, ...) {
   UseMethod("lib")
 }

@@ -18,3 +18,4 @@ Starts task based on the \code{task} object encapsulated in the \code{node} take
 from then \code{task_graph} \code{g}. It returns an \code{install_process} or
 \code{check_process} \code{R6} object.
 }
+\keyword{internal}

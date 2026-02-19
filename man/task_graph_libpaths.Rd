@@ -20,3 +20,4 @@ Function that traverses over the task dependency task to acquire libpaths
 for given nodes. It ensures that when runing a node, a libpath is
 constructed which has all the required packages on it.
 }
+\keyword{internal}

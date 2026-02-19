@@ -9,9 +9,13 @@ reference:
     contents:
       - run
 
-  - title: Designing Check Sets
+  - title: Designing and Runing Check Sets
     contents:
       - has_concept("checks")
+      
+  - title: Plan checks
+    contents:
+      - has_concept("plan")
 
   - title: Building Tasks
     contents:

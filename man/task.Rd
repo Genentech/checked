@@ -22,6 +22,7 @@ related tasks.
 \seealso{
 Other tasks: 
 \code{\link{check_task}()},
-\code{\link{install_task}()}
+\code{\link{install_task}()},
+\code{\link{meta_task}()}
 }
 \concept{tasks}

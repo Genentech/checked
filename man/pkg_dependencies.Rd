@@ -33,3 +33,4 @@ Inspired by \code{tools::package_dependencies}, but with the added benefit
 of recording the dependency type and relationships throughout the
 dependency tree.
 }
+\keyword{internal}
