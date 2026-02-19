@@ -28,7 +28,7 @@ should be scanned for packages in the \code{remotes} field and added while
 constrocuting a plan \code{task_grap} (Defaults to \code{TRUE}, overwritable using option 'checked.add_remotes' or environment variable 'R_CHECKED_ADD_REMOTES')}
 
 \item{check_envvars}{named \code{character} vector of environment variables to use during
-the R CMD check. (Defaults to \verb{c(}\emph{R_CHECK_FORCE_SUGGESTS}\verb{= FALSE,}\emph{R_CHECK_RD_XREFS}\verb{= FALSE, ;    }\emph{R_CHECK_SYSTEM_CLOCK}\verb{= FALSE,}\emph{R_CHECK_SUGGESTS_ONLY}\verb{= TRUE, ;    }\emph{R_CHECK_CRAN_INCOMING}=\verb{ = TRUE)}, overwritable using option 'checked.check_envvars' or environment variable 'R_CHECKED_CHECK_ENVVARS')}
+the R CMD check. (Defaults to \verb{c(}\emph{R_CHECK_FORCE_SUGGESTS}\verb{= "false",}\emph{R_CHECK_RD_XREFS}\verb{= "false", ;    }\emph{R_CHECK_SYSTEM_CLOCK}\verb{= "false",}\emph{R_CHECK_SUGGESTS_ONLY}\verb{= "true", ;    }\emph{R_CHECK_CRAN_INCOMING}\verb{ = "false")}, overwritable using option 'checked.check_envvars' or environment variable 'R_CHECKED_CHECK_ENVVARS')}
 
 \item{tty_tick_interval}{tty refresh interval when reporting results in milliseconds (Defaults to \code{0.1}, overwritable using option 'checked.tty_tick_interval' or environment variable 'R_CHECKED_TTY_TICK_INTERVAL')}
 

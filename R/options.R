@@ -40,11 +40,11 @@ options::define_options(
   "named `character` vector of environment variables to use during
    the R CMD check.",
   check_envvars = c(
-    "_R_CHECK_FORCE_SUGGESTS_" = FALSE,
-    "_R_CHECK_RD_XREFS_" = FALSE,
-    "_R_CHECK_SYSTEM_CLOCK_" = FALSE,
-    "_R_CHECK_SUGGESTS_ONLY_" = TRUE,
-    "_R_CHECK_CRAN_INCOMING_=" = TRUE
+    "_R_CHECK_FORCE_SUGGESTS_" = "false",
+    "_R_CHECK_RD_XREFS_" = "false",
+    "_R_CHECK_SYSTEM_CLOCK_" = "false",
+    "_R_CHECK_SUGGESTS_ONLY_" = "true",
+    "_R_CHECK_CRAN_INCOMING_" = "false"
   ),
 
   "`character` vector of args passed to the R CMD build.",
