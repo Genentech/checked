@@ -19,7 +19,7 @@ test_that("check_rev_deps works for package with no revdeps", {
     expect_no_error(
       checks <- check_rev_deps(
         file.path(sources_new, "pkg.none"),
-        n = 2L,
+        n = 1L,
         repos = repo,
         reporter = NULL
       )
@@ -37,7 +37,7 @@ test_that("check_rev_deps works for package with one breaking change", {
   withr::with_options(list(pkgType = "source"), {
     design <- check_rev_deps(
       file.path(sources_new, "pkg.ok.error"),
-      n = 2L,
+      n = 1L,
       repos = repo,
       reporter = NULL
     )
@@ -102,7 +102,7 @@ test_that("check_rev_deps works for a package without a version in repos", {
   withr::with_options(list(pkgType = "source"), {
     expect_no_error(design <- check_rev_deps(
       file.path(sources_new, "pkg.suggests"),
-      n = 2L,
+      n = 1L,
       repos = repo,
       reporter = NULL
     ))

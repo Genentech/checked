@@ -4,7 +4,7 @@ test_that("results_to_df works as expected", {
   expect_no_error(
     plan <- check_pkgs(
       file.path(examples_path, c("exampleGood", "exampleBad")),
-      n = 2L,
+      n = 1L,
       repos = "https://cran.r-project.org/",
       reporter = NULL
     )
