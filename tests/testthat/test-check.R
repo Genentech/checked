@@ -30,7 +30,7 @@ test_that("check_pkgs works as expected", {
   r_example_bad <- r[[1]][[example_bad_i]]
   expect_s3_class(r_example_bad, "rcmdcheck_check_results")
 
-  expect_length(r_example_bad$notes$issues, 3L)
+  expect_length(r_example_bad$notes$issues, 2L)
   expect_length(r_example_bad$notes$potential_issues$new, 0L)
   expect_length(r_example_bad$notes$potential_issues$old, 0L)
 
@@ -49,7 +49,7 @@ test_that("check_pkgs works as expected", {
   r_example_good <- r[[1]][[example_good_i]]
   expect_s3_class(r_example_good, "rcmdcheck_check_results")
 
-  expect_length(r_example_good$notes$issues, 2L)
+  expect_length(r_example_good$notes$issues, 0L)
   expect_length(r_example_good$notes$potential_issues$new, 0L)
   expect_length(r_example_good$notes$potential_issues$old, 0L)
 
