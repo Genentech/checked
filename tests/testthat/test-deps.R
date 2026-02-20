@@ -19,5 +19,13 @@ test_that("pkg_dependencies works as expected for cran package", {
       repos = "https://packagemanager.posit.co/cran/2026-02-01"
     )
   )
+
+  ap <- available_packages()
+  core_pkgs <- ap[!is.na(ap[, "Priority"]), "Package"]
+  df[df$package %in% core_pkgs & df$name == "R", ]$version <-
+    list(package_version(NA_character_, strict = FALSE))
+  # We need to exclude dependencies lines stating minimal R
+  # version required for base and recommended packages as these will fail
+  # for different version of R regardless of used snapshot
   expect_snapshot(df)
 })

@@ -100,7 +100,7 @@
       70     processx   Depends           R   >=       3, 4, 0
       71    lifecycle   Depends           R   >=          3, 6
       72     magrittr   Depends           R   >=       3, 4, 0
-      73       Matrix   Depends           R   >=          4, 4
+      73       Matrix   Depends           R   >=              
       74       Matrix   Depends     methods <NA>              
       75        rlang   Depends           R   >=       4, 0, 0
       76        vctrs   Depends           R   >=       4, 0, 0
@@ -165,7 +165,7 @@
       135       waldo   Imports        glue <NA>              
       136       waldo   Imports     methods <NA>              
       137       waldo   Imports       rlang   >=       1, 1, 0
-      138     lattice   Depends           R   >=       4, 0, 0
+      138     lattice   Depends           R   >=              
       139        glue   Depends           R   >=          3, 6
       140          fs   Depends           R   >=          3, 6
       141     diffobj   Depends           R   >=       3, 1, 0

@@ -16,6 +16,9 @@ old <- getOption("pkgType")
 options(pkgType = "source")
 
 test_that("reporter_basic_tty works as expected for pkg.none", {
+  # Entire testing suite takes too long on CRAN, we need to trim it
+  skip_on_cran()
+
   plan <- plan_rev_dep_checks(
     file.path(sources_new, "pkg.none"),
     repos = repo
@@ -40,6 +43,8 @@ test_that("reporter_basic_tty works as expected for pkg.none", {
 })
 
 test_that("reporter_basic_tty works as expected for pkg.ok.error", {
+  # Entire testing suite takes too long on CRAN, we need to trim it
+  skip_on_cran()
 
   plan <- plan_rev_dep_checks(
     file.path(sources_new, "pkg.ok.error"),
@@ -66,6 +71,9 @@ test_that("reporter_basic_tty works as expected for pkg.ok.error", {
 })
 
 test_that("reporter_ansi_tty works as expected for pkg.ok.error", {
+  # Entire testing suite takes too long on CRAN, we need to trim it
+  skip_on_cran()
+
   plan <- plan_rev_dep_checks(
     file.path(sources_new, "pkg.ok.error"),
     repos = repo
