@@ -20,7 +20,9 @@ test_that("pkg_dependencies works as expected for cran package", {
     )
   )
 
-  ap <- available_packages()
+  ap <- available_packages(
+    repos = "https://packagemanager.posit.co/cran/2026-02-01"
+  )
   core_pkgs <- ap[!is.na(ap[, "Priority"]), "Package"]
   df[df$package %in% core_pkgs & df$name == "R", ]$version <-
     list(package_version(NA_character_, strict = FALSE))
