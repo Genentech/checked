@@ -23,9 +23,9 @@ results.checker <- function(
     ...) {
   error_on <- match.arg(error_on, c("never", "issues", "potential_issues"))
 
-  stopifnot(
-    "checker object does not represnet a completed run" = x$is_done()
-  )
+  if (!x$is_done()) {
+    warning("checker object does not represnet a completed run. Presenting partial results") # nolint
+  }
 
   vs <- V(x$graph)
   # Find root's of meta nodes
@@ -73,6 +73,7 @@ results.igraph.vs <- function(x, ...) {
 results.rev_dep_dep_meta_task <- function(x, checker_obj, ...) {
   # x is a igraph.vs with rev_dep_dep_meta_task task
   nh <- igraph::neighbors(checker_obj$graph, x, mode = "out")
+  nh <- nh[nh$status == STATUS$done]
   structure(
     lapply(nh, results, checker_obj = checker_obj),
     names = nh$name,

@@ -43,7 +43,9 @@ RELATION <- enum(
 )
 
 #' Check execution status categories
-#' @keywords internal
+#' @export
+#' 
+#' @family checks
 STATUS <- enum(
   "pending",
   "ready",

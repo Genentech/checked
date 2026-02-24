@@ -1,3 +1,9 @@
+# checked 0.5.1
+
+* Export STATUS vector to make external statuses analysis easier
+
+* Allow obtaining partial results for uncompleted checks
+
 # checked 0.5.0
 
 * Entire package refactor

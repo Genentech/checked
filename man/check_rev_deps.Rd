@@ -62,6 +62,7 @@ identify changes in reverse dependency behaviors.
 }
 \seealso{
 Other checks: 
+\code{\link{STATUS}},
 \code{\link{check_pkgs}()},
 \code{\link{checker}},
 \code{\link{new_checker}()}

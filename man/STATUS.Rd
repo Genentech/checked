@@ -13,4 +13,12 @@ STATUS
 \description{
 Check execution status categories
 }
-\keyword{internal}
+\seealso{
+Other checks: 
+\code{\link{check_pkgs}()},
+\code{\link{check_rev_deps}()},
+\code{\link{checker}},
+\code{\link{new_checker}()}
+}
+\concept{checks}
+\keyword{datasets}
