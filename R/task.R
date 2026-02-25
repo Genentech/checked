@@ -49,8 +49,8 @@ print.task <- function(x, ...) {
 
 #' Create a task to install a package and dependencies
 #'
-#' @param origin [`pkg_origin()`] object.
-#' @param lib Any object that can be passed to [`lib()`] to generate a library
+#' @param origin [pkg_origin()] object.
+#' @param lib Any object that can be passed to [lib()] to generate a library
 #'   path.
 #' @inheritParams utils::install.packages
 #'

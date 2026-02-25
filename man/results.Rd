@@ -41,6 +41,7 @@ Get R CMD check results
 }
 \seealso{
 Other results: 
-\code{\link{print.checked_results}()}
+\code{\link{print.checked_results}()},
+\code{\link{results_to_df}()}
 }
 \concept{results}

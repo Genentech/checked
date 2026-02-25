@@ -200,7 +200,31 @@ results_check <- function(x, output, ...) {
   )
 }
 
+
+#' Summarize checked results as data.frame
+#'
+#' Turns checked results into a list of data.frams, one for each meta root task.
+#' Such form makes quick results analysis easier by providing a general overview
+#' of identified failures.
+#' 
+#' @param results checked_results object or any of the sub-objects.
+#' @param ... other prameters passed to downstream functions.
+#' @export
+#' 
+#' @family results
 results_to_df <- function(results, ...) {
+  UseMethod("results_to_df")
+}
+
+
+#' @export
+results_to_df.checked_results <- function(results, ...) {
+  lapply(results, results_to_df)
+}
+
+
+#' @export
+results_to_df.default <- function(results, ...) {
   if (length(results) == 0) {
     data.frame(
       notes = character(0),

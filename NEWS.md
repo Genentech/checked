@@ -1,8 +1,10 @@
 # checked 0.5.1
 
-* Export STATUS vector to make external statuses analysis easier
+* Export STATUS vector to make external statuses analysis easier.
 
-* Allow obtaining partial results for uncompleted checks
+* Allow obtaining partial results for uncompleted checks.
+
+* Export `results_to_df()` and make it a generic.
 
 # checked 0.5.0
 

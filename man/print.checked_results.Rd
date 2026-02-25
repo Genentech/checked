@@ -29,6 +29,7 @@ Print checked results
 }
 \seealso{
 Other results: 
-\code{\link{results}()}
+\code{\link{results}()},
+\code{\link{results_to_df}()}
 }
 \concept{results}
