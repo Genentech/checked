@@ -1,4 +1,7 @@
 test_that("check_pkgs works as expected", {
+  # Entire testing suite takes too long on CRAN, we need to trim it
+  skip_on_cran()
+
   examples_path <- system.file("example_packages", package = "checked")
 
   expect_no_error(

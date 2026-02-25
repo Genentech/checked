@@ -1,3 +1,2 @@
-The package fixes CRAN checks results failures while also preforming a full
-refactor of the logic behind it. Changes are fully tetsed and backwards compatibility
-was applied whenever possible. 
+Few minor updates to to exported functions and CRAN results failure address.
+Reduced the runtime of tests on CRAN
