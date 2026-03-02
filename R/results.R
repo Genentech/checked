@@ -427,6 +427,11 @@ strip_details_from_issue <- function(x) {
     pattern = "See(.*?)for details",
     replacement = "See <path> for details"
   )
+  x <- gsub(
+    x = x,
+    pattern = "\\[([^]]*)\\]",
+    replacement = "[]",
+  )
   gsub(
     x = x,
     pattern = "[[:space:]]",

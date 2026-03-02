@@ -1,3 +1,9 @@
+# checked 0.5.1.9000 (development)
+
+* Add timers striping to `strip_details_from_issue()` to avoid false-positives.
+
+* Remove `pkg_origin_is_base()` helper function and use memoised `base_pkgs()`.
+
 # checked 0.5.1
 
 * Export STATUS vector to make external statuses analysis easier.
