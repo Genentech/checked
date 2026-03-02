@@ -1,19 +1,20 @@
 #' @importFrom utils packageName install.packages
 #' @importFrom R6 R6Class
 #' @importFrom callr r_process
-install_packages_process <- R6::R6Class(
-  "install_package_process",
+install_process <- R6::R6Class(
+  "install_process",
   inherit = callr::r_process,
   public = list(
     log = NULL,
     initialize = function(
       pkgs,
       ...,
-      lib = .libPaths(),
+      lib = .libPaths()[[1]],
       libpaths = .libPaths(),
       available_packages_filters = getOption("available_packages_filters"),
-      log
+      log = NULL
     ) {
+      if (!dir.exists(lib)) dir.create(lib, recursive = TRUE)
       private$package <- pkgs
       self$log <- log
       private$callr_r_bg(
@@ -33,14 +34,14 @@ install_packages_process <- R6::R6Class(
           )
         },
         args = list(
-          pkgs,
+          private$package,
           ...,
           lib = lib,
           escalate_warning = is_install_failure_warning,
           available_packages_filters = available_packages_filters
         ),
         libpath = libpaths,
-        stdout = log,
+        stdout = self$log,
         stderr = "2>&1",
         system_profile = TRUE
       )
@@ -57,6 +58,7 @@ install_packages_process <- R6::R6Class(
     },
     finish = function() {
       private$time_finish <- Sys.time()
+      private$free_file_descriptors()
       if (is.function(f <- private$finish_callback)) f(self)
     },
     get_r_exit_status = function() {
@@ -85,6 +87,12 @@ install_packages_process <- R6::R6Class(
 
       private$options <- options
       super$initialize(options = options)
+    },
+    free_file_descriptors = function() {
+      if (self$has_output_connection()) close(self$get_output_connection())
+      if (self$has_error_connection())  close(self$get_error_connection())
+      if (self$has_poll_connection())   close(self$get_poll_connection())
+      if (self$has_input_connection())   close(self$get_input_connection())
     }
   )
 )

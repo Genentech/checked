@@ -1,6 +1,6 @@
 Package: checked
 Title: Systematically Run R CMD Checks
-Version: 0.2.9
+Version: 0.5.1
 Authors@R:
     c(
       person(
@@ -11,8 +11,8 @@ Authors@R:
         comment = c(ORCID = "0000-0002-3120-1601")
       ),
       person(
-        "Doug", "Kelkhoff", , 
-        "doug.kelkhoff@gmail.com", 
+        "Doug", "Kelkhoff",
+        email = "doug.kelkhoff@gmail.com", 
         role = c("aut"),
         comment = c(ORCID = "0009-0003-7845-4061")
       ),
@@ -31,20 +31,27 @@ URL:
 BugReports: https://github.com/Genentech/checked/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
+Depends:
+    R (>= 3.6.2)
 Imports:
     callr,
     cli,
+    glue,
     igraph,
     jsonlite,
+    memoise,
     options,
     R6,
     rcmdcheck,
+    rlang,
     utils (>= 3.6.2),
     tools
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-Suggests: 
+RoxygenNote: 7.3.3
+Suggests:
+    remotes,
     testthat (>= 3.0.0),
+    visNetwork,
     withr
 Config/Needs/website:
     r-lib/asciicast

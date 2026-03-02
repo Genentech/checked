@@ -7,16 +7,15 @@
 enum <- function(...) {
   x <- c(...)
   f <- factor(x, levels = x)
-  structure(
-    lapply(f, identity),
-    names = levels(f)
-  )
+  names(f) <- as.character(f)
+  structure(f, class = c("enum", "factor"))
 }
 
 #' Internally provide extended mathematical operators for enums
 #' @noRd
+#' @export
 #' @keywords internal
-Ops.factor <- function(e1, e2) {
+Ops.enum <- function(e1, e2) {
   # nolint start, styler: off
   switch(.Generic, ">" = , ">=" = , "==" = , "<" = , "<=" = {
     return(do.call(.Generic, list(as.numeric(e1), as.numeric(e2))))
@@ -25,9 +24,29 @@ Ops.factor <- function(e1, e2) {
   NextMethod()
 }
 
-#' Check execution status categories
+#' Internally provide `$` for enum factors
+#' @noRd
 #' @keywords internal
-STATUS <- enum( # nolint
+#' @export
+`$.enum` <- function(x, i) {
+  x[[i]]
+}
+
+#' Relation types
+#'
+#' A flag for edges that articulate different relations between nodes.
+#'
+#' @keywords internal
+RELATION <- enum(
+  "dep",    # for task dependencies
+  "report"  # for reporting graph, from task to reporting node
+)
+
+#' Check execution status categories
+#' @export
+#'
+#' @family checks
+STATUS <- enum(
   "pending",
   "ready",
   "in progress",
@@ -36,7 +55,7 @@ STATUS <- enum( # nolint
 
 #' Dependencies categories
 #' @keywords internal
-DEP <- enum( # nolint
+DEP <- enum(
   "Imports",
   "Depends",
   "LinkingTo",
@@ -46,11 +65,11 @@ DEP <- enum( # nolint
 
 #' Strong dependencies categories
 #' @keywords internal
-DEP_STRONG <- unlist(DEP[1:3]) # nolint
+DEP_STRONG <- unlist(DEP[1:3])
 
 #' Available packages database dependencies columns
 #' @keywords internal
-DB_COLNAMES <- c( # nolint
+DB_COLNAMES <- c(
   "Package",
   "Depends",
   "Imports",

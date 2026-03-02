@@ -2,30 +2,49 @@
 options::define_options(
   "tty refresh interval when reporting results in milliseconds",
   tty_tick_interval = 0.1,
-  
+
+  "deafult tty height used for the ANSI reporter. Used only
+   if correct values could not be acquired with system('tput lines')",
+  tty_default_height = 50,
+
+  "`logical`, indicating whether additional garbage collection should be
+   performed before starting a new task, if at least one process recently
+   finalized. This can cause the checker to orchestrate tasks slower but
+   is recommended to be used for designs with many sub-processes required as
+   native garbage collection can lag leading to memory issues. Disable only
+   when maximum prefromance is required and memory is not the issue.",
+  proactive_gc = TRUE,
+
   "character vector indicating whether R error should be thrown when issues
    are discovered when generating results. \"never\" means that no errors
    are thrown. If \"issues\" then errors are emitted only on issues, whereas
    \"potential issues\" stands for error on both issues and potential issues.",
   results_error_on = "never",
-  
+
   "character vector indicating which packages should be included in the results.
    \"all\" means that all packages are kept. If \"issues\" then only packages 
    with issues identified, whereas \"potential_issues\" stands for keeping
    packages with both \"issues\" and \"potential_issues\".",
   results_keep = "all",
-  
+
   "`logical` indicating whether output directory should be unlinked before
    running checks. If `FALSE`, an attempt will me made to restore previous
    progress from the same `output`",
   restore = NA,
-  
-  "named `character` vector of environment variables to use during R CMD check.",
+
+  "`logical` indicating whether origins inheriting from `pkg_origin_local`, 
+    should be scanned for packages in the `remotes` field and added while 
+    constrocuting a plan `task_grap`",
+  add_remotes = TRUE,
+
+  "named `character` vector of environment variables to use during
+   the R CMD check.",
   check_envvars = c(
-    "_R_CHECK_FORCE_SUGGESTS_" = FALSE,
-    "_R_CHECK_RD_XREFS_" = FALSE,
-    "_R_CHECK_SYSTEM_CLOCK_" = FALSE,
-    "_R_CHECK_SUGGESTS_ONLY_" = TRUE
+    "_R_CHECK_FORCE_SUGGESTS_" = "false",
+    "_R_CHECK_RD_XREFS_" = "false",
+    "_R_CHECK_SYSTEM_CLOCK_" = "false",
+    "_R_CHECK_SUGGESTS_ONLY_" = "true",
+    "_R_CHECK_CRAN_INCOMING_" = "false"
   ),
 
   "`character` vector of args passed to the R CMD build.",
@@ -42,7 +61,8 @@ options::define_options(
   check_args = c(
     "--timings",
     "--ignore-vignettes",
-    "--no-manual"
+    "--no-manual",
+    "--as-cran"
   ),
   envvar_fn = structure(
     function(raw, ...) trimws(strsplit(raw, " ")[[1]]),
@@ -51,7 +71,7 @@ options::define_options(
 )
 
 #' @eval options::as_roxygen_docs()
-#' 
+#'
 #' @family documentation
 NULL
 

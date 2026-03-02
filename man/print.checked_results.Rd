@@ -2,20 +2,22 @@
 % Please edit documentation in R/results.R
 \name{print.checked_results}
 \alias{print.checked_results}
-\alias{print.checked_results_check_task_spec}
-\alias{print.checked_results_revdep_check_task_spec}
+\alias{print.rev_dep_dep_results}
+\alias{print.local_check_results}
 \title{Print checked results}
 \usage{
 \method{print}{checked_results}(x, ...)
 
-\method{print}{checked_results_check_task_spec}(x, keep = options::opt("results_keep"), ...)
+\method{print}{rev_dep_dep_results}(x, ..., name = NULL, keep = options::opt("results_keep"))
 
-\method{print}{checked_results_revdep_check_task_spec}(x, ...)
+\method{print}{local_check_results}(x, ..., name = NULL, keep = options::opt("results_keep"))
 }
 \arguments{
 \item{x}{an object to be printed.}
 
 \item{...}{other parameters.}
+
+\item{name}{character name of the \code{rev_dep_dep} package}
 
 \item{keep}{character vector indicating which packages should be included in the results.
 "all" means that all packages are kept. If "issues" then only packages
@@ -28,6 +30,6 @@ Print checked results
 \seealso{
 Other results: 
 \code{\link{results}()},
-\code{\link{results_to_file}()}
+\code{\link{results_to_df}()}
 }
 \concept{results}

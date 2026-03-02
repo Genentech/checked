@@ -1,7 +1,7 @@
-#' Check Design Runner Reporters
+#' Check checker Runner Reporters
 #'
 #' Reporters are used to configure how output is communicated while running
-#' a [`check_design`]. They range from glossy command-line tools intended for
+#' a [`checker`]. They range from glossy command-line tools intended for
 #' displaying progress in an interactive R session, to line-feed logs which
 #' may be better suited for automated execution, such as in continuous
 #' itegration.
@@ -38,6 +38,12 @@ reporter_ansi_tty <- function() {
 
 #' @rdname reporters
 #' @export
+reporter_ansi_tty2 <- function() {
+  reporter("ansi_tty2")
+}
+
+#' @rdname reporters
+#' @export
 reporter_basic_tty <- function() {
   reporter("basic_tty")
 }
@@ -57,13 +63,13 @@ reporter_default <- function() {
 #' Reporter Internal Methods
 #'
 #' Each of the internal methods for reporters take a reporter, the check
-#' design object and a calling environment.
+#' checker object and a calling environment.
 #'
 #' @param reporter A object produced using [`reporters`]. Each reporter is a
 #'   thin wrapper around an environment with a class name for dispatch. The
 #'   reporter is mutable and captures any necessary state that needs to be
 #'   tracked while reporting.
-#' @param design [`check_design`] The check design to report as it evaluates.
+#' @param checker [`checker`] The check checker to report as it evaluates.
 #' @param envir `environment` An environment to attach to, to leverage on-exit
 #'   hooks.
 #' @param sleep `numeric` An interval to pause between reporter steps.
@@ -74,27 +80,47 @@ reporter_default <- function() {
 NULL
 
 #' @rdname reporters-internal
-report_sleep <- function(reporter, design, sleep) {
+report_sleep <- function(reporter, checker, sleep) {
   UseMethod("report_sleep")
 }
 
 #' @rdname reporters-internal
 #' @export
-report_sleep.default <- function(reporter, design, sleep = 1) {
+report_sleep.default <- function(reporter, checker, sleep = 1) {
   Sys.sleep(sleep)
 }
 
 #' @rdname reporters-internal
-report_initialize <- function(reporter, design, envir = parent.frame()) {
-  UseMethod("report_initialize")
+report_start_setup <- function(reporter, checker, ..., envir = parent.frame()) {
+  UseMethod("report_start_setup")
 }
 
 #' @rdname reporters-internal
-report_status <- function(reporter, design, envir = parent.frame()) {
+report_start_checks <- function(reporter, checker, ..., envir = parent.frame()) { # nolint
+  UseMethod("report_start_checks")
+}
+
+#' @rdname reporters-internal
+report_start_checks.default <- function(reporter, checker, ..., envir = parent.frame()) { # nolint
+  NULL
+}
+
+#' @rdname reporters-internal
+report_status <- function(reporter, checker, envir = parent.frame()) {
   UseMethod("report_status")
 }
 
 #' @rdname reporters-internal
-report_finalize <- function(reporter, design) {
+report_finalize <- function(reporter, checker) {
   UseMethod("report_finalize")
+}
+
+#' @rdname reporters-internal
+report_task <- function(reporter, g, v) {
+  UseMethod("report_task")
+}
+
+#' @rdname reporters-internal
+report_step <- function(reporter, checker) {
+  UseMethod("report_step")
 }

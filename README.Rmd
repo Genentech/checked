@@ -6,6 +6,12 @@ always_allow_html: yes
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+```{sh clone-dev-praise, echo = FALSE, results = "hide"}
+# praise chosen for having few direct and reverse dependencies
+rm -rf /tmp/praise
+git clone https://github.com/gaborcsardi/praise /tmp/praise
+```
+
 ```{r, include = FALSE, cache = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -22,8 +28,17 @@ knitr::opts_chunk$set(
 asciicast::init_knitr_engine(
   startup = bquote({
     options(repos = .(getOption("repos")))
+    plan <- checked::plan_rev_dep_checks("/tmp/praise")
+    design <- checked::checker$new(
+      plan,
+      n = 10,
+      lib.loc = .libPaths(),
+      restore = FALSE
+    )
   }),
-  echo_input = FALSE
+  echo_input = FALSE,
+  timeout = 300,
+  interactive = FALSE
 )
 ```
 
@@ -35,12 +50,6 @@ asciicast::init_knitr_engine(
 [![coverage](https://codecov.io/gh/Genentech/checked/branch/main/graph/badge.svg)](https://app.codecov.io/gh/Genentech/checked/tree/main)
 <!-- badges: end -->
 
-```{sh clone-dev-praise, echo = FALSE, results = "hide"}
-# praise chosen for having few direct and reverse dependencies
-rm -rf /tmp/praise
-git clone https://github.com/gaborcsardi/praise /tmp/praise
-```
-
 # Running Checks
 
 Although `checked` is broadly capable of running arbitrary sets of `R CMD check`
@@ -51,7 +60,7 @@ Running reverse dependency checks is as easy as
 
 ```r
 library(checked)
-x <- run("/home/dev/praise")
+x <- run("/home/dev/praise", n = 4)
 results(x)
 ```
 ```{r, echo = FALSE}
@@ -77,10 +86,12 @@ run("/home/dev/praise")
 ```
 ```{asciicast ansi-tty-example, cache = FALSE}
 #| asciicast_knitr_output = "svg",
-#| asciicast_at = "all",
 #| asciicast_cursor = FALSE,
-#| asciicast_speed = 2
-options(checked.tty_tick_interval = 200)
-checked::run("/tmp/praise")
+#| asciicast_speed = 2,
+#| asciicast_timeout = 300,
+#| asciicast_at = "all",
+#| asciicast_idle_time_limit = 2
+options(checked.tty_tick_interval = 0.01)
+checked::run(design)
 cat()
 ```

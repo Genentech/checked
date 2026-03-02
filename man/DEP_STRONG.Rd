@@ -5,7 +5,7 @@
 \alias{DEP_STRONG}
 \title{Strong dependencies categories}
 \format{
-An object of class \code{factor} of length 3.
+An object of class \code{enum} (inherits from \code{factor}) of length 3.
 }
 \usage{
 DEP_STRONG

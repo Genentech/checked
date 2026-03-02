@@ -2,18 +2,18 @@
 % Please edit documentation in R/task_graph.R
 \name{task_graph_which_ready}
 \alias{task_graph_which_ready}
-\title{Find task with ready state}
+\title{Find nodes with ready state}
 \usage{
 task_graph_which_ready(g)
 }
 \arguments{
-\item{g}{A dependency graph, as produced with \code{\link[=task_graph_create]{task_graph_create()}}.}
+\item{g}{A dependency graph, as produced with \code{\link[=task_graph]{task_graph()}}.}
 }
 \value{
 The names of packages with ready state.
 }
 \description{
-List tasks which have ready state prioritizing check tasks over
-install tasks.
+List nodes which have ready state prioritizing check task nodes over
+install task nodes.
 }
 \keyword{internal}

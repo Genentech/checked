@@ -19,10 +19,13 @@
 #'   to pull sources for reverse dependencies. In some cases, for instance using
 #'   binaries on Linux, we want to use different repositories when pulling
 #'   sources to check and different when installing dependencies.
-#' @param ... Additional arguments passed to [`checked-task-df`] and [`run()`]
+#' @param restore `logical` indicating whether output directory should be
+#'   unlinked before running checks. If `FALSE`, an attempt will me made to
+#'   restore previous progress from the same `output`
+#' @param ... Additional arguments passed to [`run()`]
 #'
 #' @return
-#'   [`check_design()`] R6 class storing all the details
+#'   [`checker()`] R6 class storing all the details
 #'   regarding checks that run. Can be combined with
 #'   [`results`] and [`summary()`] methods to generate results.
 #'
@@ -45,7 +48,6 @@ NULL
 #' identify changes in reverse dependency behaviors.
 #'
 #' @inheritParams check_functions
-#' @inheritParams options_params
 #' @inheritParams run
 #'
 #' @inherit check_functions return
@@ -53,70 +55,17 @@ NULL
 #' @family checks
 #' @export
 check_rev_deps <- function(
-    path,
-    n = 2L,
-    output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
-    lib.loc = .libPaths(), # nolint object_name_linter
-    repos = getOption("repos"),
-    reverse_repos = repos,
-    restore = options::opt("restore"),
-    reporter = reporter_default(),
-    ...) {
-  
-  checks <- rev_dep_check_tasks_df(
-    path = path,
-    repos = reverse_repos,
-    lib.loc = lib.loc,
-    ...
-  )
-
-  plan <- check_design$new(
-    checks,
-    n = n,
-    output = output,
-    lib.loc = lib.loc,
-    repos = repos,
-  )
-
-  run(plan, reporter = reporter, ...)
-  plan
-}
-
-#' Run reverse dependency checks against a development version only
-#'
-#' [`check_dev_rev_deps()`] works similarly to [`check_rev_deps()`] but it runs
-#' R CMD check only once for each package, with the development version of the
-#' package installed. It is advantageous to check whether adding a new package
-#' into a repository breaks existing packages that possibly take said package
-#' as a `Suggests` dependency.
-#'
-#' @inheritParams check_functions
-#' @inheritParams options_params
-#' @inheritParams run
-#'
-#' @inherit check_functions return
-#'
-#' @family checks
-#' @export
-check_dev_rev_deps <- function(
-    path,
-    n = 2L,
-    output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
-    lib.loc = .libPaths(), # nolint object_name_linter
-    repos = getOption("repos"),
-    restore = options::opt("restore"),
-    reporter = reporter_default(),
-    ...) {
-  
-  checks <- rev_dep_check_tasks_df(
-    path = path,
-    repos = repos,
-    versions = "dev",
-    ...
-  )
-
-  plan <- check_design$new(
-    checks,
+  path,
+  n = 2L,
+  output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
+  lib.loc = .libPaths(),
+  repos = getOption("repos"),
+  reverse_repos = repos,
+  restore = TRUE,
+  ...
+) {
+  checks <- checker$new(
+    plan_rev_dep_checks(path = path, repos = reverse_repos),
     n = n,
     output = output,
     lib.loc = lib.loc,
@@ -124,38 +73,35 @@ check_dev_rev_deps <- function(
     restore = restore
   )
 
-  run(plan, reporter = reporter, ...)
-  plan
+  run(checks, ...)
+  checks
 }
 
-#' Check one or more package source directories
+#' Check packages
 #'
-#' [`check_pkgs()`] Installs all dependencies and runs `R CMD check`s
-#' in parallel for all source packages whose source code is found in the
-#' `path` directory
+#' Runs classical `R CMD check` for the given source package. It
+#' first identifies and installs, in parallel, all dependencies required
+#' to check the package. Then, it runs `R CMD check` for each specified package.
 #'
 #' @inheritParams check_functions
-#' @inheritParams options_params
 #' @inheritParams run
+#' @inheritParams plan_local_checks
 #'
 #' @inherit check_functions return
 #'
 #' @family checks
 #' @export
 check_pkgs <- function(
-    path,
-    n = 2L,
-    output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
-    lib.loc = .libPaths(), # nolint object_name_linter
-    repos = getOption("repos"),
-    restore = options::opt("restore"),
-    reporter = reporter_default(),
-    ...) {
-  
-  checks <- source_check_tasks_df(path, ...)
-
-  plan <- check_design$new(
-    checks,
+  package,
+  n = 2L,
+  output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
+  lib.loc = .libPaths(),
+  repos = getOption("repos"),
+  restore = TRUE,
+  ...
+) {
+  checks <- checker$new(
+    plan_local_checks(package = package, repos = repos),
     n = n,
     output = output,
     lib.loc = lib.loc,
@@ -163,43 +109,6 @@ check_pkgs <- function(
     restore = restore
   )
 
-  run(plan, reporter = reporter, ...)
-  plan
-}
-
-#' Check all package source directories in current directory
-#'
-#' [`check_dir()`] Identifies all R packages in the given directory
-#' (non-recursively) and passes them to the [`check_pkgs()`]
-#'
-#' @inheritParams check_functions
-#' @inheritParams options_params
-#' @inheritParams run
-#'
-#' @inherit check_functions return
-#'
-#' @family checks
-#' @export
-check_dir <- function(
-    path,
-    n = 2L,
-    output = tempfile(paste(utils::packageName(), Sys.Date(), sep = "-")),
-    lib.loc = .libPaths(), # nolint object_name_linter
-    repos = getOption("repos"),
-    restore = options::opt("restore"),
-    reporter = reporter_default(),
-    ...) {
-  dirs <- list.dirs(path, full.names = TRUE, recursive = FALSE)
-  r_packages <- dirs[vlapply(dirs, path_is_pkg)]
-
-  check_pkgs(
-    r_packages,
-    n = n,
-    output = output,
-    lib.loc = lib.loc,
-    repos = repos,
-    restore = restore,
-    reporter = reporter,
-    ...
-  )
+  run(checks, ...)
+  checks
 }

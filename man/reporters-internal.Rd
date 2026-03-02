@@ -4,20 +4,32 @@
 \alias{reporters-internal}
 \alias{report_sleep}
 \alias{report_sleep.default}
-\alias{report_initialize}
+\alias{report_start_setup}
+\alias{report_start_checks}
+\alias{report_start_checks.default}
 \alias{report_status}
 \alias{report_finalize}
+\alias{report_task}
+\alias{report_step}
 \title{Reporter Internal Methods}
 \usage{
-report_sleep(reporter, design, sleep)
+report_sleep(reporter, checker, sleep)
 
-\method{report_sleep}{default}(reporter, design, sleep = 1)
+\method{report_sleep}{default}(reporter, checker, sleep = 1)
 
-report_initialize(reporter, design, envir = parent.frame())
+report_start_setup(reporter, checker, ..., envir = parent.frame())
 
-report_status(reporter, design, envir = parent.frame())
+report_start_checks(reporter, checker, ..., envir = parent.frame())
 
-report_finalize(reporter, design)
+\method{report_start_checks}{default}(reporter, checker, ..., envir = parent.frame())
+
+report_status(reporter, checker, envir = parent.frame())
+
+report_finalize(reporter, checker)
+
+report_task(reporter, g, v)
+
+report_step(reporter, checker)
 }
 \arguments{
 \item{reporter}{A object produced using \code{\link{reporters}}. Each reporter is a
@@ -25,7 +37,7 @@ thin wrapper around an environment with a class name for dispatch. The
 reporter is mutable and captures any necessary state that needs to be
 tracked while reporting.}
 
-\item{design}{\code{\link{check_design}} The check design to report as it evaluates.}
+\item{checker}{\code{\link{checker}} The check checker to report as it evaluates.}
 
 \item{sleep}{\code{numeric} An interval to pause between reporter steps.}
 
@@ -34,6 +46,6 @@ hooks.}
 }
 \description{
 Each of the internal methods for reporters take a reporter, the check
-design object and a calling environment.
+checker object and a calling environment.
 }
 \keyword{internal}

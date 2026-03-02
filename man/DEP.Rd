@@ -5,7 +5,7 @@
 \alias{DEP}
 \title{Dependencies categories}
 \format{
-An object of class \code{list} of length 5.
+An object of class \code{enum} (inherits from \code{factor}) of length 5.
 }
 \usage{
 DEP

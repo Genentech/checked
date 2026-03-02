@@ -1,8 +1,46 @@
 #' @import cli
 NULL
 
+as_vertex_name <- function(x, ...) {
+  UseMethod("as_vertex_name")
+}
+
+#' @export
+as_vertex_name.default <- function(x, ...) {
+  hash(x, ...)
+}
+
+#' @export
+as_vertex_name.task <- function(x, ...) {
+  paste0(
+    hash(x, ...),
+    gsub("\\s+", "-", fmt(task = x, "-{action}-{package}", ansi = FALSE))
+  )
+}
+
+#' @export
+as_vertex_name.local_check_meta_task <- function(x, ...) {
+  paste0(
+    hash(x, ...),
+    gsub("\\s+", "-", fmt(task = x, "-{action}", ansi = FALSE))
+  )
+}
+
+hash <- function(x, n = 12) {
+  substring(cli::hash_obj_sha256(x), 1, n)
+}
+
+hashes <- function(x, ...) {
+  vcapply(x, hash, ...)
+}
+
 base_pkgs <- function() {
   c("R", utils::installed.packages(priority = "base")[, "Package"])
+}
+
+is_package_installed <- function(pkg, lib.loc = .libPaths()) {
+  path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
+  length(path) > 0
 }
 
 .callr <- as.list(getNamespace("callr"), all.names = TRUE)[c(
@@ -13,21 +51,6 @@ base_pkgs <- function() {
   ".split_dependencies"
 )]
 
-replace_with_map <- function(x, value, replacement) {
-  m <- match(x, value)
-  x[which(!is.na(m))] <- replacement[m[!is.na(m)]]
-  x
-}
-
-is_package_installed <- function(pkg, lib.loc) {  # nolint object_name_linter
-  path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
-  length(path) > 0
-}
-
-hash_alias <- function(x) {
-  paste0(c("hash", as.character(charToRaw(x))), collapse = "")
-}
-
 dir_create <- function(path) {
   if (!dir.exists(path)) {
     dir.create(path, showWarnings = FALSE, recursive = TRUE)
@@ -36,16 +59,18 @@ dir_create <- function(path) {
 
 `%||%` <- function(lhs, rhs) if (is.null(lhs)) rhs else lhs
 
-drlapply <- function(...) {
-  do.call(rbind, lapply(...))
-}
-
-drmapply <- function(...) {
-  do.call(rbind, mapply(..., USE.NAMES = FALSE, SIMPLIFY = FALSE))
-}
-
-uulist <- function(...) unique(as.character(unlist(...)))
 vcapply <- function(...) vapply(..., FUN.VALUE = character(1L))
 vlapply <- function(...) vapply(..., FUN.VALUE = logical(1L))
 viapply <- function(...) vapply(..., FUN.VALUE = integer(1L))
 vnapply <- function(...) vapply(..., FUN.VALUE = numeric(1L))
+
+suppressWarningsRegex <- function(expr, regex, ...) {
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      if (grepl(pattern = regex, x = conditionMessage(w), ...)) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
+}

@@ -26,6 +26,24 @@ tty refresh interval when reporting results in milliseconds\item{default: }{\pre
 \item{envvar: }{R_CHECKED_TTY_TICK_INTERVAL (evaluated if possible, raw string otherwise)}
 }}
 
+\item{tty_default_height}{\describe{
+deafult tty height used for the ANSI reporter. Used only
+if correct values could not be acquired with system('tput lines')\item{default: }{\preformatted{50}}
+\item{option: }{checked.tty_default_height}
+\item{envvar: }{R_CHECKED_TTY_DEFAULT_HEIGHT (evaluated if possible, raw string otherwise)}
+}}
+
+\item{proactive_gc}{\describe{
+\code{logical}, indicating whether additional garbage collection should be
+performed before starting a new task, if at least one process recently
+finalized. This can cause the checker to orchestrate tasks slower but
+is recommended to be used for designs with many sub-processes required as
+native garbage collection can lag leading to memory issues. Disable only
+when maximum prefromance is required and memory is not the issue.\item{default: }{\preformatted{TRUE}}
+\item{option: }{checked.proactive_gc}
+\item{envvar: }{R_CHECKED_PROACTIVE_GC (evaluated if possible, raw string otherwise)}
+}}
+
 \item{results_error_on}{\describe{
 character vector indicating whether R error should be thrown when issues
 are discovered when generating results. "never" means that no errors
@@ -52,9 +70,19 @@ progress from the same \code{output}\item{default: }{\preformatted{NA}}
 \item{envvar: }{R_CHECKED_RESTORE (evaluated if possible, raw string otherwise)}
 }}
 
+\item{add_remotes}{\describe{
+\code{logical} indicating whether origins inheriting from \code{pkg_origin_local},
+should be scanned for packages in the \code{remotes} field and added while
+constrocuting a plan \code{task_grap}\item{default: }{\preformatted{TRUE}}
+\item{option: }{checked.add_remotes}
+\item{envvar: }{R_CHECKED_ADD_REMOTES (evaluated if possible, raw string otherwise)}
+}}
+
 \item{check_envvars}{\describe{
-named \code{character} vector of environment variables to use during R CMD check.\item{default: }{\preformatted{c(`_R_CHECK_FORCE_SUGGESTS_` = FALSE, `_R_CHECK_RD_XREFS_` = FALSE, 
-    `_R_CHECK_SYSTEM_CLOCK_` = FALSE, `_R_CHECK_SUGGESTS_ONLY_` = TRUE)}}
+named \code{character} vector of environment variables to use during
+the R CMD check.\item{default: }{\preformatted{c(`_R_CHECK_FORCE_SUGGESTS_` = "false", `_R_CHECK_RD_XREFS_` = "false", 
+    `_R_CHECK_SYSTEM_CLOCK_` = "false", `_R_CHECK_SUGGESTS_ONLY_` = "true", 
+    `_R_CHECK_CRAN_INCOMING_` = "false")}}
 \item{option: }{checked.check_envvars}
 \item{envvar: }{R_CHECKED_CHECK_ENVVARS (evaluated if possible, raw string otherwise)}
 }}
@@ -66,7 +94,7 @@ named \code{character} vector of environment variables to use during R CMD check
 }}
 
 \item{check_args}{\describe{
-\code{character} vector of args passed to the R CMD check.\item{default: }{\preformatted{c("--timings", "--ignore-vignettes", "--no-manual")}}
+\code{character} vector of args passed to the R CMD check.\item{default: }{\preformatted{c("--timings", "--ignore-vignettes", "--no-manual", "--as-cran")}}
 \item{option: }{checked.check_args}
 \item{envvar: }{R_CHECKED_CHECK_ARGS (space-separated R CMD check flags)}
 }}

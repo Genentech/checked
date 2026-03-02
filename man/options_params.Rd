@@ -4,19 +4,31 @@
 \alias{options_params}
 \title{Checked Options}
 \arguments{
+\item{proactive_gc}{\code{logical}, indicating whether additional garbage collection should be
+performed before starting a new task, if at least one process recently
+finalized. This can cause the checker to orchestrate tasks slower but
+is recommended to be used for designs with many sub-processes required as
+native garbage collection can lag leading to memory issues. Disable only
+when maximum prefromance is required and memory is not the issue. (Defaults to \code{TRUE}, overwritable using option 'checked.proactive_gc' or environment variable 'R_CHECKED_PROACTIVE_GC')}
+
 \item{results_error_on}{character vector indicating whether R error should be thrown when issues
 are discovered when generating results. "never" means that no errors
 are thrown. If "issues" then errors are emitted only on issues, whereas
 "potential issues" stands for error on both issues and potential issues. (Defaults to \code{"never"}, overwritable using option 'checked.results_error_on' or environment variable 'R_CHECKED_RESULTS_ERROR_ON')}
 
-\item{check_args}{\code{character} vector of args passed to the R CMD check. (Defaults to \code{c("--timings", "--ignore-vignettes", "--no-manual")}, overwritable using option 'checked.check_args' or environment variable 'R_CHECKED_CHECK_ARGS')}
+\item{check_args}{\code{character} vector of args passed to the R CMD check. (Defaults to \code{c("--timings", "--ignore-vignettes", "--no-manual", "--as-cran")}, overwritable using option 'checked.check_args' or environment variable 'R_CHECKED_CHECK_ARGS')}
 
 \item{results_keep}{character vector indicating which packages should be included in the results.
 "all" means that all packages are kept. If "issues" then only packages
 with issues identified, whereas "potential_issues" stands for keeping
 packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, overwritable using option 'checked.results_keep' or environment variable 'R_CHECKED_RESULTS_KEEP')}
 
-\item{check_envvars}{named \code{character} vector of environment variables to use during R CMD check. (Defaults to \verb{c(}\emph{R_CHECK_FORCE_SUGGESTS}\verb{= FALSE,}\emph{R_CHECK_RD_XREFS}\verb{= FALSE, ;    }\emph{R_CHECK_SYSTEM_CLOCK}\verb{= FALSE,}\emph{R_CHECK_SUGGESTS_ONLY}\verb{ = TRUE)}, overwritable using option 'checked.check_envvars' or environment variable 'R_CHECKED_CHECK_ENVVARS')}
+\item{add_remotes}{\code{logical} indicating whether origins inheriting from \code{pkg_origin_local},
+should be scanned for packages in the \code{remotes} field and added while
+constrocuting a plan \code{task_grap} (Defaults to \code{TRUE}, overwritable using option 'checked.add_remotes' or environment variable 'R_CHECKED_ADD_REMOTES')}
+
+\item{check_envvars}{named \code{character} vector of environment variables to use during
+the R CMD check. (Defaults to \verb{c(}\emph{R_CHECK_FORCE_SUGGESTS}\verb{= "false",}\emph{R_CHECK_RD_XREFS}\verb{= "false", ;    }\emph{R_CHECK_SYSTEM_CLOCK}\verb{= "false",}\emph{R_CHECK_SUGGESTS_ONLY}\verb{= "true", ;    }\emph{R_CHECK_CRAN_INCOMING}\verb{ = "false")}, overwritable using option 'checked.check_envvars' or environment variable 'R_CHECKED_CHECK_ENVVARS')}
 
 \item{tty_tick_interval}{tty refresh interval when reporting results in milliseconds (Defaults to \code{0.1}, overwritable using option 'checked.tty_tick_interval' or environment variable 'R_CHECKED_TTY_TICK_INTERVAL')}
 
@@ -25,6 +37,9 @@ packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, o
 \item{restore}{\code{logical} indicating whether output directory should be unlinked before
 running checks. If \code{FALSE}, an attempt will me made to restore previous
 progress from the same \code{output} (Defaults to \code{NA}, overwritable using option 'checked.restore' or environment variable 'R_CHECKED_RESTORE')}
+
+\item{tty_default_height}{deafult tty height used for the ANSI reporter. Used only
+if correct values could not be acquired with system('tput lines') (Defaults to \code{50}, overwritable using option 'checked.tty_default_height' or environment variable 'R_CHECKED_TTY_DEFAULT_HEIGHT')}
 }
 \description{
 Checked Options

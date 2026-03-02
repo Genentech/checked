@@ -1,3 +1,7 @@
+# We need to define it as variable instead of direct default parameter
+# to comply with CRAN LaTeX requirements
+DEFAULT_ROW_SYMBOL <- list(bar = "\u2502")
+
 #' Internal Utilities for Command-line Output
 #'
 #' Various helper functions for consistent cli output, including theming and
@@ -16,14 +20,19 @@ NULL
 
 #' @name cli
 cli_table_row <- function(
-    status,
-    ok = "OK",
-    notes = "N",
-    warnings = "W",
-    errors = "E",
-    msg = "",
-    title = FALSE) {
+  status = "",
+  ok = "OK",
+  notes = "N",
+  warnings = "W",
+  errors = "E",
+  msg = "",
+  style = c("row", "title", "header"),
+  symbols = DEFAULT_ROW_SYMBOL
+) {
+  style <- match.arg(style)
+
   cli_theme()
+
   status <- trimws(as.character(status))
   status <- switch(status,
     "1" = ,
@@ -37,7 +46,11 @@ cli_table_row <- function(
     "WARNING" = cli::format_inline("{.warn ?}"),
     "6" = ,
     "ERROR" = cli::format_inline("{.err \u2a2f}"),
-    if (title) cli::col_none(cli::style_bold(status)) else status
+    switch(style,
+      "title" = cli::col_none(cli::style_bold(status)),
+      "header" = " ",
+      status
+    )
   )
 
   ok <- str_pad(ok, n = 2)
@@ -45,19 +58,23 @@ cli_table_row <- function(
   warnings <- str_pad(warnings, n = 2)
   errors <- str_pad(errors, n = 2)
 
-  if (title) {
-    ok <- cli::col_none(cli::style_bold(ok))
-    notes <- cli::col_none(cli::style_bold(notes))
-    warnings <- cli::col_none(cli::style_bold(warnings))
-    errors <- cli::col_none(cli::style_bold(errors))
-  } else {
-    ok <- cli::format_inline("{.ok {ok}}")
-    notes <- cli::format_inline("{.note {notes}}")
-    warnings <- cli::format_inline("{.warn {warnings}}")
-    errors <- cli::format_inline("{.err {errors}}")
-  }
+  switch(
+    style,
+    "title" = {
+      ok <- cli::col_none(cli::style_bold(ok))
+      notes <- cli::col_none(cli::style_bold(notes))
+      warnings <- cli::col_none(cli::style_bold(warnings))
+      errors <- cli::col_none(cli::style_bold(errors))
+    },
+    "row" = {
+      ok <- cli::format_inline("{.ok {ok}}")
+      notes <- cli::format_inline("{.note {notes}}")
+      warnings <- cli::format_inline("{.warn {warnings}}")
+      errors <- cli::format_inline("{.err {errors}}")
+    }
+  )
 
-  fmt <- "\u2502 {status} \u2502 {ok} {notes} {warnings} {errors} \u2502 {msg}"
+  fmt <- "{symbols$bar} {status} {symbols$bar} {ok} {notes} {warnings} {errors} {symbols$bar} {msg}"  # nolint
   cli::format_inline(fmt)
 }
 
@@ -76,5 +93,7 @@ cli_theme <- function(..., .envir = parent.frame()) {
 
 cli_wrap_lines <- function(text, w = cli::console_width()) {
   n <- cli::ansi_nchar(text)
-  cli::ansi_substring(text, seq_len(ceiling(n / w)) * w - w + 1, seq_len(ceiling(n / w)) * w)
+  cli::ansi_substring(
+    text, seq_len(ceiling(n / w)) * w - w + 1, seq_len(ceiling(n / w)) * w
+  )
 }

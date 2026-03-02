@@ -5,7 +5,7 @@
 \alias{STATUS}
 \title{Check execution status categories}
 \format{
-An object of class \code{list} of length 4.
+An object of class \code{enum} (inherits from \code{factor}) of length 4.
 }
 \usage{
 STATUS
@@ -13,4 +13,12 @@ STATUS
 \description{
 Check execution status categories
 }
-\keyword{internal}
+\seealso{
+Other checks: 
+\code{\link{check_pkgs}()},
+\code{\link{check_rev_deps}()},
+\code{\link{checker}},
+\code{\link{new_checker}()}
+}
+\concept{checks}
+\keyword{datasets}

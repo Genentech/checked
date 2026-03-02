@@ -1,17 +1,35 @@
 # Regular Expression for Parsing R CMD check checks
 # nolint start, styler: off
 RE_CHECK <- paste0(
-  "(?<=^|\n)",       # starts on a new line (or start of string)
-  "\\* checking ",   # literal "* checking "
-  "(?<check>.*?)",   # capture any check content as "check"
-  " \\.\\.\\.",      # until literal "..."
-  "(?:",             # ignore additional check details:
-    "[\\s\\*]{2,}",  #   any content starting with two or more of spaces or "*"
-    ".*?(?:\n|$)",   #   until a newline (or end of string)
-  ")*",              #   repeating until
-  "(?<status>.*?)",  # capturing a status as "status"
-  "(?=\n|$)"         # terminated by a new line (or end of string)
+  "(?<=^|\\n)",                   # must start at beginning of string OR right after a newline
+  "\\* checking ",                # literal "* checking "
+  "(?<check>.*?)",                # capture check name/content (non-greedy) as "check"
+  " \\.\\.\\.",                   # followed by literal " ..."
+  "(?:",                          # zero or more "detail" lines that belong to this check
+  "\\n[ \\t]*(?=\\n)",            #   a blank line (newline + optional spaces/tabs + next newline)
+  "|",
+  "\\n",                          #   or: a normal detail line starting on the next line
+  "(?:[ \\t]{2,}",                #     either indented (2+ spaces/tabs)
+  "|\\*(?! (?:DONE|checking )))", #     or a '*' line that is NOT "* DONE" and NOT "* checking ..."
+  "[^\\n]*(?:\\n|$)",             #     consume the rest of that detail line (to newline/end)
+  ")*",
+  "[ \\t]*",                      # allow extra spaces/tabs after "..." on the SAME line
+  "(?:",                          # position the engine right before a status token if one exists
+  # Case 1: status token is on the current line (possibly preceded by comment text)
+  "(?:[^\\n]*[ \\t]+)?(?=(?:[A-Z]{2}[A-Z0-9_-]*)\\s*(?:\\n|$))",
+  "|",
+  # Case 2: status token is on the next line:
+  # consume remainder of current line + newline + optional indent,
+  # but only if the next thing is a status token at end-of-line
+  "[^\\n]*\\n[ \\t]*(?=(?:[A-Z]{2}[A-Z0-9_-]*)\\s*(?:\\n|$))",
+  "|",
+  # Case 3: no status token (eat remainder/comment and stop here)
+  "[^\\n]*",
+  ")",
+  "(?<status>(?:[A-Z]{2}[A-Z0-9_-]*)|)", # capture status token, or capture empty string if absent
+  "(?=\\s*(?:\\n|$))"                    # must end at newline/end (allow trailing whitespace)
 )
+
 # nolint end, styler: on
 
 #' @importFrom R6 R6Class
@@ -23,6 +41,10 @@ check_process <- R6::R6Class(
     checks = function() {
       self$poll_output()
       private$parsed_checks
+    },
+    results = function() {
+      private$cache_parsed_results()
+      private$parsed_results
     }
   ),
   public = list(
@@ -34,7 +56,9 @@ check_process <- R6::R6Class(
       private$throttle <- throttle()
       private$spinners <- list(
         check = silent_spinner("circleHalves"),
-        starting = silent_spinner(list(frames = c("\u2834", "\u2826", "\u2816", "\u2832")))
+        starting = silent_spinner(list(
+          frames = c("\u2834", "\u2826", "\u2816", "\u2832")
+        ))
       )
 
       super$initialize(...)
@@ -44,9 +68,19 @@ check_process <- R6::R6Class(
       if (!self$is_alive()) callback(self)
     },
     finish = function() {
-      self$poll_output()
-      self$save_results()
-      if (is.function(f <- private$finish_callback)) f(self)
+      # self$checks active binding calls poll_output so there is not need
+      # to call it explicitly
+      checks <- self$checks
+      # In some cases, check subprocess might suffer from a race condition, when
+      # process itself finished, but the final results of the last subcheck
+      # are not yet available to parse. Therefore we allow the process to
+      # finalize only if the last subcheck has reported status.
+      if (checks[length(checks)] != "") {
+        self$save_results()
+        private$cache_parsed_results()
+        private$free_file_descriptors()
+        if (is.function(f <- private$finish_callback)) f(self)
+      }
     },
     get_time_last_check_start = function() {
       private$time_last_check_start
@@ -122,17 +156,43 @@ check_process <- R6::R6Class(
     save_results = function() {
       path <- file.path(private$check_dir, "result.json")
       try(rcmdcheck_to_json(self$parse_results(), path), silent = TRUE)
+    },
+    safe_parse_results = function() {
+      r <- try(self$parse_results(), silent = TRUE)
+      if (!inherits(r, "try-error")) {
+        r
+      } else {
+        NULL
+      }
     }
   ),
   private = list(
     args = list(),
     time_last_check_start = NULL,
     time_finish = NULL,
-    parsed_checks = factor(levels = c("", "NONE", "OK", "NOTE", "WARNING", "ERROR")),
+    parsed_checks = factor(levels = c(
+      "",
+      "NONE",
+      "OK",
+      "NOTE",
+      "WARNING",
+      "ERROR"
+    )),
+    parsed_results = NULL,
     parsed_partial_check_output = "",
     throttle = NULL,
     spinners = NULL,
-    finish_callback = NULL
+    finish_callback = NULL,
+    cache_parsed_results = function() {
+      r <- self$safe_parse_results()
+      private$parsed_results <- r %||% private$parsed_results
+    },
+    free_file_descriptors = function() {
+      if (self$has_output_connection()) close(self$get_output_connection())
+      if (self$has_error_connection())  close(self$get_error_connection())
+      if (self$has_poll_connection())   close(self$get_poll_connection())
+      if (self$has_input_connection())   close(self$get_input_connection())
+    }
   )
 )
 

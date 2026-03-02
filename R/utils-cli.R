@@ -1,3 +1,158 @@
+#' Task formatter bindings
+#'
+#' This bit of code is intended for use with [`fmt()`], and allows for us
+#' to layer symbol bindings on top of the environment used for string
+#' interpolation which provide syntactic sugar for common formatting components.
+#'
+#' @param g task_graph object.
+#' @param nodes graph nodes to format.
+#' @param task task to format.
+#' @param tasks currently unused.
+#'
+#' @keywords internal
+task_formats <- function(
+  g = NULL,
+  nodes = V(g),
+  task = NULL,
+  tasks = list(task)
+) {
+  if (is.null(task)) {
+    task <- nodes$task
+  }
+
+  # # NOTE: currently unused, vestigial vectorized alternative # nolint
+  # if (length(tasks) == 1 && is.null(tasks[[1]])) { # nolint
+  #   tasks <- V(g)$task # nolint
+  # } # nolint
+
+  makeActiveBinding("source", env = environment(), function() {
+    src <- task$origin %||% character(0L)
+    src <- format(src)
+    if (!is.null(names(src))) src <- names(src)
+    cli_type("path", src)
+  })
+
+  makeActiveBinding("source.full", env = environment(), function() {
+    src <-  task$origin$source %||% character(0L)
+    cli_type("path", format(src))
+  })
+
+  makeActiveBinding("source.type", env = environment(), function() {
+    src_type <- class(task$origin)[[1]]
+    src_type_str <- switch(src_type,
+      "pkg_origin_remote" = source,
+      "pkg_origin_local" = "local",
+      "pkg_origin_repo" = source,
+      "remote"
+    )
+
+    cli_type("path", format(src_type_str))
+  })
+
+  makeActiveBinding("package", env = environment(), function() {
+    pkg <- task$origin$package %||% character(0L)
+    cli_type("package", pkg)
+  })
+
+  makeActiveBinding("version", env = environment(), function() {
+    cli_type("version", format(task$origin$version %||% character(0L)))
+  })
+
+  makeActiveBinding("action", env = environment(), function() {
+    cli_type("task_type", format_task_type(task, g = g))
+  })
+
+  makeActiveBinding("dep.sources", env = environment(), function() {
+    # get nodes dependencies
+    dep_edges <- E(g)$relation == as.numeric(RELATION$dep)
+    dep_g <- igraph::subgraph_from_edges(g, which(dep_edges))
+    vs <- task_graph_neighborhoods(dep_g, nodes = nodes$name, mindist = 1)
+    vs <- unlist(vs)
+
+    # get dependency source names
+    sources <- lapply(V(g)[vs]$task, function(task) format(task$origin))
+    sources <- unlist(Filter(length, sources))
+
+    if (!is.null(names(sources))) {
+      is_unnamed <- names(sources) == ""
+      names(sources[is_unnamed]) <- sources[is_unnamed]
+    }
+
+    # filter for only novel dependencies
+    sources <- setdiff(names(sources), names(getOption("repos")))
+    cli_type("dep_sources", sources)
+  })
+
+  environment()
+}
+
+#' Produce cli output for a task
+#'
+#' Provided a task, allows for use of a handful of shorthand symbols which will
+#' use the task as a context for formatting task fields.
+#'
+#' @param ... params passed to [`cli::format_inline`].
+#' @param .envir output environment.
+#' @param ansi logical whether ansi should be stripped.
+#' @inheritParams task_formats
+#'
+#' @examples
+#' task <- install_task(origin = pkg_origin(
+#'   package = "pkg",
+#'   version = package_version("1.2.3"),
+#'   source = system.file(
+#'     "example_packages",
+#'     "exampleGood",
+#'     package = "checked"
+#'    )
+#' ))
+#'
+#' # Examples for unexported functions are not supported
+#' # fmt(task = task, "{action} {package} ({version}) from {source}")
+#'
+#' @keywords internal
+fmt <- function(
+  ...,
+  g,
+  nodes,
+  task = NULL,
+  .envir = parent.frame(),
+  ansi = TRUE
+) {
+  env <- task_formats(g = g, nodes = nodes, task = task, tasks = NULL)
+  parent.env(env) <- .envir
+
+  cli::cli_div(
+    theme = list(
+      div = list(
+        "class-map" = list(
+          "cli_path" = "path",
+          "cli_task_type" = "class",
+          "cli_package" = "pkg",
+          "cli_version" = "pkg-version"
+        )
+      ),
+      ".pkg-version" = list(
+        "font-style" = "italic",
+        "transform" = function(x) sprintf("v%s", x)
+      )
+    )
+  )
+
+  out <- cli::format_inline(..., .envir = env)
+
+  # ideally would use `options(cli.ansi)`, but it seems to be unused
+  if (!ansi) out <- cli::ansi_strip(out)
+
+  out
+}
+
+glu <- function(..., g, nodes, task = NULL, .envir = parent.frame()) {
+  env <- task_formats(g = g, nodes = nodes, task = task, tasks = NULL)
+  parent.env(env) <- .envir
+  glue::glue(..., .envir = env)
+}
+
 #' Create a 'cli' Spinner With Suppressed Output
 #'
 #' 'cli' will implicitly push spinner output to various output streams,
@@ -41,4 +196,13 @@ format_time <- function(x) {
 str_pad <- function(x, n) {
   x <- format(x)
   paste0(strrep(" ", n - nchar(x)), x)
+}
+
+emoji <- list(
+  dev = "\U0001F6A7",
+  release = "\U0001F680"
+)
+
+cli_env_has_pb <- function(env) {
+  !is.null(attr(env, "withr_handlers"))
 }

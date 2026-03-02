@@ -3,11 +3,14 @@
 \name{reporters}
 \alias{reporters}
 \alias{reporter_ansi_tty}
+\alias{reporter_ansi_tty2}
 \alias{reporter_basic_tty}
 \alias{reporter_default}
-\title{Check Design Runner Reporters}
+\title{Check checker Runner Reporters}
 \usage{
 reporter_ansi_tty()
+
+reporter_ansi_tty2()
 
 reporter_basic_tty()
 
@@ -15,7 +18,7 @@ reporter_default()
 }
 \description{
 Reporters are used to configure how output is communicated while running
-a \code{\link{check_design}}. They range from glossy command-line tools intended for
+a \code{\link{checker}}. They range from glossy command-line tools intended for
 displaying progress in an interactive R session, to line-feed logs which
 may be better suited for automated execution, such as in continuous
 itegration.

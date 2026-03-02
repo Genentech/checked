@@ -6,15 +6,15 @@
 \usage{
 task_graph_update_ready(
   g,
-  v = igraph::V(g),
+  v = V(g),
   dependencies = TRUE,
   status = STATUS$pending
 )
 }
 \arguments{
-\item{g}{A dependency graph, as produced with \code{\link[=task_graph_create]{task_graph_create()}}.}
+\item{g}{A dependency graph, as produced with \code{\link[=task_graph]{task_graph()}}.}
 
-\item{v}{Names or nodes objects of packages whose readiness should be
+\item{v}{Names or nodes objects of packages whose satisfiability should be
 checked.}
 
 \item{dependencies}{Which dependencies types should be met for a node to be
@@ -27,20 +27,18 @@ with that status.}
 The name of the next package to prioritize
 }
 \description{
-While other packages are in progress, identify tasks with all the
-dependencies done and mark them as \code{ready} already has its dependencies
-done.
+While other packages are in progress, ensure that the next selected package
+already has its dependencies done.
 }
 \details{
 There are helpers defined for particular use cases that strictly rely on the
-\code{\link[=task_graph_update_ready]{task_graph_update_ready()}}, they are:
+\code{\link[=task_graph_which_ready]{task_graph_which_ready()}}, they are:
 \itemize{
-\item \code{task_graph_update_ready_strong()} - List vertices whose strong
+\item \code{task_graph_update_check_ready()} - Updates check vertices whose all
 dependencies are satisfied.
-\item \code{task_graph_update_check_ready()} - List root vertices whose all
+\item \code{task_graph_update_install_ready()} - Update install vertices whose all
 dependencies are satisfied.
-\item \code{task_graph_update_install_ready()} - List install vertices whose
-dependencies are all satisfied
+\item \code{task_graph_which_ready()} - List vertices whose wit ready status.
 }
 }
 \keyword{internal}

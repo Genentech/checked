@@ -1,19 +1,5 @@
-split_packages_names <- function(x) {
-  if (is.na(x)) {
-    data.frame(
-      dep = character(0),
-      op = character(0),
-      version = character(0)
-    )
-  } else {
-    drlapply(.tools$.split_dependencies(x), function(x){
-      data.frame(
-        dep = x$name,
-        op = x$op %||% ">",
-        version = x$version %||% numeric_version("0")
-      )
-    })
-  }
+strip_src_contrib <- function(x) {
+  sub("/src/contrib$", "", x)
 }
 
 check_dependencies <- function(dependencies) {
@@ -71,7 +57,7 @@ fetch_package_source <- function(archive_url, destdir) {
 
 get_package_source <- function(package, repos, db = NULL, destdir = NULL) {
   if (is.null(db)) {
-    db <- utils::available.packages(repos = repos)
+    db <- available_packages(repos = repos)
   }
   pkg <- db[package, ]
   archive_url <- sprintf(
@@ -85,13 +71,5 @@ get_package_source <- function(package, repos, db = NULL, destdir = NULL) {
     fetch_package_source(archive_url, destdir)
   } else {
     archive_url
-  }
-}
-
-package_deps <- function(packages = NULL, ...) {
-  if (length(packages) == 0) {
-    NULL
-  } else {
-    tools::package_dependencies(packages = packages, ...)
   }
 }

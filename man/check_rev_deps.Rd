@@ -11,8 +11,7 @@ check_rev_deps(
   lib.loc = .libPaths(),
   repos = getOption("repos"),
   reverse_repos = repos,
-  restore = options::opt("restore"),
-  reporter = reporter_default(),
+  restore = TRUE,
   ...
 )
 }
@@ -36,17 +35,14 @@ to pull sources for reverse dependencies. In some cases, for instance using
 binaries on Linux, we want to use different repositories when pulling
 sources to check and different when installing dependencies.}
 
-\item{restore}{\code{logical} indicating whether output directory should be unlinked before
-running checks. If \code{FALSE}, an attempt will me made to restore previous
-progress from the same \code{output} (Defaults to \code{NA}, overwritable using option 'checked.restore' or environment variable 'R_CHECKED_RESTORE')}
+\item{restore}{\code{logical} indicating whether output directory should be
+unlinked before running checks. If \code{FALSE}, an attempt will me made to
+restore previous progress from the same \code{output}}
 
-\item{reporter}{A reporter to provide progress updates. Will default to the
-most expressive command-line reporter given your terminal capabilities.}
-
-\item{...}{Additional arguments passed to \code{\link{checked-task-df}} and \code{\link[=run]{run()}}}
+\item{...}{Additional arguments passed to \code{\link[=run]{run()}}}
 }
 \value{
-\code{\link[=check_design]{check_design()}} R6 class storing all the details
+\code{\link[=checker]{checker()}} R6 class storing all the details
 regarding checks that run. Can be combined with
 \code{\link{results}} and \code{\link[=summary]{summary()}} methods to generate results.
 }
@@ -66,10 +62,9 @@ identify changes in reverse dependency behaviors.
 }
 \seealso{
 Other checks: 
-\code{\link{check_design}},
-\code{\link{check_dev_rev_deps}()},
-\code{\link{check_dir}()},
+\code{\link{STATUS}},
 \code{\link{check_pkgs}()},
-\code{\link{new_check_design}()}
+\code{\link{checker}},
+\code{\link{new_checker}()}
 }
 \concept{checks}
