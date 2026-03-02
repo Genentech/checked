@@ -1,8 +1,11 @@
-# checked 0.5.1.9000 (development)
+# checked 0.5.2 (development)
 
 * Add timers striping to `strip_details_from_issue()` to avoid false-positives.
 
 * Remove `pkg_origin_is_base()` helper function and use memoised `base_pkgs()`.
+
+* Update `RE_CHECK` to capture even more edge cases while parsing R CMD check
+  output.
 
 # checked 0.5.1
 
