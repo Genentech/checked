@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">checked</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,11 +48,11 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'checked_results'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'checked_results_check_task_spec'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, keep <span class="op">=</span> <span class="fu">options</span><span class="fu">::</span><span class="fu"><a href="https://dgkf.github.io/options/reference/opt.html" class="external-link">opt</a></span><span class="op">(</span><span class="st">"results_keep"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="co"># S3 method for class 'rev_dep_dep_results'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, name <span class="op">=</span> <span class="cn">NULL</span>, keep <span class="op">=</span> <span class="fu">options</span><span class="fu">::</span><span class="fu"><a href="https://dgkf.github.io/options/reference/opt.html" class="external-link">opt</a></span><span class="op">(</span><span class="st">"results_keep"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'checked_results_revdep_check_task_spec'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># S3 method for class 'local_check_results'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, name <span class="op">=</span> <span class="cn">NULL</span>, keep <span class="op">=</span> <span class="fu">options</span><span class="fu">::</span><span class="fu"><a href="https://dgkf.github.io/options/reference/opt.html" class="external-link">opt</a></span><span class="op">(</span><span class="st">"results_keep"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -67,6 +67,10 @@
 <dd><p>other parameters.</p></dd>
 
 
+<dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
+<dd><p>character name of the <code>rev_dep_dep</code> package</p></dd>
+
+
 <dt id="arg-keep">keep<a class="anchor" aria-label="anchor" href="#arg-keep"></a></dt>
 <dd><p>character vector indicating which packages should be included in the results.
 "all" means that all packages are kept. If "issues" then only packages
@@ -77,8 +81,8 @@ packages with both "issues" and "potential_issues". (Defaults to <code>"all"</co
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other results:
-<code><a href="results.html">results</a>()</code>,
-<code><a href="results_to_file.html">results_to_file</a>()</code></p></div>
+<code><a href="results.html">results()</a></code>,
+<code><a href="results_to_df.html">results_to_df()</a></code></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -90,7 +94,7 @@ packages with both "issues" and "potential_issues". (Defaults to <code>"all"</co
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

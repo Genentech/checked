@@ -1,0 +1,94 @@
+# Package index
+
+## Running Checks
+
+- [`run()`](https://Genentech.github.io/checked/reference/run.md) :
+
+  Run a Series of `R CMD check`s
+
+## Designing and Runing Check Sets
+
+- [`STATUS`](https://Genentech.github.io/checked/reference/STATUS.md) :
+  Check execution status categories
+
+- [`check_pkgs()`](https://Genentech.github.io/checked/reference/check_pkgs.md)
+  : Check packages
+
+- [`check_rev_deps()`](https://Genentech.github.io/checked/reference/check_rev_deps.md)
+  : Check reverse dependencies
+
+- [`checker`](https://Genentech.github.io/checked/reference/checker.md)
+  :
+
+  `R6` Checks Coordinator
+
+- [`new_checker()`](https://Genentech.github.io/checked/reference/new_checker.md)
+  [`new_rev_dep_checker()`](https://Genentech.github.io/checked/reference/new_checker.md)
+  : Creating new Check Design Objects
+
+## Plan checks
+
+- [`plan_local_checks()`](https://Genentech.github.io/checked/reference/plan_local_checks.md)
+  : Plan R CMD Checks
+- [`plan_local_install()`](https://Genentech.github.io/checked/reference/plan_local_install.md)
+  : Plan source package installation
+- [`plan_rev_dep_checks()`](https://Genentech.github.io/checked/reference/plan_rev_dep_checks.md)
+  : Plan Reverse Dependency Checks
+
+## Building Tasks
+
+- [`check_task()`](https://Genentech.github.io/checked/reference/check_task.md)
+  :
+
+  Create a task to run `R CMD check`
+
+- [`install_task()`](https://Genentech.github.io/checked/reference/install_task.md)
+  : Create a task to install a package and dependencies
+
+- [`meta_task()`](https://Genentech.github.io/checked/reference/meta_task.md)
+  : Construct a 'Meta' Task
+
+- [`task()`](https://Genentech.github.io/checked/reference/task.md) :
+  Task specification
+
+## Package Specifications
+
+- [`lib_path()`](https://Genentech.github.io/checked/reference/lib_path.md)
+  [`lib_path_default()`](https://Genentech.github.io/checked/reference/lib_path.md)
+  [`lib_path_isolated()`](https://Genentech.github.io/checked/reference/lib_path.md)
+  : Make a Library Location
+- [`pkg_origin()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
+  [`pkg_origin_repo()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
+  [`pkg_origin_is_base()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
+  [`pkg_origin_base()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
+  [`pkg_origin_unknown()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
+  [`pkg_origin_local()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
+  [`pkg_origin_remote()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
+  [`pkg_origin_archive()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
+  : Package specification
+
+## Check Results
+
+- [`print(`*`<checked_results>`*`)`](https://Genentech.github.io/checked/reference/print.checked_results.md)
+  [`print(`*`<rev_dep_dep_results>`*`)`](https://Genentech.github.io/checked/reference/print.checked_results.md)
+  [`print(`*`<local_check_results>`*`)`](https://Genentech.github.io/checked/reference/print.checked_results.md)
+  : Print checked results
+- [`results()`](https://Genentech.github.io/checked/reference/results.md)
+  : Check results
+- [`results_to_df()`](https://Genentech.github.io/checked/reference/results_to_df.md)
+  : Summarize checked results as data.frame
+
+## Reporters
+
+- [`reporter_ansi_tty()`](https://Genentech.github.io/checked/reference/reporters.md)
+  [`reporter_ansi_tty2()`](https://Genentech.github.io/checked/reference/reporters.md)
+  [`reporter_basic_tty()`](https://Genentech.github.io/checked/reference/reporters.md)
+  [`reporter_default()`](https://Genentech.github.io/checked/reference/reporters.md)
+  : Check checker Runner Reporters
+
+## Documentation
+
+- [`options`](https://Genentech.github.io/checked/reference/options.md)
+  : checked Options
+- [`options_params`](https://Genentech.github.io/checked/reference/options_params.md)
+  : Checked Options

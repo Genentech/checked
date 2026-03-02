@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">checked</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,8 +42,7 @@
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -55,108 +54,113 @@
         </dt>
         <dd>Run a Series of <code>R CMD check</code>s</dd>
       </dl></div><div class="section level2">
-      <h2 id="designing-check-sets">Designing Check Sets<a class="anchor" aria-label="anchor" href="#designing-check-sets"></a></h2>
+      <h2 id="designing-and-runing-check-sets">Designing and Runing Check Sets<a class="anchor" aria-label="anchor" href="#designing-and-runing-check-sets"></a></h2>
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
 
       <dl><dt>
 
-          <code><a href="check_design.html">check_design</a></code>
+          <code><a href="STATUS.html">STATUS</a></code>
 
         </dt>
-        <dd><code>R6</code> Checks Coordinator</dd>
-      </dl><dl><dt>
+        <dd>Check execution status categories</dd>
 
-          <code><a href="check_dev_rev_deps.html">check_dev_rev_deps()</a></code>
-
-        </dt>
-        <dd>Run reverse dependency checks against a development version only</dd>
-      </dl><dl><dt>
-
-          <code><a href="check_dir.html">check_dir()</a></code>
-
-        </dt>
-        <dd>Check all package source directories in current directory</dd>
-      </dl><dl><dt>
+        <dt>
 
           <code><a href="check_pkgs.html">check_pkgs()</a></code>
 
         </dt>
-        <dd>Check one or more package source directories</dd>
-      </dl><dl><dt>
+        <dd>Check packages</dd>
+
+        <dt>
 
           <code><a href="check_rev_deps.html">check_rev_deps()</a></code>
 
         </dt>
         <dd>Check reverse dependencies</dd>
-      </dl><dl><dt>
 
-          <code><a href="new_check_design.html">new_check_design()</a></code> <code><a href="new_check_design.html">new_rev_dep_check_design()</a></code>
+        <dt>
+
+          <code><a href="checker.html">checker</a></code>
+
+        </dt>
+        <dd><code>R6</code> Checks Coordinator</dd>
+
+        <dt>
+
+          <code><a href="new_checker.html">new_checker()</a></code> <code><a href="new_checker.html">new_rev_dep_checker()</a></code>
 
         </dt>
         <dd>Creating new Check Design Objects</dd>
       </dl></div><div class="section level2">
-      <h2 id="building-tasks">Building Tasks<a class="anchor" aria-label="anchor" href="#building-tasks"></a></h2>
+      <h2 id="plan-checks">Plan checks<a class="anchor" aria-label="anchor" href="#plan-checks"></a></h2>
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
 
       <dl><dt>
 
-          <code><a href="check_task_spec.html">check_task_spec()</a></code>
+          <code><a href="plan_local_checks.html">plan_local_checks()</a></code>
+
+        </dt>
+        <dd>Plan R CMD Checks</dd>
+
+        <dt>
+
+          <code><a href="plan_local_install.html">plan_local_install()</a></code>
+
+        </dt>
+        <dd>Plan source package installation</dd>
+
+        <dt>
+
+          <code><a href="plan_rev_dep_checks.html">plan_rev_dep_checks()</a></code>
+
+        </dt>
+        <dd>Plan Reverse Dependency Checks</dd>
+      </dl></div><div class="section level2">
+      <h2 id="building-tasks">Building Tasks<a class="anchor" aria-label="anchor" href="#building-tasks"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="check_task.html">check_task()</a></code>
 
         </dt>
         <dd>Create a task to run <code>R CMD check</code></dd>
-      </dl><dl><dt>
 
-          <code><a href="checked-task-df.html">checked-task-df</a></code>
+        <dt>
 
-        </dt>
-        <dd>Check schedule data frame</dd>
-      </dl><dl><dt>
-
-          <code><a href="custom_install_task_spec.html">custom_install_task_spec()</a></code>
-
-        </dt>
-        <dd>Create a custom install task</dd>
-      </dl><dl><dt>
-
-          <code><a href="install_task_spec.html">install_task_spec()</a></code>
+          <code><a href="install_task.html">install_task()</a></code>
 
         </dt>
         <dd>Create a task to install a package and dependencies</dd>
-      </dl><dl><dt>
 
-          <code><a href="rev_dep_check_tasks_df.html">rev_dep_check_tasks_df()</a></code>
+        <dt>
 
-        </dt>
-        <dd>Build Tasks for Reverse Dependency Checks Generates checks schedule data.frame appropriate for running reverse dependency check for certain source package. In such case <code>path</code> parameter should point to the source of the development version of the package and <code>repos</code> should be a repository for which reverse dependencies should be identified.</dd>
-      </dl><dl><dt>
-
-          <code><a href="revdep_check_task_spec.html">revdep_check_task_spec()</a></code>
+          <code><a href="meta_task.html">meta_task()</a></code>
 
         </dt>
-        <dd>Create a task to run reverse dependency checks</dd>
-      </dl><dl><dt>
+        <dd>Construct a 'Meta' Task</dd>
 
-          <code><a href="source_check_tasks_df.html">source_check_tasks_df()</a></code>
+        <dt>
 
-        </dt>
-        <dd>Create a Task to Check a Package from Source</dd>
-      </dl><dl><dt>
-
-          <code><a href="task_spec.html">task_spec()</a></code>
+          <code><a href="task.html">task()</a></code>
 
         </dt>
         <dd>Task specification</dd>
@@ -165,15 +169,21 @@
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
 
       <dl><dt>
 
-          <code><a href="package_spec.html">package_spec()</a></code> <code><a href="package_spec.html">package_spec_source()</a></code> <code><a href="package_spec.html">package_spec_archive_source()</a></code>
+          <code><a href="lib_path.html">lib_path()</a></code> <code><a href="lib_path.html">lib_path_default()</a></code> <code><a href="lib_path.html">lib_path_isolated()</a></code>
+
+        </dt>
+        <dd>Make a Library Location</dd>
+
+        <dt>
+
+          <code><a href="pkg_origin.html">pkg_origin()</a></code> <code><a href="pkg_origin.html">pkg_origin_repo()</a></code> <code><a href="pkg_origin.html">pkg_origin_is_base()</a></code> <code><a href="pkg_origin.html">pkg_origin_base()</a></code> <code><a href="pkg_origin.html">pkg_origin_unknown()</a></code> <code><a href="pkg_origin.html">pkg_origin_local()</a></code> <code><a href="pkg_origin.html">pkg_origin_remote()</a></code> <code><a href="pkg_origin.html">pkg_origin_archive()</a></code>
 
         </dt>
         <dd>Package specification</dd>
@@ -182,54 +192,53 @@
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
 
       <dl><dt>
 
-          <code><a href="print.checked_results.html">print(<i>&lt;checked_results&gt;</i>)</a></code> <code><a href="print.checked_results.html">print(<i>&lt;checked_results_check_task_spec&gt;</i>)</a></code> <code><a href="print.checked_results.html">print(<i>&lt;checked_results_revdep_check_task_spec&gt;</i>)</a></code>
+          <code><a href="print.checked_results.html">print(<i>&lt;checked_results&gt;</i>)</a></code> <code><a href="print.checked_results.html">print(<i>&lt;rev_dep_dep_results&gt;</i>)</a></code> <code><a href="print.checked_results.html">print(<i>&lt;local_check_results&gt;</i>)</a></code>
 
         </dt>
         <dd>Print checked results</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="results.html">results()</a></code>
 
         </dt>
         <dd>Check results</dd>
-      </dl><dl><dt>
 
-          <code><a href="results_to_file.html">results_to_file()</a></code>
+        <dt>
+
+          <code><a href="results_to_df.html">results_to_df()</a></code>
 
         </dt>
-        <dd>Results to file</dd>
+        <dd>Summarize checked results as data.frame</dd>
       </dl></div><div class="section level2">
       <h2 id="reporters">Reporters<a class="anchor" aria-label="anchor" href="#reporters"></a></h2>
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
 
       <dl><dt>
 
-          <code><a href="reporters.html">reporter_ansi_tty()</a></code> <code><a href="reporters.html">reporter_basic_tty()</a></code> <code><a href="reporters.html">reporter_default()</a></code>
+          <code><a href="reporters.html">reporter_ansi_tty()</a></code> <code><a href="reporters.html">reporter_ansi_tty2()</a></code> <code><a href="reporters.html">reporter_basic_tty()</a></code> <code><a href="reporters.html">reporter_default()</a></code>
 
         </dt>
-        <dd>Check Design Runner Reporters</dd>
+        <dd>Check checker Runner Reporters</dd>
       </dl></div><div class="section level2">
       <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a></h2>
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -240,7 +249,8 @@
 
         </dt>
         <dd>checked Options</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="options_params.html">options_params</a></code>
 
@@ -256,7 +266,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

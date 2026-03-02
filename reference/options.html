@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">checked</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,6 +73,42 @@ tty refresh interval when reporting results in milliseconds<dt>default: </dt>
 </dl></dd>
 
 
+<dt>tty_default_height</dt>
+<dd><dl>
+deafult tty height used for the ANSI reporter. Used only
+if correct values could not be acquired with system('tput lines')<dt>default: </dt>
+<dd><div class="sourceCode"><pre><code><span><span class="fl">50</span></span></code></pre></div></dd>
+
+<dt>option: </dt>
+<dd><p>checked.tty_default_height</p></dd>
+
+<dt>envvar: </dt>
+<dd><p>R_CHECKED_TTY_DEFAULT_HEIGHT (evaluated if possible, raw string otherwise)</p></dd>
+
+
+</dl></dd>
+
+
+<dt>proactive_gc</dt>
+<dd><dl>
+logical, indicating whether additional garbage collection should be
+performed before starting a new task, if at least one process recently
+finalized. This can cause the checker to orchestrate tasks slower but
+is recommended to be used for designs with many sub-processes required as
+native garbage collection can lag leading to memory issues. Disable only
+when maximum prefromance is required and memory is not the issue.<dt>default: </dt>
+<dd><div class="sourceCode"><pre><code><span><span class="cn">TRUE</span></span></code></pre></div></dd>
+
+<dt>option: </dt>
+<dd><p>checked.proactive_gc</p></dd>
+
+<dt>envvar: </dt>
+<dd><p>R_CHECKED_PROACTIVE_GC (evaluated if possible, raw string otherwise)</p></dd>
+
+
+</dl></dd>
+
+
 <dt>results_error_on</dt>
 <dd><dl>
 character vector indicating whether R error should be thrown when issues
@@ -126,11 +162,30 @@ progress from the same output<dt>default: </dt>
 </dl></dd>
 
 
+<dt>add_remotes</dt>
+<dd><dl>
+logical indicating whether origins inheriting from pkg_origin_local,
+should be scanned for packages in the remotes field and added while
+constrocuting a plan task_grap<dt>default: </dt>
+<dd><div class="sourceCode"><pre><code><span><span class="cn">TRUE</span></span></code></pre></div></dd>
+
+<dt>option: </dt>
+<dd><p>checked.add_remotes</p></dd>
+
+<dt>envvar: </dt>
+<dd><p>R_CHECKED_ADD_REMOTES (evaluated if possible, raw string otherwise)</p></dd>
+
+
+</dl></dd>
+
+
 <dt>check_envvars</dt>
 <dd><dl>
-named character vector of environment variables to use during R CMD check.<dt>default: </dt>
-<dd><div class="sourceCode"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>`_R_CHECK_FORCE_SUGGESTS_` <span class="op">=</span> <span class="cn">FALSE</span>, `_R_CHECK_RD_XREFS_` <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>    `_R_CHECK_SYSTEM_CLOCK_` <span class="op">=</span> <span class="cn">FALSE</span>, `_R_CHECK_SUGGESTS_ONLY_` <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div></dd>
+named character vector of environment variables to use during
+the R CMD check.<dt>default: </dt>
+<dd><div class="sourceCode"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>`_R_CHECK_FORCE_SUGGESTS_` <span class="op">=</span> <span class="st">"false"</span>, `_R_CHECK_RD_XREFS_` <span class="op">=</span> <span class="st">"false"</span>,</span>
+<span>    `_R_CHECK_SYSTEM_CLOCK_` <span class="op">=</span> <span class="st">"false"</span>, `_R_CHECK_SUGGESTS_ONLY_` <span class="op">=</span> <span class="st">"true"</span>,</span>
+<span>    `_R_CHECK_CRAN_INCOMING_` <span class="op">=</span> <span class="st">"false"</span><span class="op">)</span></span></code></pre></div></dd>
 
 <dt>option: </dt>
 <dd><p>checked.check_envvars</p></dd>
@@ -160,7 +215,7 @@ character vector of args passed to the R CMD build.<dt>default: </dt>
 <dt>check_args</dt>
 <dd><dl>
 character vector of args passed to the R CMD check.<dt>default: </dt>
-<dd><div class="sourceCode"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"--timings"</span>, <span class="st">"--ignore-vignettes"</span>, <span class="st">"--no-manual"</span><span class="op">)</span></span></code></pre></div></dd>
+<dd><div class="sourceCode"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"--timings"</span>, <span class="st">"--ignore-vignettes"</span>, <span class="st">"--no-manual"</span>, <span class="st">"--as-cran"</span><span class="op">)</span></span></code></pre></div></dd>
 
 <dt>option: </dt>
 <dd><p>checked.check_args</p></dd>
@@ -190,7 +245,7 @@ character vector of args passed to the R CMD check.<dt>default: </dt>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

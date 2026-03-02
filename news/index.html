@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">checked</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,37 +39,28 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.8" id="checked-028">checked 0.2.8<a class="anchor" aria-label="anchor" href="#checked-028"></a></h2><p class="text-muted">CRAN release: 2025-04-29</p>
-<ul><li>Unify notes, warnings and errors are internally stored when generating results (R4.5 compatibility)</li>
+<h2 class="pkg-version" data-toc-text="0.5.1" id="checked-051">checked 0.5.1<a class="anchor" aria-label="anchor" href="#checked-051"></a></h2><p class="text-muted">CRAN release: 2026-02-25</p>
+<ul><li><p>Export STATUS vector to make external statuses analysis easier.</p></li>
+<li><p>Allow obtaining partial results for uncompleted checks.</p></li>
+<li><p>Export <code><a href="../reference/results_to_df.html">results_to_df()</a></code> and make it a generic.</p></li>
 </ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.7" id="checked-027">checked 0.2.7<a class="anchor" aria-label="anchor" href="#checked-027"></a></h2>
-<ul><li>Fix a bug where wrong lib.loc was used to derive whether a package has already been satisfied.</li>
-</ul></div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.6" id="checked-026">checked 0.2.6<a class="anchor" aria-label="anchor" href="#checked-026"></a></h2>
-<ul><li>Save minimal version required by each edge and use them to properly identify whether dependecy is satisfied when calling <code>task_graph_update_done</code>
-</li>
-</ul></div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.5" id="checked-025">checked 0.2.5<a class="anchor" aria-label="anchor" href="#checked-025"></a></h2>
-<ul><li>Refine reverse suggested dependecy strategy.</li>
-</ul></div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.4" id="checked-024">checked 0.2.4<a class="anchor" aria-label="anchor" href="#checked-024"></a></h2><p class="text-muted">CRAN release: 2024-10-25</p>
-<ul><li><p>Fix check processes hanging forever in some system configurations.</p></li>
-<li><p>Remove all whitespaces (<code>"[[:space:]]"</code>) before comparing potential issues to skip most of the false positives.</p></li>
-<li><p>Shortened many user-facing function names. In general, uses of <code>reverse</code> were shortened to <code>rev</code>, <code>dependencies</code> was shortened to <code>deps</code>, <code>development</code> was shortened to <code>dev</code> and <code>package</code> was shortened to <code>pkg</code>. For example, <code>check_reverse_dependencies_development()</code> was shortened to <code><a href="../reference/check_dev_rev_deps.html">check_dev_rev_deps()</a></code> (<a href="https://github.com/dgkf-roche" class="external-link">@dgkf-roche</a>)</p></li>
-<li><p>Fix names in the <code>enum</code> function for R lower than 4.3.</p></li>
-<li><p>Add tests for the reverse dependency check use case.</p></li>
-<li><p>Make <code>install_packages_process</code> capture session’s <code>available_packages_filters</code> and reuse them when installing packages to ensure consistency with the main session filtering.</p></li>
-<li><p>Prettify output by stripping excessive new lines.</p></li>
-<li><p><code>checked</code> now depends on <code>options</code></p></li>
-<li><p>Expose <code>...</code> allowing customization of check subprocesses when creating checks df.</p></li>
-<li><p>Force garbage collection before scheduling task, to make sure any already finished processes are removed from the memory.</p></li>
+<h2 class="pkg-version" data-toc-text="0.5.0" id="checked-050">checked 0.5.0<a class="anchor" aria-label="anchor" href="#checked-050"></a></h2><p class="text-muted">CRAN release: 2026-02-20</p>
+<ul><li>Entire package refactor</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.3" id="checked-023">checked 0.2.3<a class="anchor" aria-label="anchor" href="#checked-023"></a></h2>
+<ul><li><p>Fix check processes hanging forever in some system configurations.</p></li>
+<li><p>Remove all whitespaces (<code>"[[:space:]]"</code>) before comparing potential issues to skip most of the false positives.</p></li>
+<li><p>Shortened many user-facing function names. In general, uses of <code>reverse</code> were shortened to <code>rev</code>, <code>dependencies</code> was shortened to <code>deps</code>, <code>development</code> was shortened to <code>dev</code> and <code>package</code> was shortened to <code>pkg</code>. For example, <code>check_reverse_dependencies_development()</code> was shortened to <code>check_dev_rev_deps()</code> (<a href="https://github.com/dgkf-roche" class="external-link">@dgkf-roche</a>)</p></li>
+<li><p>Fix names in the <code>enum</code> function for R lower than 4.3.</p></li>
+<li><p>Add tests for the reverse dependency check use case.</p></li>
+<li><p>Make <code>install_process</code> capture session’s <code>available_packages_filters</code> and reuse them when installing packages to ensure consistency with the main session filtering.</p></li>
+<li><p>Prettify output by stripping excessive new lines.</p></li>
+<li><p>Force garbage collection before scheduling task, to make sure any already finished processes are removed from the memory.</p></li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.3" id="checked-023-1">checked 0.2.3<a class="anchor" aria-label="anchor" href="#checked-023-1"></a></h2>
 <ul><li><p>Use custom <code>checked</code> <code>finisher</code>’s instead of the <code>processx</code> <code>finalizer</code>’s when cleaning up finished processes to avoid executing callbacks when objects are garbage collected.</p></li>
 <li><p>In <code>rev_dep_check_tasks_df</code> add custom package value for each check associated with the release version of the package to make sure, the current release version of the package is always fetched and installed.</p></li>
 <li><p>Prevent <code>results</code> from attempting to read results for unfinished checks.</p></li>
@@ -110,7 +101,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

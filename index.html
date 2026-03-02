@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">checked</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,16 +71,16 @@
 <p>Running reverse dependency checks is as easy as</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Genentech.github.io/checked/">checked</a></span><span class="op">)</span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span><span class="st">"/home/dev/praise"</span><span class="op">)</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span><span class="st">"/home/dev/praise"</span>, n <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/results.html">results</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co">#&gt; # Revdep Check Task Spec </span></span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co">#&gt; # praise reverse dependency check results (1c999505a831-meta-revdeps-of-praise) </span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; goodpractice package R CMD check diff </span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; testthat package R CMD check diff </span></span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; notes: OK </span></span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt; warnings: OK </span></span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; errors: OK </span></span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; testthat package R CMD check diff </span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; goodpractice package R CMD check diff </span></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; notes: OK </span></span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; warnings: OK </span></span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; errors: OK</span></span></code></pre></div>
@@ -92,7 +92,7 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Genentech.github.io/checked/">checked</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span><span class="st">"/home/dev/praise"</span><span class="op">)</span></span></code></pre></div>
-<p><picture><source media="(prefers-color-scheme: dark)" srcset="reference/figures/README/ansi-tty-example-dark.svg"><img src="reference/figures/README/ansi-tty-example.svg" width="100%"></source></picture></p>
+<p><picture><source media="(prefers-color-scheme: dark)" srcset="reference/figures/README/ansi-tty-example-dark.svg"><img src="reference/figures/README/ansi-tty-example.svg" alt="" width="100%"></source></picture></p>
 </div>
 </div>
 
@@ -148,7 +148,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
