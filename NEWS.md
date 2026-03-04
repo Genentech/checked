@@ -7,6 +7,9 @@
 * Update `RE_CHECK` to capture even more edge cases while parsing R CMD check
   output.
 
+* Finish check process even if checks seem incomplete but 3 or mire minutes have
+  passed since the process ended to avoid infinite loops.
+
 # checked 0.5.1
 
 * Export STATUS vector to make external statuses analysis easier.
