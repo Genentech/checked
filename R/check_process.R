@@ -80,8 +80,8 @@ check_process <- R6::R6Class(
       # finalize only if the last subcheck has reported status. However
       # if we stuck in this state for longer than 3 minutes we should
       # try to finish anyway, to prevent possible infinite loops.
-      if (checks[length(checks)] != "" |
-          Sys.time() - private$time_finish >= as.difftime(3, units = "mins")) {
+      if (checks[length(checks)] != "" ||
+          (Sys.time() - self$get_time_finish() >= as.difftime(3, units = "mins"))) {
         self$save_results()
         private$cache_parsed_results()
         private$free_file_descriptors()
