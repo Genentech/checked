@@ -71,8 +71,8 @@ check_process <- R6::R6Class(
       if (!self$is_alive()) callback(self)
     },
     finish = function() {
-      # self$checks active binding calls poll_output so there is not need
-      # to call it explicitly
+      # Make sure results are polled
+      self$poll_output()
       checks <- self$checks
       # In some cases, check subprocess might suffer from a race condition, when
       # process itself finished, but the final results of the last subcheck
@@ -80,8 +80,9 @@ check_process <- R6::R6Class(
       # finalize only if the last subcheck has reported status. However
       # if we stuck in this state for longer than 3 minutes we should
       # try to finish anyway, to prevent possible infinite loops.
+      time_finished <- self$get_time_finish() %||% Sys.time()
       if (checks[length(checks)] != "" ||
-          (Sys.time() - self$get_time_finish() >= as.difftime(3, units = "mins"))) {
+          ((Sys.time() - time_finished) >= as.difftime(3, units = "mins"))) {
         self$save_results()
         private$cache_parsed_results()
         private$free_file_descriptors()

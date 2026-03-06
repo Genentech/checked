@@ -10,6 +10,8 @@
 * Finish check process even if checks seem incomplete but 3 or mire minutes have
   passed since the process ended to avoid infinite loops.
 
+* Further improvements to the check process finisher.
+
 # checked 0.5.1
 
 * Export STATUS vector to make external statuses analysis easier.
