@@ -74,23 +74,13 @@ pkg_origin_repo <- function(package, repos, ...) {
 
 
 try_pkg_origin_repo <- function(package, repos, ...) {
-  if (isTRUE(pkg_origin_is_base(package))) {
+  if (package %in% base_pkgs()) {
     pkg_origin_base(package, ...)
   } else if (package %in% available_packages(repos = repos)[, "Package"]) {
     pkg_origin_repo(package = package, repos = repos, ...)
   } else {
     pkg_origin_unknown(package = package, ...)
   }
-}
-
-
-#' @export
-#' @rdname pkg_origin
-pkg_origin_is_base <- function(package, ...) {
-  is_base <- package == "R"
-  is_inst <- package %in% utils::installed.packages()[, "Package"]
-  is_base[is_inst] <- utils::installed.packages()[package[is_inst], "Priority"] == "base" # nolint
-  is_base
 }
 
 

@@ -1,7 +1,6 @@
 # Regular Expression for Parsing R CMD check checks
 # nolint start, styler: off
 RE_CHECK <- paste0(
-  "(?<=^|\\n)",                   # must start at beginning of string OR right after a newline
   "\\* checking ",                # literal "* checking "
   "(?<check>.*?)",                # capture check name/content (non-greedy) as "check"
   " \\.\\.\\.",                   # followed by literal " ..."
@@ -11,23 +10,27 @@ RE_CHECK <- paste0(
   "\\n",                          #   or: a normal detail line starting on the next line
   "(?:[ \\t]{2,}",                #     either indented (2+ spaces/tabs)
   "|\\*(?! (?:DONE|checking )))", #     or a '*' line that is NOT "* DONE" and NOT "* checking ..."
-  "[^\\n]*(?:\\n|$)",             #     consume the rest of that detail line (to newline/end)
+  "[^\\n]*?",                     #     consume content...
+  "(?:\\n|$|(?=\\* (?:DONE|checking )))", # ...until newline/end OR before next "* DONE"/"* checking"
   ")*",
   "[ \\t]*",                      # allow extra spaces/tabs after "..." on the SAME line
   "(?:",                          # position the engine right before a status token if one exists
   # Case 1: status token is on the current line (possibly preceded by comment text)
-  "(?:[^\\n]*[ \\t]+)?(?=(?:[A-Z]{2}[A-Z0-9_-]*)\\s*(?:\\n|$))",
+  "(?:(?:(?!\\* (?:DONE|checking ))[^\\n])*[ \\t]+)?",
+  "(?=(?:[A-Z]{2}[A-Z0-9_-]*)\\s*(?:\\n|$|\\* (?:DONE|checking )))",
   "|",
   # Case 2: status token is on the next line:
   # consume remainder of current line + newline + optional indent,
-  # but only if the next thing is a status token at end-of-line
-  "[^\\n]*\\n[ \\t]*(?=(?:[A-Z]{2}[A-Z0-9_-]*)\\s*(?:\\n|$))",
+  # but only if the next thing is a status token at end-of-line (or right before next marker)
+  "(?:(?!\\* (?:DONE|checking ))[^\\n])*\\n[ \\t]*",
+  "(?=(?:[A-Z]{2}[A-Z0-9_-]*)\\s*(?:\\n|$|\\* (?:DONE|checking )))",
   "|",
-  # Case 3: no status token (eat remainder/comment and stop here)
-  "[^\\n]*",
+  # Case 3: no status token (eat remainder/comment and stop here),
+  # but do NOT swallow the next "* checking/* DONE" if it's glued to this line
+  "[^\\n]*?(?=\\n|$|\\* (?:DONE|checking ))",
   ")",
-  "(?<status>(?:[A-Z]{2}[A-Z0-9_-]*)|)", # capture status token, or capture empty string if absent
-  "(?=\\s*(?:\\n|$))"                    # must end at newline/end (allow trailing whitespace)
+  "(?<status>(?:[A-Z]{2}[A-Z0-9_-]*)|)",  # status token OR empty string
+  "(?=\\s*(?:\\n|$|\\* (?:DONE|checking )))" # terminated by newline/end OR next marker
 )
 
 # nolint end, styler: on
@@ -68,8 +71,8 @@ check_process <- R6::R6Class(
       if (!self$is_alive()) callback(self)
     },
     finish = function() {
-      # self$checks active binding calls poll_output so there is not need
-      # to call it explicitly
+      # Make sure results are polled
+      self$poll_output()
       checks <- self$checks
       # In some cases, check subprocess might suffer from a race condition, when
       # process itself finished, but the final results of the last subcheck
