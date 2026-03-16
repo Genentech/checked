@@ -82,7 +82,7 @@ check_process <- R6::R6Class(
       # try to finish anyway, to prevent possible infinite loops.
       time_finished <- self$get_time_finish() %||% Sys.time()
       if (checks[length(checks)] != "" ||
-          ((Sys.time() - time_finished) >= as.difftime(3, units = "mins"))) {
+            ((Sys.time() - time_finished) >= as.difftime(3, units = "mins"))) {
         self$save_results()
         private$cache_parsed_results()
         private$free_file_descriptors()

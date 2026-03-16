@@ -1,4 +1,4 @@
-# checked 0.5.2 (development)
+# checked 0.5.2
 
 * Add timers striping to `strip_details_from_issue()` to avoid false-positives.
 
@@ -11,6 +11,10 @@
   passed since the process ended to avoid infinite loops.
 
 * Further improvements to the check process finisher.
+
+* Make `graph_dedup_attrs` rebuild the graph from scratch with deduplicated
+  attributes rather than manipulating the exiting graph. I significantly speeds
+  up the function.
 
 # checked 0.5.1
 
