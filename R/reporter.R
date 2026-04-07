@@ -20,7 +20,7 @@
 #'
 #' A line-feed reporter presenting output one line at a time, providing
 #' a reporter with minimal assumptions about terminal capabilities.
-#' 
+#'
 #' @param checks_only whether basic tty reporter should report only check tasks.
 #' @param ... additional values which should be assigned to the reported
 #'  environment.
