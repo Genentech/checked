@@ -7,11 +7,15 @@ report_start_setup.reporter_basic_tty <- function(
 ) {
   # start with all tasks initialized as pending
   v <- igraph::V(checker$graph)
-  v_actionable <- v[is_actionable_task(v$task)]
+  v_reportable <- if (reporter$checks_only) {
+    v[is_check(v$task)]
+  } else {
+    v[is_actionable_task(v$task)]
+  }
 
   # named factor vector, names as task aliases and value of last reported status
-  reporter$status <- rep(STATUS$pending, times = length(v_actionable))
-  names(reporter$status) <- v_actionable$name
+  reporter$status <- rep(STATUS$pending, times = length(v_reportable))
+  names(reporter$status) <- v_reportable$name
 
   reporter$time_start <- Sys.time()
 

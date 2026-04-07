@@ -1,3 +1,12 @@
+# checked (development)
+
+* Make is possible to construct reporter environments with additional values
+  to better control their behavior.
+
+* Add `checks_only` parameter to `reporter_basic_tty` which if set to TRUE
+  will make the reporter broadcast only check tasks instead of both
+  install and check.
+  
 # checked 0.5.2
 
 * Add timers striping to `strip_details_from_issue()` to avoid false-positives.
