@@ -4,12 +4,20 @@
 \alias{plan_local_install}
 \title{Plan source package installation}
 \usage{
-plan_local_install(package, repos = getOption("repos"))
+plan_local_install(
+  package,
+  repos = getOption("repos"),
+  remotes_dependencies = TRUE
+)
 }
 \arguments{
 \item{package}{A path to package source.}
 
 \item{repos}{repository used to identify packages when name is provided.}
+
+\item{remotes_dependencies}{A vector of length one or a named list.
+Compatible with \code{\link{as_pkg_dependencies}}. Used to filter out remotes
+dependencies.}
 }
 \description{
 Generates a plan for running installing a package from source.

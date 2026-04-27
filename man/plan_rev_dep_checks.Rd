@@ -4,12 +4,20 @@
 \alias{plan_rev_dep_checks}
 \title{Plan Reverse Dependency Checks}
 \usage{
-plan_rev_dep_checks(path, repos = getOption("repos"))
+plan_rev_dep_checks(
+  path,
+  repos = getOption("repos"),
+  remotes_dependencies = TRUE
+)
 }
 \arguments{
 \item{path}{path to the package source.}
 
 \item{repos}{repository used to identify reverse dependencies.}
+
+\item{remotes_dependencies}{A vector of length one or a named list.
+Compatible with \code{\link{as_pkg_dependencies}}. Used to filter out remotes
+dependencies.}
 }
 \description{
 Generates a plan for running reverse dependency check for certain

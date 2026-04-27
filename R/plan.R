@@ -7,12 +7,16 @@
 #'
 #' @param path path to the package source.
 #' @param repos repository used to identify reverse dependencies.
+#' @param remotes_dependencies A vector of length one or a named list.
+#'  Compatible with [`as_pkg_dependencies`]. Used to filter out remotes
+#'  dependencies.
 #'
 #' @family plan
 #' @export
 plan_rev_dep_checks <- function(
   path,
-  repos = getOption("repos")
+  repos = getOption("repos"),
+  remotes_dependencies = TRUE
 ) {
   path <- check_path_is_pkg_source(path)
   ap <- available_packages(repos = repos)
@@ -75,7 +79,7 @@ plan_rev_dep_checks <- function(
   g <- task_graph_class(g)
 
   if (remotes_permitted()) {
-    remotes_graph(g)
+    remotes_graph(g, dependencies = remotes_dependencies)
   } else {
     g
   }
@@ -131,6 +135,9 @@ plan_rev_dep_release_check <- function(origin, revdep, repos) {
 #' @param package A path to either package, directory with packages or name
 #'  of the package (details)
 #' @param repos repository used to identify packages when name is provided.
+#' @param remotes_dependencies A vector of length one or a named list.
+#'  Compatible with [`as_pkg_dependencies`]. Used to filter out remotes
+#'  dependencies.
 #'
 #' @details
 #' `package` parameter has two different allowed values:
@@ -145,7 +152,8 @@ plan_rev_dep_release_check <- function(origin, revdep, repos) {
 #' @export
 plan_local_checks <- function(
   package,
-  repos = getOption("repos")
+  repos = getOption("repos"),
+  remotes_dependencies = TRUE
 ) {
 
   task <- meta_task(
@@ -179,7 +187,7 @@ plan_local_checks <- function(
   star_plan_template(c(
     list(task),
     local_checks_tasks
-  ))
+  ), remotes_dependencies)
 }
 
 
@@ -189,11 +197,15 @@ plan_local_checks <- function(
 #'
 #' @param package A path to package source.
 #' @param repos repository used to identify packages when name is provided.
+#' @param remotes_dependencies A vector of length one or a named list.
+#'  Compatible with [`as_pkg_dependencies`]. Used to filter out remotes
+#'  dependencies.
 #'
 #' @family plan
 plan_local_install <- function(
   package,
-  repos = getOption("repos")
+  repos = getOption("repos"),
+  remotes_dependencies = TRUE
 ) {
 
   m_task <- meta_task(
@@ -208,10 +220,10 @@ plan_local_install <- function(
   star_plan_template(list(
     m_task,
     i_task
-  ))
+  ), remotes_dependencies)
 }
 
-star_plan_template <- function(tasks) {
+star_plan_template <- function(tasks, remotes_dependencies) {
   g <- star_graph(
     task = tasks
   )
@@ -221,7 +233,7 @@ star_plan_template <- function(tasks) {
   g <- task_graph_class(g)
 
   if (remotes_permitted()) {
-    remotes_graph(g)
+    remotes_graph(g, dependencies = remotes_dependencies)
   } else {
     g
   }

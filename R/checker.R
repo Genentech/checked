@@ -82,6 +82,8 @@ checker <- R6::R6Class(
     #' @param restore `logical` value, whether output directory should be
     #'   unlinked before running checks. If `FALSE`, an attempt will me made to
     #'   restore previous progress from the same `output`.
+    #' @param dependencies A vector of length one or a named list.
+    #'  Compatible with [`as_pkg_dependencies`].
     #' @param ... Additional arguments unused
     #'
     #' @return [checker].
@@ -95,6 +97,7 @@ checker <- R6::R6Class(
       lib.loc = .libPaths(),
       repos = getOption("repos"),
       restore = options::opt("restore"),
+      dependencies = TRUE,
       ...
     ) {
       check_past_output(output, restore, ask = interactive())
@@ -111,7 +114,7 @@ checker <- R6::R6Class(
       )
       private$repos <- repos
 
-      self$graph <- task_graph(self$plan, repos)
+      self$graph <- task_graph(self$plan, repos, dependencies = dependencies)
       private$restore_complete_checks()
     },
 

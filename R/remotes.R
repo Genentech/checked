@@ -3,9 +3,14 @@ remotes_graph <- function(x, ...) {
 }
 
 #' @export
-remotes_graph.task_graph <- function(x, ...) {
+remotes_graph.task_graph <- function(x, ..., dependencies = TRUE) {
   vs <- V(x)
-  remotes_subgraphs <- lapply(vs, remotes_graph, vs = vs)
+  remotes_subgraphs <- lapply(
+    vs,
+    remotes_graph,
+    vs = vs,
+    dependencies = dependencies
+  )
 
   task_graph_class(
     suppressWarningsRegex(
@@ -23,13 +28,13 @@ remotes_graph.task_graph <- function(x, ...) {
 
 #' @export
 remotes_graph.integer <- function(x, ..., vs) {
-  remotes_graph(vs[[x]])
+  remotes_graph(vs[[x]], ...)
 }
 
 #' @export
 #' @method remotes_graph igraph.vs
 remotes_graph.igraph.vs <- function(x, ...) {
-  remotes_graph(x$task)
+  remotes_graph(x$task, ...)
 }
 
 #' @export
@@ -40,16 +45,19 @@ remotes_graph.task <- function(x, ...) {
 }
 
 #' @export
-remotes_graph.install_task <- function(x, ...) {
+remotes_graph.install_task <- function(x, ..., dependencies = TRUE) {
   remote_tasks <- get_remote_tasks(x)
   if (length(remote_tasks) == 0) return(igraph::make_empty_graph())
   remote_tasks_names <- vcapply(remote_tasks, package)
 
+  dependencies <- as_pkg_dependencies(dependencies)$direct
   x_deps <- pkg_deps(x$origin)
-  x_remote_deps <- x_deps[
-    x_deps$package == package(x) & x_deps$name %in% remote_tasks_names,
-  ]
-
+  x_remote_deps <- x_deps[x_deps$package == package(x) &
+                            x_deps$name %in% remote_tasks_names &
+                            x_deps$type %in% dependencies, ]
+  
+  if (NROW(x_remote_deps) == 0) return(igraph::make_empty_graph())
+  
   # Sort tasks according to same key
   remote_tasks <- remote_tasks[order(remote_tasks_names)]
   remote_tasks_types <- x_remote_deps[order(x_remote_deps$name), ]$type
