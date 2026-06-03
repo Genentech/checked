@@ -7,7 +7,8 @@
 plan_local_install(
   package,
   repos = getOption("repos"),
-  remotes_dependencies = TRUE
+  remotes_dependencies = TRUE,
+  INSTALL_opts = c()
 )
 }
 \arguments{
@@ -18,6 +19,9 @@ plan_local_install(
 \item{remotes_dependencies}{A vector of length one or a named list.
 Compatible with \code{\link{as_pkg_dependencies}}. Used to filter out remotes
 dependencies.}
+
+\item{INSTALL_opts}{Options to set while the root package is being installed.
+Check \code{\link[utils:install.packages]{utils::install.packages}} for details.}
 }
 \description{
 Generates a plan for running installing a package from source.

@@ -62,36 +62,44 @@ start_task.install_task <- function(
   g,
   output,
   lib.loc,
+  upgrade,
   ...
 ) {
   task <- node$task[[1]]
+  
+  if (package(task) == "DALEX") browser()
+  
   libpaths <- unique(c(
     task_graph_libpaths(g, node, lib.loc = lib.loc, output = output),
     lib.loc
   ))
   install_parameters <- install_params(task$origin)
 
-  if (any(inherits(task$origin, c("pkg_origin_base", "pkg_origin_unknown")))) {
-    return(NULL)
-  }
+  is_base <- any(
+    inherits(task$origin, c("pkg_origin_base", "pkg_origin_unknown"))
+  )
+  if (is_base) return(NULL)
 
   # install_parameters$package is a valid package name only for
   # pkg_origin_repo. Otherwise it's a path to the source package in which case
   # is_package_installed returns FALSE (as it should)
-  if (is_package_installed(install_parameters$package, libpaths)) {
-    return(NULL)
-  }
+  is_installed <- is_package_installed(
+    install_parameters$package,
+    libpaths,
+    upgrade %nif% task$origin$version
+  )
+  if (is_installed) return(NULL)
 
   install_process$new(
     install_parameters$package,
     lib = lib(task, lib.loc = lib.loc, lib.root = path_libs(output)),
     libpaths = libpaths,
-    repos = task$origin$repos,
+    repos = install_parameters$repos,
     dependencies = FALSE,
     type = task$type,
-    INSTALL_opts = c(), # TODO
-    log = path_install_log(output, node$name[[1]]),
-    env = c() # TODO
+    INSTALL_opts = task$INSTALL_opts,
+    log = path_install_log(output, package(task), node$name[[1]]),
+    env = task$env
   )
 }
 

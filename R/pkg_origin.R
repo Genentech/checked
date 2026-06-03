@@ -57,16 +57,13 @@ pkg_origin_repo <- function(package, repos, ...) {
   ap_pkg <- available_packages(repos = repos)[package, ]
 
   version <- package_version(ap_pkg["Version"])
-  source <- strip_src_contrib(ap_pkg["Repository"])
-  if (any(which <- startsWith(repos, source))) {
-    source <- repos[which][1]
-  }
+  repo <- strip_src_contrib(ap_pkg["Repository"], repos = repos)
 
   pkg_origin(
     package = package,
     version = version,
-    source = source,
-    repos = repos,
+    source = repo,
+    repos = repo,
     ...,
     .class = "pkg_origin_repo"
   )

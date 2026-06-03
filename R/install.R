@@ -12,7 +12,8 @@ install_process <- R6::R6Class(
       lib = .libPaths()[[1]],
       libpaths = .libPaths(),
       available_packages_filters = getOption("available_packages_filters"),
-      log = NULL
+      log = NULL,
+      env = callr::rcmd_safe_env()
     ) {
       if (!dir.exists(lib)) dir.create(lib, recursive = TRUE)
       private$package <- pkgs
@@ -21,7 +22,7 @@ install_process <- R6::R6Class(
         function(..., escalate_warning, available_packages_filters) {
           options(available_packages_filters = available_packages_filters)
           withCallingHandlers(
-            utils::install.packages(...),
+            utils::install.packages(..., quiet = FALSE, verbose = TRUE),
             warning = function(w) {
               if (escalate_warning(w)) {
                 print(w$message)
@@ -43,7 +44,9 @@ install_process <- R6::R6Class(
         libpath = libpaths,
         stdout = self$log,
         stderr = "2>&1",
-        system_profile = TRUE
+        system_profile = options::opt("install_system_profile"),
+        user_profile = options::opt("install_user_profile"),
+        env = env
       )
     },
     get_duration = function() {

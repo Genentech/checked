@@ -82,6 +82,7 @@ and installation order are embedded.
   repos = getOption("repos"),
   restore = options::opt("restore"),
   dependencies = TRUE,
+  upgrade = FALSE,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -109,6 +110,10 @@ restore previous progress from the same \code{output}.}
 
 \item{\code{dependencies}}{A vector of length one or a named list.
 Compatible with \code{\link{as_pkg_dependencies}}.}
+
+\item{\code{upgrade}}{\code{logical} value, whether packages should be upgraded
+if more recent version is discovered in available sources. Remotes
+packages, if allowed to be used, are always installed and prioritized.}
 
 \item{\code{...}}{Additional arguments unused}
 }

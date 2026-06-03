@@ -45,8 +45,10 @@ task_graph.task <- function(
   # Distinguish direct dependencies of the package form possible indirect
   # in the same data.frame which could come from suggested loops. This ensures
   # there is a separate node for the root task.
-  df$package[df$depth == "direct"] <-
-    paste(df$package[df$depth == "direct"], "root", sep = "-")
+  if (inherits(x, "check_task")) {
+    df$package[df$depth == "direct"] <-
+      paste(df$package[df$depth == "direct"], "root", sep = "-")
+  }
   colmap <- c("package" = "from", "name" = "to")
   rename <- match(names(df), names(colmap))
   to_rename <- !is.na(rename)
@@ -57,7 +59,7 @@ task_graph.task <- function(
   E(g_dep)$relation <- RELATION$dep
   E(g_dep)$type <- DEP[E(g_dep)$type]
   V(g_dep)$task <- lapply(V(g_dep)$name, function(p) {
-    if (endsWith(p, "-root")) {
+    if (endsWith(p, "-root") || (inherits(x, "install_task") && p == package(x))) { # nolint
       x
     } else {
       origin <- try_pkg_origin_repo(package = p, repos = repos)

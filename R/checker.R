@@ -84,6 +84,9 @@ checker <- R6::R6Class(
     #'   restore previous progress from the same `output`.
     #' @param dependencies A vector of length one or a named list.
     #'  Compatible with [`as_pkg_dependencies`].
+    #' @param upgrade `logical` value, whether packages should be upgraded
+    #'  if more recent version is discovered in available sources. Remotes
+    #'  packages, if allowed to be used, are always installed and prioritized.
     #' @param ... Additional arguments unused
     #'
     #' @return [checker].
@@ -98,6 +101,7 @@ checker <- R6::R6Class(
       repos = getOption("repos"),
       restore = options::opt("restore"),
       dependencies = TRUE,
+      upgrade = FALSE,
       ...
     ) {
       check_past_output(output, restore, ask = interactive())
@@ -113,6 +117,7 @@ checker <- R6::R6Class(
         lib.loc
       )
       private$repos <- repos
+      private$upgrade <- upgrade
 
       self$graph <- task_graph(self$plan, repos, dependencies = dependencies)
       private$restore_complete_checks()
@@ -186,7 +191,8 @@ checker <- R6::R6Class(
           node = next_node,
           g = self$graph,
           output = self$output,
-          lib.loc = private$lib.loc
+          lib.loc = private$lib.loc,
+          upgrade = private$upgrade
         )
 
         if (is.null(process)) {
@@ -242,6 +248,9 @@ checker <- R6::R6Class(
 
     # task loop counter
     gc_needed = FALSE,
+    
+    # upgrade flag
+    upgrade = FALSE,
 
     start_node = function(node) {
       task_graph_package_status(self$graph, node) <- STATUS$`in progress`

@@ -1,5 +1,8 @@
-strip_src_contrib <- function(x) {
-  sub("/src/contrib$", "", x)
+strip_src_contrib <- function(x, repos) {
+  match <- vlapply(repos, function(r) {
+    utils::contrib.url(r) == x
+  })
+  repos[match]
 }
 
 check_dependencies <- function(dependencies) {

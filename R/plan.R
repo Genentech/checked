@@ -200,12 +200,15 @@ plan_local_checks <- function(
 #' @param remotes_dependencies A vector of length one or a named list.
 #'  Compatible with [`as_pkg_dependencies`]. Used to filter out remotes
 #'  dependencies.
+#' @param INSTALL_opts Options to set while the root package is being installed.
+#'  Check [`utils::install.packages`] for details.
 #'
 #' @family plan
 plan_local_install <- function(
   package,
   repos = getOption("repos"),
-  remotes_dependencies = TRUE
+  remotes_dependencies = TRUE,
+  INSTALL_opts = c()
 ) {
 
   m_task <- meta_task(
@@ -214,7 +217,8 @@ plan_local_install <- function(
   )
 
   i_task <- install_task(
-    origin = pkg_origin_local(package)
+    origin = pkg_origin_local(package),
+    INSTALL_opts = INSTALL_opts
   )
 
   star_plan_template(list(
@@ -232,7 +236,7 @@ star_plan_template <- function(tasks, remotes_dependencies) {
 
   g <- task_graph_class(g)
 
-  if (remotes_permitted()) {
+  if (remotes_permitted() && !isFALSE(remotes_dependencies)) {
     remotes_graph(g, dependencies = remotes_dependencies)
   } else {
     g
