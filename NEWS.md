@@ -1,3 +1,30 @@
+# checked (development)
+
+* Make is possible to construct reporter environments with additional values
+  to better control their behavior.
+
+* Add `checks_only` parameter to `reporter_basic_tty` which if set to TRUE
+  will make the reporter broadcast only check tasks instead of both
+  install and check.
+  
+# checked 0.5.2
+
+* Add timers striping to `strip_details_from_issue()` to avoid false-positives.
+
+* Remove `pkg_origin_is_base()` helper function and use memoised `base_pkgs()`.
+
+* Update `RE_CHECK` to capture even more edge cases while parsing R CMD check
+  output.
+
+* Finish check process even if checks seem incomplete but 3 or mire minutes have
+  passed since the process ended to avoid infinite loops.
+
+* Further improvements to the check process finisher.
+
+* Make `graph_dedup_attrs` rebuild the graph from scratch with deduplicated
+  attributes rather than manipulating the exiting graph. I significantly speeds
+  up the function.
+
 # checked 0.5.1
 
 * Export STATUS vector to make external statuses analysis easier.

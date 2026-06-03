@@ -7,11 +7,15 @@ report_start_setup.reporter_basic_tty <- function(
 ) {
   # start with all tasks initialized as pending
   v <- igraph::V(checker$graph)
-  v_actionable <- v[is_actionable_task(v$task)]
+  v_reportable <- if (reporter$checks_only) {
+    v[is_check(v$task)]
+  } else {
+    v[is_actionable_task(v$task)]
+  }
 
   # named factor vector, names as task aliases and value of last reported status
-  reporter$status <- rep(STATUS$pending, times = length(v_actionable))
-  names(reporter$status) <- v_actionable$name
+  reporter$status <- rep(STATUS$pending, times = length(v_reportable))
+  names(reporter$status) <- v_reportable$name
 
   reporter$time_start <- Sys.time()
 
@@ -44,8 +48,17 @@ report_status.reporter_basic_tty <- function(reporter, checker, envir) {
         "pending" = "queued",
         "in progress" = cli::cli_fmt(cli::cli_text("started")),
         "done" = {
+          pkgs_done <- reporter$status == STATUS$done # nolint
+          # +1 to acount for the task that is currently processed
+          fmt_count <-
+            cli::col_grey(" [{sum(pkgs_done)+1}/{length(pkgs_done)}]")
+
           if (is.null(p)) {
-            cli::cli_fmt(cli::cli_text("finished (restored)"))
+            cli::cli_fmt(
+              cli::cli_text(
+                "finished", cli::format_inline(fmt_count), " (restored)"
+              )
+            )
           } else if (p$get_r_exit_status() != 0) {
             # checks processes don't have logs associated with it
             message <- if (!is.null(p$log)) {
@@ -70,6 +83,7 @@ report_status.reporter_basic_tty <- function(reporter, checker, envir) {
             fmt_warning <- "{.warn {ewn[[2]]} WARNING{?/S}}"
             fmt_note <- "{.note {ewn[[3]]} NOTE{?/S}}"
             fmt_duration <- " {.time_taken ({format_time(dur)})}"
+
             cli::cli_fmt(cli::cli_text(
               "finished",
               if (sum(ewn) > 0) " with ",
@@ -78,6 +92,7 @@ report_status.reporter_basic_tty <- function(reporter, checker, envir) {
                 if (ewn[[2]] > 0) cli::format_inline(fmt_warning),
                 if (ewn[[3]] > 0) cli::format_inline(fmt_note)
               )),
+              cli::format_inline(fmt_count),
               if (!is.null(dur)) cli::format_inline(fmt_duration)
             ))
           }

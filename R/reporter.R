@@ -21,31 +21,39 @@
 #' A line-feed reporter presenting output one line at a time, providing
 #' a reporter with minimal assumptions about terminal capabilities.
 #'
+#' @param checks_only whether basic tty reporter should report only check tasks.
+#' @param ... additional values which should be assigned to the reported
+#'  environment.
+#'
 #' @family reporters
 #' @name reporters
 NULL
 
-reporter <- function(type) {
+reporter <- function(type, ...) {
   type <- paste0("reporter_", type)
-  structure(new.env(parent = baseenv()), class = c(type, "reporter"))
+  reporter_options <- list(...)
+  structure(
+    list2env(reporter_options, parent = baseenv(), hash = TRUE),
+    class = c(type, "reporter")
+  )
 }
 
 #' @rdname reporters
 #' @export
-reporter_ansi_tty <- function() {
-  reporter("ansi_tty")
+reporter_ansi_tty <- function(...) {
+  reporter("ansi_tty", ...)
 }
 
 #' @rdname reporters
 #' @export
-reporter_ansi_tty2 <- function() {
-  reporter("ansi_tty2")
+reporter_ansi_tty2 <- function(...) {
+  reporter("ansi_tty2", ...)
 }
 
 #' @rdname reporters
 #' @export
-reporter_basic_tty <- function() {
-  reporter("basic_tty")
+reporter_basic_tty <- function(checks_only = FALSE, ...) {
+  reporter("basic_tty", checks_only = checks_only, ...)
 }
 
 #' @rdname reporters
