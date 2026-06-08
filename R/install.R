@@ -73,7 +73,7 @@ install_process <- R6::R6Class(
     callr_r_bg = function(...) {
       # default formal argument values
       options <- formals(callr::r_bg)
-      options <- options[vlapply(options, `!=`, bquote())]
+      options <- options[vlapply(options, function(x) !identical(x, bquote()))]
       options <- lapply(options, eval, envir = asNamespace("callr"))
 
       # ellipsis arguments

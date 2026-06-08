@@ -6,6 +6,9 @@
 * Add `checks_only` parameter to `reporter_basic_tty` which if set to TRUE
   will make the reporter broadcast only check tasks instead of both
   install and check.
+
+* Address changes related to default parameters changes in `callr`
+  and resulting NULL comparison in `checked` (@gaborcsardi, #93)
   
 # checked 0.5.2
 
