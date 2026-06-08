@@ -1,3 +1,8 @@
+# checked (development)
+
+* Address changes related to default parameters changes in `callr`
+  and resulting NULL comparison in `checked` (@gaborcsardi, #93)
+
 # checked 0.5.1
 
 * Export STATUS vector to make external statuses analysis easier.
