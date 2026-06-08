@@ -15,13 +15,13 @@ Source:
 [`DESCRIPTION`](https://github.com/Genentech/checked/blob/main/DESCRIPTION)
 
 Maksymiuk S, Kelkhoff D (2026). *checked: Systematically Run R CMD
-Checks*. R package version 0.5.1,
+Checks*. R package version 0.5.1.9000,
 <https://Genentech.github.io/checked/>.
 
     @Manual{,
       title = {checked: Systematically Run R CMD Checks},
       author = {Szymon Maksymiuk and Doug Kelkhoff},
       year = {2026},
-      note = {R package version 0.5.1},
+      note = {R package version 0.5.1.9000},
       url = {https://Genentech.github.io/checked/},
     }
