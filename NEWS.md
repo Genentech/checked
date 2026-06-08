@@ -11,6 +11,8 @@
 
 * Ensure packages destined into isolated libraries are always installed.
 
+* Redesign logs by grouping them into package specific directories.
+
 # checked 0.5.2
 
 * Add timers striping to `strip_details_from_issue()` to avoid false-positives.
