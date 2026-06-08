@@ -11,6 +11,7 @@ common use cases where batch `R CMD check`s are needed.
 Running reverse dependency checks is as easy as
 
 ``` r
+
 library(checked)
 x <- run("/home/dev/praise", n = 4)
 results(x)
@@ -43,6 +44,7 @@ This would also free up your preferred editor for you to use while your
 checks run.
 
 ``` r
+
 library(checked)
 run("/home/dev/praise")
 ```
