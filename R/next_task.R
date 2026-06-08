@@ -66,9 +66,7 @@ start_task.install_task <- function(
   ...
 ) {
   task <- node$task[[1]]
-  
-  if (package(task) == "DALEX") browser()
-  
+
   libpaths <- unique(c(
     task_graph_libpaths(g, node, lib.loc = lib.loc, output = output),
     lib.loc
@@ -88,7 +86,7 @@ start_task.install_task <- function(
     libpaths,
     upgrade %nif% task$origin$version
   )
-  if (is_installed) return(NULL)
+  if (is_installed && is_lib_path_default(task)) return(NULL)
 
   install_process$new(
     install_parameters$package,

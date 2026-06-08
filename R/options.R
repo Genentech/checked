@@ -68,15 +68,15 @@ options::define_options(
     function(raw, ...) trimws(strsplit(raw, " ")[[1]]),
     desc = "space-separated R CMD check flags"
   ),
-  
+
   "named `character` vector of environment variables to use during
    the package installation.",
   install_envvars = callr::rcmd_safe_env(),
-  
+
   "`logical` used as `sytem_profile` parameter passed to the `callr::r_bg()`
    function used to install packages",
   install_system_profile = FALSE,
-  
+
   "value used as `user_profile` parameter passed to the `callr::r_bg()`
    function used to install packages",
   install_user_profile = "project"

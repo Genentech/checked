@@ -55,14 +55,14 @@ remotes_graph.install_task <- function(x, ..., dependencies = TRUE) {
   x_remote_deps <- x_deps[x_deps$package == package(x) &
                             x_deps$name %in% remote_tasks_names &
                             x_deps$type %in% dependencies, ]
-  
+
   if (NROW(x_remote_deps) == 0) return(igraph::make_empty_graph())
-  
+
   # Filter out deps out of scopr
   remote_tasks <- remote_tasks[remote_tasks_names %in% x_remote_deps$name]
   remote_tasks_names <-
     remote_tasks_names[remote_tasks_names %in% x_remote_deps$name]
-  
+
   # Sort tasks according to same key
   remote_tasks <- remote_tasks[order(remote_tasks_names)]
   remote_tasks_types <- x_remote_deps[order(x_remote_deps$name), ]$type

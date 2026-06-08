@@ -248,7 +248,7 @@ checker <- R6::R6Class(
 
     # task loop counter
     gc_needed = FALSE,
-    
+
     # upgrade flag
     upgrade = FALSE,
 

@@ -1,4 +1,4 @@
-# checked (development)
+# checked 0.5.3
 
 * Make is possible to construct reporter environments with additional values
   to better control their behavior.
@@ -7,6 +7,10 @@
   will make the reporter broadcast only check tasks instead of both
   install and check.
   
+* Multiple API changes facilitating additional customization for tasks. 
+
+* Ensure packages destined into isolated libraries are always installed.
+
 # checked 0.5.2
 
 * Add timers striping to `strip_details_from_issue()` to avoid false-positives.

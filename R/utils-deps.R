@@ -23,7 +23,7 @@ as_pkg_dependencies <- function(x) {
       x <- character(0L)
     }
 
-    if ((is.character(x) || is.factor(x)) & length(x) > 0) {
+    if ((is.character(x) || is.factor(x)) && length(x) > 0) {
       x <- switch(x,
         "all" = DEP,
         "most" = DEP[c("Depends", "Imports", "LinkingTo", "Suggests")],

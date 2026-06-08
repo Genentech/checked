@@ -104,11 +104,11 @@ task_graph.task_graph <- function(
 
     deduplicate_task_graph(subtree)
   })
-  
+
   # then merge all the full check task task trees into a single graph
   g <- graph_dedup_attrs(igraph::union(x, check_task_neighborhoods))
   # Make sure orphaned packages, so those that do not lead to any meta tasks,
-  # are skipped 
+  # are skipped
   g <- task_graph_removed_orphaned(g)
 
   E(g)$type <- DEP[E(g)$type]
@@ -158,9 +158,9 @@ deduplicate_task_graph <- function(g) {
 task_graph_removed_orphaned <- function(g) {
   # The only package without "in" vertex should be meta tasks
   vs <- igraph::V(g)
-   
+
   isolated <- igraph::degree(g, mode = "in") == 0 & !is_meta(vs$task)
-  
+
   igraph::delete_vertices(g, vs[isolated])
 }
 
