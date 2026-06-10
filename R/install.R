@@ -20,7 +20,10 @@ install_process <- R6::R6Class(
       self$log <- log
       private$callr_r_bg(
         function(..., escalate_warning, available_packages_filters) {
-          options(available_packages_filters = available_packages_filters)
+          options(
+            timeout = 600,
+            available_packages_filters = available_packages_filters
+          )
           withCallingHandlers(
             utils::install.packages(..., quiet = FALSE, verbose = TRUE),
             warning = function(w) {
