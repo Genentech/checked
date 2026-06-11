@@ -19,7 +19,7 @@ as_pkg_dependencies <- function(x) {
       x <- "hard"
     } else if (identical(x, TRUE)) {
       x <- "most"
-    } else if (identical(x, FALSE)) {
+    } else if (identical(x, FALSE) || identical(x, "self")) {
       x <- character(0L)
     }
 
