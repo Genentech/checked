@@ -16,7 +16,13 @@ are discovered when generating results. "never" means that no errors
 are thrown. If "issues" then errors are emitted only on issues, whereas
 "potential issues" stands for error on both issues and potential issues. (Defaults to \code{"never"}, overwritable using option 'checked.results_error_on' or environment variable 'R_CHECKED_RESULTS_ERROR_ON')}
 
+\item{install_envvars}{named \code{character} vector of environment variables to use during
+the package installation. (Defaults to \code{callr::rcmd_safe_env()}, overwritable using option 'checked.install_envvars' or environment variable 'R_CHECKED_INSTALL_ENVVARS')}
+
 \item{check_args}{\code{character} vector of args passed to the R CMD check. (Defaults to \code{c("--timings", "--ignore-vignettes", "--no-manual", "--as-cran")}, overwritable using option 'checked.check_args' or environment variable 'R_CHECKED_CHECK_ARGS')}
+
+\item{install_system_profile}{\code{logical} used as \code{sytem_profile} parameter passed to the \code{callr::r_bg()}
+function used to install packages (Defaults to \code{FALSE}, overwritable using option 'checked.install_system_profile' or environment variable 'R_CHECKED_INSTALL_SYSTEM_PROFILE')}
 
 \item{results_keep}{character vector indicating which packages should be included in the results.
 "all" means that all packages are kept. If "issues" then only packages
@@ -37,6 +43,9 @@ the R CMD check. (Defaults to \verb{c(}\emph{R_CHECK_FORCE_SUGGESTS}\verb{= "fal
 \item{restore}{\code{logical} indicating whether output directory should be unlinked before
 running checks. If \code{FALSE}, an attempt will me made to restore previous
 progress from the same \code{output} (Defaults to \code{NA}, overwritable using option 'checked.restore' or environment variable 'R_CHECKED_RESTORE')}
+
+\item{install_user_profile}{value used as \code{user_profile} parameter passed to the \code{callr::r_bg()}
+function used to install packages (Defaults to \code{"project"}, overwritable using option 'checked.install_user_profile' or environment variable 'R_CHECKED_INSTALL_USER_PROFILE')}
 
 \item{tty_default_height}{deafult tty height used for the ANSI reporter. Used only
 if correct values could not be acquired with system('tput lines') (Defaults to \code{50}, overwritable using option 'checked.tty_default_height' or environment variable 'R_CHECKED_TTY_DEFAULT_HEIGHT')}

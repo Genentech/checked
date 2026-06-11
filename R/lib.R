@@ -50,6 +50,10 @@ format.lib_path <- function(x, ...) {
   "library"
 }
 
+is_lib_path_default <- function(task) {
+  inherits(task$lib, "lib_path_default")
+}
+
 #' Get Library Location
 #'
 #' @param x An object describing a library location

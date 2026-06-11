@@ -1,4 +1,4 @@
-# checked (development)
+# checked 0.5.3
 
 * Make is possible to construct reporter environments with additional values
   to better control their behavior.
@@ -10,6 +10,12 @@
 * Address changes related to default parameters changes in `callr`
   and resulting NULL comparison in `checked` (@gaborcsardi, #93)
   
+* Multiple API changes facilitating additional customization for tasks. 
+
+* Ensure packages destined into isolated libraries are always installed.
+
+* Redesign logs by grouping them into package specific directories.
+
 # checked 0.5.2
 
 * Add timers striping to `strip_details_from_issue()` to avoid false-positives.

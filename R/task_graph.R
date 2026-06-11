@@ -14,6 +14,8 @@
 #' @param x a `plan` object, containing a list of related steps.
 #' @param repos `repos`, as expected by [`tools::package_dependencies()`] to
 #'   determine package relationships.
+#' @param dependencies A vector of length one or a named list. Compatible with
+#'  [`as_pkg_dependencies`].
 #' @param ... params passed to helper methods.
 #' @return A `data.frame` that can be used to build
 #'   [`igraph::make_graph`] edges.
@@ -26,18 +28,27 @@
 #' @keywords internal
 #'
 #' @importFrom igraph V E
-task_graph <- function(x, repos = getOption("repos"), ...) {
+task_graph <- function(
+  x, repos = getOption("repos"), dependencies = TRUE, ...
+) {
   UseMethod("task_graph")
 }
 
 #' @export
-task_graph.task <- function(x, repos = getOption("repos"), ...) {
-  df <- pkg_deps(x$origin, repos = repos, dependencies = TRUE)
+task_graph.task <- function(
+  x,
+  repos = getOption("repos"),
+  dependencies = TRUE,
+  ...
+) {
+  df <- pkg_deps(x$origin, repos = repos, dependencies = dependencies)
   # Distinguish direct dependencies of the package form possible indirect
   # in the same data.frame which could come from suggested loops. This ensures
   # there is a separate node for the root task.
-  df$package[df$depth == "direct"] <-
-    paste(df$package[df$depth == "direct"], "root", sep = "-")
+  if (inherits(x, "check_task")) {
+    df$package[df$depth == "direct"] <-
+      paste(df$package[df$depth == "direct"], "root", sep = "-")
+  }
   colmap <- c("package" = "from", "name" = "to")
   rename <- match(names(df), names(colmap))
   to_rename <- !is.na(rename)
@@ -47,17 +58,14 @@ task_graph.task <- function(x, repos = getOption("repos"), ...) {
 
   E(g_dep)$relation <- RELATION$dep
   E(g_dep)$type <- DEP[E(g_dep)$type]
-  V(g_dep)$task <- lapply(
-    V(g_dep)$name,
-    function(p) {
-      if (endsWith(p, "-root")) {
-        x
-      } else {
-        origin <- try_pkg_origin_repo(package = p, repos = repos)
-        install_task(origin = origin)
-      }
+  V(g_dep)$task <- lapply(V(g_dep)$name, function(p) {
+    if (endsWith(p, "-root") || (inherits(x, "install_task") && p == package(x))) { # nolint
+      x
+    } else {
+      origin <- try_pkg_origin_repo(package = p, repos = repos)
+      install_task(origin = origin)
     }
-  )
+  })
 
   V(g_dep)$name <- vcapply(V(g_dep)$task, as_vertex_name)
 
@@ -65,7 +73,9 @@ task_graph.task <- function(x, repos = getOption("repos"), ...) {
 }
 
 #' @export
-task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
+task_graph.task_graph <- function(
+  x, repos = getOption("repos"), dependencies = TRUE, ...
+) {
   # only use dependency edges when populating graph
   nodes <- V(x)[is_actionable_task(V(x)$task)]
 
@@ -82,7 +92,7 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
     subtree <- igraph::induced_subgraph(x, nh)
 
     # build dependency graph, with fallback installation task
-    deps <- task_graph(nh[[1]]$task, repos = repos)
+    deps <- task_graph(nh[[1]]$task, repos = repos, dependencies = dependencies)
 
     # merge trees on package names
     # NOTE: attributes (tasks) are preserved in the order they appear
@@ -94,8 +104,12 @@ task_graph.task_graph <- function(x, repos = getOption("repos"), ...) {
 
     deduplicate_task_graph(subtree)
   })
+
   # then merge all the full check task task trees into a single graph
   g <- graph_dedup_attrs(igraph::union(x, check_task_neighborhoods))
+  # Make sure orphaned packages, so those that do not lead to any meta tasks,
+  # are skipped
+  g <- task_graph_removed_orphaned(g)
 
   E(g)$type <- DEP[E(g)$type]
   V(g)$status <- STATUS$pending
@@ -138,8 +152,16 @@ deduplicate_task_graph <- function(g) {
       )
     }
   }
-  isolated <- which(igraph::degree(g) == 0)
-  igraph::delete_vertices(g, isolated)
+  g
+}
+
+task_graph_removed_orphaned <- function(g) {
+  # The only package without "in" vertex should be meta tasks
+  vs <- igraph::V(g)
+
+  isolated <- igraph::degree(g, mode = "in") == 0 & !is_meta(vs$task)
+
+  igraph::delete_vertices(g, vs[isolated])
 }
 
 dep_edges <- function(edges, dependencies = TRUE) {

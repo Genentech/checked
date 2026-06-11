@@ -53,6 +53,7 @@ print.task <- function(x, ...) {
 #' @param lib Any object that can be passed to [lib()] to generate a library
 #'   path.
 #' @inheritParams utils::install.packages
+#' @inheritParams callr::r_bg
 #'
 #' @family tasks
 #' @export
@@ -61,6 +62,7 @@ install_task <- function(
   type = package_install_type(origin),
   INSTALL_opts = NULL,
   lib = lib_path(origin),
+  env = options::opt("install_envvars"),
   ...
 ) {
   task(
@@ -68,6 +70,7 @@ install_task <- function(
     type = type,
     INSTALL_opts = INSTALL_opts,
     lib = lib,
+    env = env,
     ...,
     .subclass = "install"
   )

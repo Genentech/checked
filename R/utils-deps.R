@@ -19,22 +19,21 @@ as_pkg_dependencies <- function(x) {
       x <- "hard"
     } else if (identical(x, TRUE)) {
       x <- "most"
-    } else if (identical(x, FALSE)) {
+    } else if (identical(x, FALSE) || identical(x, "self")) {
       x <- character(0L)
     }
 
-    deptypes <- c("Depends", "Imports", "LinkingTo", "Suggests", "Enhances")
-    if (is.character(x)) {
+    if ((is.character(x) || is.factor(x)) && length(x) > 0) {
       x <- switch(x,
-        "all" = deptypes,
-        "most" = c("Depends", "Imports", "LinkingTo", "Suggests"),
-        "hard" = c("Depends", "Imports", "LinkingTo"),
-        "soft" = c("Suggests", "Enhances"),
-        x
+        "all" = DEP,
+        "most" = DEP[c("Depends", "Imports", "LinkingTo", "Suggests")],
+        "hard" = DEP[c("Depends", "Imports", "LinkingTo")],
+        "soft" = DEP[c("Suggests", "Enhances")],
+        DEP[x]
       )
     }
 
-    stopifnot(all(x %in% deptypes))
+    stopifnot(all(x %in% DEP))
 
     x
   }

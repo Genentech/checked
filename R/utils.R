@@ -38,9 +38,24 @@ base_pkgs <- memoise::memoise(function() {
   c("R", utils::installed.packages(priority = "base")[, "Package"])
 })
 
-is_package_installed <- function(pkg, lib.loc = .libPaths()) {
-  path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
-  length(path) > 0
+is_package_installed <- function(pkg, lib.loc = .libPaths(), version = NULL) {
+  if (is.null(version)) {
+    path <- find.package(pkg, lib.loc = lib.loc, quiet = TRUE)
+    length(path) > 0
+  } else {
+    tryCatch(
+      utils::packageVersion(pkg, lib.loc) >= version,
+      error = function(e) FALSE
+    )
+  }
+}
+
+`%nif%` <- function(lhs, rhs) {
+  if (isTRUE(lhs)) {
+    rhs
+  } else {
+    NULL
+  }
 }
 
 .callr <- as.list(getNamespace("callr"), all.names = TRUE)[c(

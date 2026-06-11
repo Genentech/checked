@@ -99,6 +99,27 @@ the R CMD check.\item{default: }{\preformatted{c(`_R_CHECK_FORCE_SUGGESTS_` = "f
 \item{envvar: }{R_CHECKED_CHECK_ARGS (space-separated R CMD check flags)}
 }}
 
+\item{install_envvars}{\describe{
+named \code{character} vector of environment variables to use during
+the package installation.\item{default: }{\preformatted{callr::rcmd_safe_env()}}
+\item{option: }{checked.install_envvars}
+\item{envvar: }{R_CHECKED_INSTALL_ENVVARS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{install_system_profile}{\describe{
+\code{logical} used as \code{sytem_profile} parameter passed to the \code{callr::r_bg()}
+function used to install packages\item{default: }{\preformatted{FALSE}}
+\item{option: }{checked.install_system_profile}
+\item{envvar: }{R_CHECKED_INSTALL_SYSTEM_PROFILE (evaluated if possible, raw string otherwise)}
+}}
+
+\item{install_user_profile}{\describe{
+value used as \code{user_profile} parameter passed to the \code{callr::r_bg()}
+function used to install packages\item{default: }{\preformatted{"project"}}
+\item{option: }{checked.install_user_profile}
+\item{envvar: }{R_CHECKED_INSTALL_USER_PROFILE (evaluated if possible, raw string otherwise)}
+}}
+
 }
 }
 
