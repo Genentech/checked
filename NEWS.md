@@ -12,7 +12,8 @@
   
 * Multiple API changes facilitating additional customization for tasks. 
 
-* Ensure packages destined into isolated libraries are always installed.
+* Ensure packages destined into isolated libraries or those coming from
+  non-standard sources are always installed.
 
 * Redesign logs by grouping them into package specific directories.
 
