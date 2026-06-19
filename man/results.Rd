@@ -32,7 +32,7 @@ results(x, ...)
 \item{error_on}{character vector indicating whether R error should be thrown when issues
 are discovered when generating results. "never" means that no errors
 are thrown. If "issues" then errors are emitted only on issues, whereas
-"potential issues" stands for error on both issues and potential issues. (Defaults to \code{"never"}, overwritable using option 'checked.results_error_on' or environment variable 'CHECKED_RESULTS_ERROR_ON')}
+"potential issues" stands for error on both issues and potential issues. (Defaults to \code{"never"}, overwritable using option 'checked.results_error_on' or environment variable 'R_CHECKED_RESULTS_ERROR_ON')}
 
 \item{checker_obj}{\code{\link{checker}} object.}
 }
