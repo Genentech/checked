@@ -4,51 +4,248 @@
 \alias{options_params}
 \title{Checked Options}
 \arguments{
+\item{build_binaries}{Logical whether binary source of the package should be compiled during
+validation. (Defaults to \code{FALSE}, overwritable using option 'autovalidateutils.build_binaries' or environment variable 'AUTOVALIDATEUTILS_BUILD_BINARIES')}
+
+\item{check_build_args}{\code{character} vector of args passed to the R CMD build. (Defaults to \code{c("--no-build-vignettes", "--no-manual")}, overwritable using option 'checked.check_build_args' or environment variable 'CHECKED_CHECK_BUILD_ARGS')}
+
+\item{add_remotes}{\code{logical} indicating whether origins inheriting from \code{pkg_origin_local},
+should be scanned for packages in the \code{remotes} field and added while
+constrocuting a plan \code{task_grap} (Defaults to \code{TRUE}, overwritable using option 'checked.add_remotes' or environment variable 'CHECKED_ADD_REMOTES')}
+
+\item{lib.loc}{Character vector describing the location of R library trees to search
+through. It will be passed to installed.packages() while deriving whether all
+required dependencies are installed.
+Defaults to c(.Library, .Library.site). (Defaults to \code{c(.Library, .Library.site)}, overwritable using option 'autovalidateutils.lib.loc' or environment variable 'AUTOVALIDATEUTILS_LIB_LOC')}
+
+\item{tty_tick_interval}{tty refresh interval when reporting results in milliseconds (Defaults to \code{0.1}, overwritable using option 'checked.tty_tick_interval' or environment variable 'CHECKED_TTY_TICK_INTERVAL')}
+
+\item{checked_debug}{Logical whether checked should use detailed reporter which reports every task
+to allow debuging of the checked state. (Defaults to \code{FALSE}, overwritable using option 'autovalidateutils.checked_debug' or environment variable 'AUTOVALIDATEUTILS_CHECKED_DEBUG')}
+
 \item{proactive_gc}{\code{logical}, indicating whether additional garbage collection should be
 performed before starting a new task, if at least one process recently
 finalized. This can cause the checker to orchestrate tasks slower but
 is recommended to be used for designs with many sub-processes required as
 native garbage collection can lag leading to memory issues. Disable only
-when maximum prefromance is required and memory is not the issue. (Defaults to \code{TRUE}, overwritable using option 'checked.proactive_gc' or environment variable 'R_CHECKED_PROACTIVE_GC')}
+when maximum prefromance is required and memory is not the issue. (Defaults to \code{TRUE}, overwritable using option 'checked.proactive_gc' or environment variable 'CHECKED_PROACTIVE_GC')}
 
-\item{results_error_on}{character vector indicating whether R error should be thrown when issues
-are discovered when generating results. "never" means that no errors
-are thrown. If "issues" then errors are emitted only on issues, whereas
-"potential issues" stands for error on both issues and potential issues. (Defaults to \code{"never"}, overwritable using option 'checked.results_error_on' or environment variable 'R_CHECKED_RESULTS_ERROR_ON')}
+\item{install_user_profile}{value used as \code{user_profile} parameter passed to the \code{callr::r_bg()}
+function used to install packages (Defaults to \code{"project"}, overwritable using option 'checked.install_user_profile' or environment variable 'CHECKED_INSTALL_USER_PROFILE')}
 
-\item{install_envvars}{named \code{character} vector of environment variables to use during
-the package installation. (Defaults to \code{callr::rcmd_safe_env()}, overwritable using option 'checked.install_envvars' or environment variable 'R_CHECKED_INSTALL_ENVVARS')}
+\item{use_testthat}{Whether testthat infrastructure should be available within
+autovalidateutils. The actual usage will be determined based on the
+uses_testthat function output. Defaults to \code{TRUE}. (Defaults to \code{TRUE}, overwritable using option 'autovalidateutils.use_testthat' or environment variable 'AUTOVALIDATEUTILS_USE_TESTTHAT')}
 
-\item{check_args}{\code{character} vector of args passed to the R CMD check. (Defaults to \code{c("--timings", "--ignore-vignettes", "--no-manual", "--as-cran")}, overwritable using option 'checked.check_args' or environment variable 'R_CHECKED_CHECK_ARGS')}
+\item{vulnerabilities}{The file path to which metadata reagarding possible package's
+vulnerabilities should be captured. (Defaults to \code{"vulnerabilities.yml"}, overwritable using option 'autovalidateutils.vulnerabilities' or environment variable 'AUTOVALIDATEUTILS_VULNERABILITIES')}
 
-\item{install_system_profile}{\code{logical} used as \code{sytem_profile} parameter passed to the \code{callr::r_bg()}
-function used to install packages (Defaults to \code{FALSE}, overwritable using option 'checked.install_system_profile' or environment variable 'R_CHECKED_INSTALL_SYSTEM_PROFILE')}
+\item{news}{The file path of the \code{NEWS} (or \code{NEWS.md}) file contents. If the \code{NEWS} file
+is not already markdown formatted, it will be converted into a preformatted
+markdown code block to be embedded in an \code{autovalidate} report. (Defaults to \code{"news.md"}, overwritable using option 'autovalidateutils.news' or environment variable 'AUTOVALIDATEUTILS_NEWS')}
+
+\item{add_missing_traces}{Logical if covr traces which are missing in the testresults file should be
+added to the JUnit (Defaults to \code{TRUE}, overwritable using option 'autovalidateutils.add_missing_traces' or environment variable 'AUTOVALIDATEUTILS_ADD_MISSING_TRACES')}
 
 \item{results_keep}{character vector indicating which packages should be included in the results.
 "all" means that all packages are kept. If "issues" then only packages
 with issues identified, whereas "potential_issues" stands for keeping
-packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, overwritable using option 'checked.results_keep' or environment variable 'R_CHECKED_RESULTS_KEEP')}
+packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, overwritable using option 'checked.results_keep' or environment variable 'CHECKED_RESULTS_KEEP')}
 
-\item{add_remotes}{\code{logical} indicating whether origins inheriting from \code{pkg_origin_local},
-should be scanned for packages in the \code{remotes} field and added while
-constrocuting a plan \code{task_grap} (Defaults to \code{TRUE}, overwritable using option 'checked.add_remotes' or environment variable 'R_CHECKED_ADD_REMOTES')}
+\item{installed_packages}{The name of the installed packages json file. It keeps track of
+the information about which packages were installed to the environemnt
+and their versions. File will be written to the log_output directory (Defaults to \code{"installed_packages.json"}, overwritable using option 'autovalidateutils.installed_packages' or environment variable 'AUTOVALIDATEUTILS_INSTALLED_PACKAGES')}
+
+\item{junit}{The file path into which a JUnit-style xml test results
+file should be written. (Defaults to \code{file.path("traceability_matrix", "junit.xml")}, overwritable using option 'autovalidateutils.junit' or environment variable 'AUTOVALIDATEUTILS_JUNIT')}
+
+\item{output}{A parent directory for all non-relative output files. Defaults to the
+current working directory. (Defaults to \code{file.path(normalize_path(tempdir()), "autovalidateutils")}, overwritable using option 'autovalidateutils.output' or environment variable 'AUTOVALIDATEUTILS_OUTPUT')}
+
+\item{results_error_on}{character vector indicating whether R error should be thrown when issues
+are discovered when generating results. "never" means that no errors
+are thrown. If "issues" then errors are emitted only on issues, whereas
+"potential issues" stands for error on both issues and potential issues. (Defaults to \code{"never"}, overwritable using option 'checked.results_error_on' or environment variable 'CHECKED_RESULTS_ERROR_ON')}
+
+\item{session}{The file path of the session information metadata file, a
+yaml-formatted itemization of a few characteristic measures of an R session
+environment. (Defaults to \code{"session.yml"}, overwritable using option 'autovalidateutils.session' or environment variable 'AUTOVALIDATEUTILS_SESSION')}
+
+\item{version_control}{The file path to which package version control metadata
+should be captured. (Defaults to \code{"version_control.yml"}, overwritable using option 'autovalidateutils.version_control' or environment variable 'AUTOVALIDATEUTILS_VERSION_CONTROL')}
+
+\item{timeout}{A difftime object or a numeric value with a real number indicating
+number of seconds that should pass before certain calls are timed out. Set to
+Inf to turn off timeout. By deafult set to difftime 14 hours. (Defaults to \code{as.difftime(14, units = "hours")}, overwritable using option 'autovalidateutils.timeout' or environment variable 'AUTOVALIDATEUTILS_TIMEOUT')}
+
+\item{revdep_repos}{Repository used for identyfying reverse dependencies. It should
+be the same as \code{repos} unless using linux binaries, then it should be
+repo URL without binaires part. (Defaults to \code{getOption("repos")}, overwritable using option 'autovalidateutils.revdep_repos' or environment variable 'AUTOVALIDATEUTILS_REVDEP_REPOS')}
+
+\item{install_envvars}{named \code{character} vector of environment variables to use during
+the package installation. (Defaults to \code{callr::rcmd_safe_env()}, overwritable using option 'checked.install_envvars' or environment variable 'CHECKED_INSTALL_ENVVARS')}
+
+\item{description}{The file path of the \code{DESCRIPTION} file contents, written out to
+a plain text, yaml-formatted file. (Defaults to \code{"description.yml"}, overwritable using option 'autovalidateutils.description' or environment variable 'AUTOVALIDATEUTILS_DESCRIPTION')}
+
+\item{cov_table}{The file path in which to save markdown table with coverage percentage for
+each file. (Defaults to \code{file.path("coverage", "cov_table.md")}, overwritable using option 'autovalidateutils.cov_table' or environment variable 'AUTOVALIDATEUTILS_COV_TABLE')}
+
+\item{revdep_clean_sources}{Logical flag whether the sources of reverse dependencies should be removed. (Defaults to \code{TRUE}, overwritable using option 'autovalidateutils.revdep_clean_sources' or environment variable 'AUTOVALIDATEUTILS_REVDEP_CLEAN_SOURCES')}
+
+\item{generalize_sources}{Logical whether sources produced during validation should be renamed to
+general 'package_binary.tgz/tar.gz/zip' and 'package_source.tar.gz'. (Defaults to \code{FALSE}, overwritable using option 'autovalidateutils.generalize_sources' or environment variable 'AUTOVALIDATEUTILS_GENERALIZE_SOURCES')}
+
+\item{r_cmd_check_variables}{The named character vector of environmental variables,
+that will be passed to the \code{withr::with_envvar} function and used to execute
+rcmdcheck::rcmdcheck. It can also be a single keyword, either 'cran' or
+'internal' that will result in using predefined set of variables. (Defaults to \code{"internal"}, overwritable using option 'autovalidateutils.r_cmd_check_variables' or environment variable 'AUTOVALIDATEUTILS_R_CMD_CHECK_VARIABLES')}
+
+\item{tty_default_height}{deafult tty height used for the ANSI reporter. Used only
+if correct values could not be acquired with system('tput lines') (Defaults to \code{50}, overwritable using option 'checked.tty_default_height' or environment variable 'CHECKED_TTY_DEFAULT_HEIGHT')}
+
+\item{r_cmd_check}{The file path to which \verb{R CMD check} results should be written.
+Contents are written in yaml format. (Defaults to \code{"r_cmd_check.yml"}, overwritable using option 'autovalidateutils.r_cmd_check' or environment variable 'AUTOVALIDATEUTILS_R_CMD_CHECK')}
+
+\item{install_system_profile}{\code{logical} used as \code{sytem_profile} parameter passed to the \code{callr::r_bg()}
+function used to install packages (Defaults to \code{FALSE}, overwritable using option 'checked.install_system_profile' or environment variable 'CHECKED_INSTALL_SYSTEM_PROFILE')}
+
+\item{coverage_threshold}{The numeric value of the minimal code coverage percentage
+required for package to be validated (Defaults to \code{80}, overwritable using option 'autovalidateutils.coverage_threshold' or environment variable 'AUTOVALIDATEUTILS_COVERAGE_THRESHOLD')}
 
 \item{check_envvars}{named \code{character} vector of environment variables to use during
-the R CMD check. (Defaults to \verb{c(}\emph{R_CHECK_FORCE_SUGGESTS}\verb{= "false",}\emph{R_CHECK_RD_XREFS}\verb{= "false", ;    }\emph{R_CHECK_SYSTEM_CLOCK}\verb{= "false",}\emph{R_CHECK_SUGGESTS_ONLY}\verb{= "true", ;    }\emph{R_CHECK_CRAN_INCOMING}\verb{ = "false")}, overwritable using option 'checked.check_envvars' or environment variable 'R_CHECKED_CHECK_ENVVARS')}
+the R CMD check. (Defaults to \verb{c(}\emph{R_CHECK_FORCE_SUGGESTS}\verb{= "false",}\emph{R_CHECK_RD_XREFS}\verb{= "false", ;    }\emph{R_CHECK_SYSTEM_CLOCK}\verb{= "false",}\emph{R_CHECK_SUGGESTS_ONLY}\verb{= "true", ;    }\emph{R_CHECK_CRAN_INCOMING}\verb{ = "false")}, overwritable using option 'checked.check_envvars' or environment variable 'CHECKED_CHECK_ENVVARS')}
 
-\item{tty_tick_interval}{tty refresh interval when reporting results in milliseconds (Defaults to \code{0.1}, overwritable using option 'checked.tty_tick_interval' or environment variable 'R_CHECKED_TTY_TICK_INTERVAL')}
+\item{documentation_fragments}{A \code{character} vector of the types of \code{Rd} fragments
+to be included in the resulting documentation markdown files, or \code{NULL} to
+include all \code{Rd} contents. (Defaults to \code{c("title", "usage", "description", "details")}, overwritable using option 'autovalidateutils.documentation_fragments' or environment variable 'AUTOVALIDATEUTILS_DOCUMENTATION_FRAGMENTS')}
 
-\item{check_build_args}{\code{character} vector of args passed to the R CMD build. (Defaults to \code{c("--no-build-vignettes", "--no-manual")}, overwritable using option 'checked.check_build_args' or environment variable 'R_CHECKED_CHECK_BUILD_ARGS')}
+\item{inst_deps}{Character vector of dependency types. All packages with those types
+are permitted to be installed from any available repo during validation.
+Defaults to only 'Suggests' (Defaults to \code{"Suggests"}, overwritable using option 'autovalidateutils.inst_deps' or environment variable 'AUTOVALIDATEUTILS_INST_DEPS')}
+
+\item{install_n_workers}{Number of subprocesses used by the checked package for
+executing tasks when installing package and dependencies. (Defaults to \code{20L}, overwritable using option 'autovalidateutils.install_n_workers' or environment variable 'AUTOVALIDATEUTILS_INSTALL_N_WORKERS')}
+
+\item{revdep_n_workers}{Number of subprocesses used by the checked package for
+executing tasks when running reverse dependecy check. (Defaults to \code{20L}, overwritable using option 'autovalidateutils.revdep_n_workers' or environment variable 'AUTOVALIDATEUTILS_REVDEP_N_WORKERS')}
+
+\item{req_deps}{Character vector of dependecies types. All packages with those types
+are required to be installed before the validation can start. (Defaults to \code{c("Depends", "Imports", "LinkingTo")}, overwritable using option 'autovalidateutils.req_deps' or environment variable 'AUTOVALIDATEUTILS_REQ_DEPS')}
+
+\item{r_cmd_check_clean_tests}{Logical flag whether the \if{html}{\out{<pkg>}}.Rcheck/\if{html}{\out{<pkg>}}/tests
+directory should be cleared by removing all the directories in it (Defaults to \code{FALSE}, overwritable using option 'autovalidateutils.r_cmd_check_clean_tests' or environment variable 'AUTOVALIDATEUTILS_R_CMD_CHECK_CLEAN_TESTS')}
+
+\item{documentation}{The directory path into which R documentation should
+be written as markdown-formatted files. Files will be named with a prefixed
+index according to their lexical Rd name sorting. This index corresponds to
+the requirements index in the \code{mapper_file} option, and is used by
+\code{autovalidate} to generate a traceability matrix. (Defaults to \code{file.path("traceability_matrix", "documentation")}, overwritable using option 'autovalidateutils.documentation' or environment variable 'AUTOVALIDATEUTILS_DOCUMENTATION')}
+
+\item{suggests_repos}{Character vector of libraries that will be appended to
+standard repos during installation of suggested packages. (Defaults to \code{c("https://cran.r-project.org/")}, overwritable using option 'autovalidateutils.suggests_repos' or environment variable 'AUTOVALIDATEUTILS_SUGGESTS_REPOS')}
+
+\item{clean}{Whether directories created by autovaldiateutils in /tmp directory
+should be removed. Set to TRUE if you want to save space in your /tmp. Keep
+FALSE to maintain all the output in /tmp. Does not affect regular output (Defaults to \code{TRUE}, overwritable using option 'autovalidateutils.clean' or environment variable 'AUTOVALIDATEUTILS_CLEAN')}
+
+\item{mapper_defaults}{If \code{TRUE}, default values will be injected into the
+autovalidate mapper.yml file for fields that have no direct analog in a
+typical testthat-generated junit.xml file. This includes the \code{author},
+\code{reviewer} and \code{review_date}. (Defaults to \code{TRUE}, overwritable using option 'autovalidateutils.mapper_defaults' or environment variable 'AUTOVALIDATEUTILS_MAPPER_DEFAULTS')}
+
+\item{cov_logs}{Directory where logs gathered during coverage execution are saved. (Defaults to \code{file.path("coverage", "logs")}, overwritable using option 'autovalidateutils.cov_logs' or environment variable 'AUTOVALIDATEUTILS_COV_LOGS')}
+
+\item{cov_report}{The file path in which to save coverage .html report. (Defaults to \code{file.path("coverage", "cov_report.html")}, overwritable using option 'autovalidateutils.cov_report' or environment variable 'AUTOVALIDATEUTILS_COV_REPORT')}
+
+\item{check_args}{\code{character} vector of args passed to the R CMD check. (Defaults to \code{c("--timings", "--ignore-vignettes", "--no-manual", "--as-cran")}, overwritable using option 'checked.check_args' or environment variable 'CHECKED_CHECK_ARGS')}
+
+\item{test_exec_log}{The file path of a file in which console output generated during test
+execution. (Defaults to \code{"tests.Rout"}, overwritable using option 'autovalidateutils.test_exec_log' or environment variable 'AUTOVALIDATEUTILS_TEST_EXEC_LOG')}
+
+\item{quiet}{Whether execution should suppress output. When \code{TRUE}, only warnings
+are emitted. When \code{FALSE}, a pretty-formatted log is emitted to the
+console. (Defaults to \code{FALSE}, overwritable using option 'autovalidateutils.quiet' or environment variable 'AUTOVALIDATEUTILS_QUIET')}
+
+\item{steps}{A listing of autovalidateutils steps to perform. Either a \code{character} vector
+or \code{list}. Alternatively, the vector or list may consist of modifications
+to a listing of all steps, which must be prefixed by \code{-} (for example,
+\code{-write_revdep_check}, which will use all steps except reverse dependency
+checks). (Defaults to \code{c("-write_checked")}, overwritable using option 'autovalidateutils.steps' or environment variable 'AUTOVALIDATEUTILS_STEPS')}
+
+\item{subprocess_debug}{Logical whether certain functionalities shall be run in a debug mode. Debug
+means functions are run in the main process rather that callr::r_vanilla (Defaults to \code{FALSE}, overwritable using option 'autovalidateutils.subprocess_debug' or environment variable 'AUTOVALIDATEUTILS_SUBPROCESS_DEBUG')}
+
+\item{reuse_check_source}{Logical whether the source generated when running
+R CMD check should be used when calcualting coverage code coverage instead
+of the raw source. (Defaults to \code{TRUE}, overwritable using option 'autovalidateutils.reuse_check_source' or environment variable 'AUTOVALIDATEUTILS_REUSE_CHECK_SOURCE')}
+
+\item{version_control.md5}{When a source control hash can't be derived from
+the target directory, this option will be used to populate version control
+metadata. This is of particular interest when the source code has been
+extracted from a tar.gz package bundle. In this case, the md5 hash should
+reflect the hash of the originating package bundle. (Defaults to \code{NULL}, overwritable using option 'autovalidateutils.version_control.md5' or environment variable 'AUTOVALIDATEUTILS_VERSION_CONTROL_MD5')}
+
+\item{upgrade_deps}{Whether packages should be upgraded if higher version than installed is
+available. Keep NULL to use the default autovalidateutils behavior
+which is upgrading for DEP_LIB_CORE and not upgrading for DEP_LIB_OPTIONAL. (Defaults to \code{NULL}, overwritable using option 'autovalidateutils.upgrade_deps' or environment variable 'AUTOVALIDATEUTILS_UPGRADE_DEPS')}
+
+\item{testing_session}{The file path of the yml parsed sessionInfo file that
+captures the environment in which units tests were executed. (Defaults to \code{file.path("coverage", "testing_session.yml")}, overwritable using option 'autovalidateutils.testing_session' or environment variable 'AUTOVALIDATEUTILS_TESTING_SESSION')}
+
+\item{original_libpaths}{Vector storing original .libPaths before the vector was
+altered by avu_install function. It is always overwritten during
+autovalidateutils runtime. (Defaults to \code{NULL}, overwritable using option 'autovalidateutils.original_libpaths' or environment variable 'AUTOVALIDATEUTILS_ORIGINAL_LIBPATHS')}
+
+\item{sonarqube}{The file path in which to record a sonarqube xml coverage output file. (Defaults to \code{file.path("coverage", "sonarqube.xml")}, overwritable using option 'autovalidateutils.sonarqube' or environment variable 'AUTOVALIDATEUTILS_SONARQUBE')}
+
+\item{rd_transform}{A function which will be applied to the raw rd object before
+converting it to the markdown file. Identity function by default. (Defaults to \code{function(x) x}, overwritable using option 'autovalidateutils.rd_transform' or environment variable 'AUTOVALIDATEUTILS_RD_TRANSFORM')}
+
+\item{junit_reporter}{A quoted expression, producing a \code{testthat} reporter. The
+reporter's initialization is expected to match the signature of
+\code{testthat::JunitReporter$new()}, notably expecting a \code{file} argument to
+use as the output \code{junit.xml} filepath. (Defaults to \code{quote(testthat::JunitReporter)}, overwritable using option 'autovalidateutils.junit_reporter' or environment variable 'AUTOVALIDATEUTILS_JUNIT_REPORTER')}
+
+\item{version_control.url}{When a source control origin can't be derived from
+the target directory, this option will be used to populate version control
+metadata. This is of particular interest when the source code has been
+extracted from a tar.gz package bundle. In this case, the url should
+reflect the url from which the originating package bundle was downloaded. (Defaults to \code{NULL}, overwritable using option 'autovalidateutils.version_control.url' or environment variable 'AUTOVALIDATEUTILS_VERSION_CONTROL_URL')}
+
+\item{log_output}{path to the directory where log files will be created. (Defaults to \code{file.path(normalize_path(tempdir()), "log_autovalidateutils")}, overwritable using option 'autovalidateutils.log_output' or environment variable 'AUTOVALIDATEUTILS_LOG_OUTPUT')}
+
+\item{conditions}{The file path of the file to which conditions should be emitted. They are
+logged in yaml format, which is later read by \code{autovalidate} to
+re-emit them as \code{autovalidate} checks and trigger failures when applicable (Defaults to \code{"conditions.yml"}, overwritable using option 'autovalidateutils.conditions' or environment variable 'AUTOVALIDATEUTILS_CONDITIONS')}
 
 \item{restore}{\code{logical} indicating whether output directory should be unlinked before
 running checks. If \code{FALSE}, an attempt will me made to restore previous
-progress from the same \code{output} (Defaults to \code{NA}, overwritable using option 'checked.restore' or environment variable 'R_CHECKED_RESTORE')}
+progress from the same \code{output} (Defaults to \code{NA}, overwritable using option 'checked.restore' or environment variable 'CHECKED_RESTORE')}
 
-\item{install_user_profile}{value used as \code{user_profile} parameter passed to the \code{callr::r_bg()}
-function used to install packages (Defaults to \code{"project"}, overwritable using option 'checked.install_user_profile' or environment variable 'R_CHECKED_INSTALL_USER_PROFILE')}
+\item{skip_cov_report}{Logical whether interactive coverage report calculation shall be skipped (Defaults to \code{FALSE}, overwritable using option 'autovalidateutils.skip_cov_report' or environment variable 'AUTOVALIDATEUTILS_SKIP_COV_REPORT')}
 
-\item{tty_default_height}{deafult tty height used for the ANSI reporter. Used only
-if correct values could not be acquired with system('tput lines') (Defaults to \code{50}, overwritable using option 'checked.tty_default_height' or environment variable 'R_CHECKED_TTY_DEFAULT_HEIGHT')}
+\item{use_remotes}{Logical flag or named character mapping dependency types to the mechanism of
+handling remotes, one of "allow", "prefer" or "disallow". "allow"
+option means that the remote sources are allowed but will not take precedence
+over other standard sources if both available. "prefer" means allow and
+overwrite standard sources while "disallow" stands for skipping remote
+sources at all. If no value is provided for a dependency type it is
+considered to be "disallow". Can also be set to TRUE to "prefer" all or
+FALSE to "disallow all. (Defaults to \verb{c(Depends = "disallow", Imports = "disallow", LinkingTo = "disallow", ;     Suggests = "allow", Enhances = "allow")}, overwritable using option 'autovalidateutils.use_remotes' or environment variable 'AUTOVALIDATEUTILS_USE_REMOTES')}
+
+\item{mapper}{The file path into which an \code{autovalidate}-style mapper file should
+be written. (Defaults to \code{file.path("traceability_matrix", "mapper.yml")}, overwritable using option 'autovalidateutils.mapper' or environment variable 'AUTOVALIDATEUTILS_MAPPER')}
+
+\item{clear_description}{Logical value whether all non-utf8 characters should be removed from
+the DESCRIPTION value. This is to avoid potential erros that might
+occure when installing the package from the source. (Defaults to \code{FALSE}, overwritable using option 'autovalidateutils.clear_description' or environment variable 'AUTOVALIDATEUTILS_CLEAR_DESCRIPTION')}
+
+\item{revdep_clean_library}{Logical whether the source of the target package should be removed after
+completing checks. (Defaults to \code{TRUE}, overwritable using option 'autovalidateutils.revdep_clean_library' or environment variable 'AUTOVALIDATEUTILS_REVDEP_CLEAN_LIBRARY')}
+
+\item{check_dir}{The directory R CMD check results should be written to
+(.tag.gz, .Rcheck). (Defaults to \code{"check"}, overwritable using option 'autovalidateutils.check_dir' or environment variable 'AUTOVALIDATEUTILS_CHECK_DIR')}
 }
 \description{
 Checked Options

@@ -1,3 +1,9 @@
+# checked 0.5.4
+
+* Improve error messaging when using basic_tty
+
+* Various improvements to reporters and minor display tweaks
+
 # checked 0.5.3
 
 * Make is possible to construct reporter environments with additional values

@@ -62,6 +62,7 @@ be created and stored.}
 \item \href{#method-checker-step}{\code{checker$step()}}
 \item \href{#method-checker-start_next_task}{\code{checker$start_next_task()}}
 \item \href{#method-checker-is_done}{\code{checker$is_done()}}
+\item \href{#method-checker-tasks}{\code{checker$tasks()}}
 \item \href{#method-checker-clone}{\code{checker$clone()}}
 }
 }
@@ -192,6 +193,19 @@ Check if checks are done
 Checks whether all the scheduled tasks were successfully executed.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{checker$is_done()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-checker-tasks"></a>}}
+\if{latex}{\out{\hypertarget{method-checker-tasks}{}}}
+\subsection{Method \code{tasks()}}{
+Tasks
+
+Returns what type of tasks the checker consists of and returns a unique
+vector of primary classes
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{checker$tasks()}\if{html}{\out{</div>}}
 }
 
 }

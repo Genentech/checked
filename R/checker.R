@@ -228,6 +228,14 @@ checker <- R6::R6Class(
         all(V(self$graph)$status == STATUS$done)
       }
 
+    },
+    #' @description
+    #' Tasks
+    #'
+    #' Returns what type of tasks the checker consists of and returns a unique
+    #' vector of primary classes
+    tasks = function() {
+      unique(vcapply(V(self$graph)$task, function(x) class(x)[[1]]))
     }
   ),
   private = list(

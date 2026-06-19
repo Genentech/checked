@@ -19,7 +19,13 @@ report_start_setup.reporter_basic_tty <- function(
 
   reporter$time_start <- Sys.time()
 
-  cli::cli_text("<", utils::packageName(), "> Checks")
+  type <- if (all(vlapply(v_reportable$task, inherits, "install_task"))) {
+    "> Installs"
+  } else {
+    "> Checks"
+  }
+
+  cli::cli_text("<", utils::packageName(), type)
 }
 
 #' @export
@@ -41,6 +47,7 @@ report_status.reporter_basic_tty <- function(reporter, checker, envir) {
 
     p <- node$process
 
+    failure_message <- NULL
     # report stating of new checks
     if (!identical(node$status, reporter$status[[node$name]])) {
       status <- switch( # nolint
@@ -61,12 +68,19 @@ report_status.reporter_basic_tty <- function(reporter, checker, envir) {
             )
           } else if (p$get_r_exit_status() != 0) {
             # checks processes don't have logs associated with it
-            message <- if (!is.null(p$log)) {
-              sprintf("failed (log: '%s')", p$log)
-            } else {
-              "failed"
+            failure_message <- if (inherits(p, "install_process")) {
+              paste(
+                p$get_results_safe(),
+                if (file.exists(p$log)) sprintf("\nfull log: '%s'", p$log),
+                sep = "\n",
+                collapse = "\n"
+              )
             }
-            cli::cli_fmt(cli::cli_text(message))
+            cli::cli_fmt(
+              cli::cli_text(
+                "failed", cli::format_inline(fmt_count)
+              )
+            )
           } else {
             dur <- if (!is.null(p$get_duration)) {
               p$get_duration()
@@ -103,6 +117,7 @@ report_status.reporter_basic_tty <- function(reporter, checker, envir) {
       type <- format_task_type(node$task) # nolint (used via glue)
       prefix <- cli::col_cyan("[{format_time(time)}][{type}] ")
       cli::cli_text(prefix, "{.pkg {package(node$task)}} {status}")
+      if (!is.null(failure_message)) cli::cli_text(failure_message)
       reporter$status[[node$name]] <- node$status
     }
   }

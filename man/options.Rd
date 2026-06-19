@@ -20,17 +20,431 @@ options::opt(x, default, env = "checked")
 \section{Options}{
 
 \describe{
+\item{quiet}{\describe{
+Whether execution should suppress output. When \code{TRUE}, only warnings
+are emitted. When \code{FALSE}, a pretty-formatted log is emitted to the
+console.\item{default: }{\preformatted{FALSE}}
+\item{option: }{autovalidateutils.quiet}
+\item{envvar: }{AUTOVALIDATEUTILS_QUIET (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{clean}{\describe{
+Whether directories created by autovaldiateutils in /tmp directory
+should be removed. Set to TRUE if you want to save space in your /tmp. Keep
+FALSE to maintain all the output in /tmp. Does not affect regular output\item{default: }{\preformatted{TRUE}}
+\item{option: }{autovalidateutils.clean}
+\item{envvar: }{AUTOVALIDATEUTILS_CLEAN (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{timeout}{\describe{
+A difftime object or a numeric value with a real number indicating
+number of seconds that should pass before certain calls are timed out. Set to
+Inf to turn off timeout. By deafult set to difftime 14 hours.\item{default: }{\preformatted{as.difftime(14, units = "hours")}}
+\item{option: }{autovalidateutils.timeout}
+\item{envvar: }{AUTOVALIDATEUTILS_TIMEOUT (evaluated if possible, raw string otherwise)}
+}}
+
+\item{output}{\describe{
+A parent directory for all non-relative output files. Defaults to the
+current working directory.\item{default: }{\preformatted{file.path(normalize_path(tempdir()), "autovalidateutils")}}
+\item{option: }{autovalidateutils.output}
+\item{envvar: }{AUTOVALIDATEUTILS_OUTPUT (evaluated if possible, raw string otherwise)}
+}}
+
+\item{log_output}{\describe{
+path to the directory where log files will be created.\item{default: }{\preformatted{file.path(normalize_path(tempdir()), "log_autovalidateutils")}}
+\item{option: }{autovalidateutils.log_output}
+\item{envvar: }{AUTOVALIDATEUTILS_LOG_OUTPUT (evaluated if possible, raw string otherwise)}
+}}
+
+\item{original_libpaths}{\describe{
+Vector storing original .libPaths before the vector was
+altered by avu_install function. It is always overwritten during
+autovalidateutils runtime.\item{default: }{\preformatted{NULL}}
+\item{option: }{autovalidateutils.original_libpaths}
+\item{envvar: }{AUTOVALIDATEUTILS_ORIGINAL_LIBPATHS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{lib.loc}{\describe{
+Character vector describing the location of R library trees to search
+through. It will be passed to installed.packages() while deriving whether all
+required dependencies are installed.
+Defaults to c(.Library, .Library.site).\item{default: }{\preformatted{c(.Library, .Library.site)}}
+\item{option: }{autovalidateutils.lib.loc}
+\item{envvar: }{AUTOVALIDATEUTILS_LIB_LOC (evaluated if possible, raw string otherwise)}
+}}
+
+\item{clear_description}{\describe{
+Logical value whether all non-utf8 characters should be removed from
+the DESCRIPTION value. This is to avoid potential erros that might
+occure when installing the package from the source.\item{default: }{\preformatted{FALSE}}
+\item{option: }{autovalidateutils.clear_description}
+\item{envvar: }{AUTOVALIDATEUTILS_CLEAR_DESCRIPTION (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{subprocess_debug}{\describe{
+Logical whether certain functionalities shall be run in a debug mode. Debug
+means functions are run in the main process rather that callr::r_vanilla\item{default: }{\preformatted{FALSE}}
+\item{option: }{autovalidateutils.subprocess_debug}
+\item{envvar: }{AUTOVALIDATEUTILS_SUBPROCESS_DEBUG (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{install_n_workers}{\describe{
+Number of subprocesses used by the checked package for
+executing tasks when installing package and dependencies.\item{default: }{\preformatted{20L}}
+\item{option: }{autovalidateutils.install_n_workers}
+\item{envvar: }{AUTOVALIDATEUTILS_INSTALL_N_WORKERS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{session}{\describe{
+The file path of the session information metadata file, a
+yaml-formatted itemization of a few characteristic measures of an R session
+environment.\item{default: }{\preformatted{"session.yml"}}
+\item{option: }{autovalidateutils.session}
+\item{envvar: }{AUTOVALIDATEUTILS_SESSION (evaluated if possible, raw string otherwise)}
+}}
+
+\item{description}{\describe{
+The file path of the \code{DESCRIPTION} file contents, written out to
+a plain text, yaml-formatted file.\item{default: }{\preformatted{"description.yml"}}
+\item{option: }{autovalidateutils.description}
+\item{envvar: }{AUTOVALIDATEUTILS_DESCRIPTION (evaluated if possible, raw string otherwise)}
+}}
+
+\item{news}{\describe{
+The file path of the \code{NEWS} (or \code{NEWS.md}) file contents. If the \code{NEWS} file
+is not already markdown formatted, it will be converted into a preformatted
+markdown code block to be embedded in an \code{autovalidate} report.\item{default: }{\preformatted{"news.md"}}
+\item{option: }{autovalidateutils.news}
+\item{envvar: }{AUTOVALIDATEUTILS_NEWS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{conditions}{\describe{
+The file path of the file to which conditions should be emitted. They are
+logged in yaml format, which is later read by \code{autovalidate} to
+re-emit them as \code{autovalidate} checks and trigger failures when applicable\item{default: }{\preformatted{"conditions.yml"}}
+\item{option: }{autovalidateutils.conditions}
+\item{envvar: }{AUTOVALIDATEUTILS_CONDITIONS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{build_binaries}{\describe{
+Logical whether binary source of the package should be compiled during
+validation.\item{default: }{\preformatted{FALSE}}
+\item{option: }{autovalidateutils.build_binaries}
+\item{envvar: }{AUTOVALIDATEUTILS_BUILD_BINARIES (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{generalize_sources}{\describe{
+Logical whether sources produced during validation should be renamed to
+general 'package_binary.tgz/tar.gz/zip' and 'package_source.tar.gz'.\item{default: }{\preformatted{FALSE}}
+\item{option: }{autovalidateutils.generalize_sources}
+\item{envvar: }{AUTOVALIDATEUTILS_GENERALIZE_SOURCES (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{steps}{\describe{
+A listing of autovalidateutils steps to perform. Either a \code{character} vector
+or \code{list}. Alternatively, the vector or list may consist of modifications
+to a listing of all steps, which must be prefixed by \code{-} (for example,
+\code{-write_revdep_check}, which will use all steps except reverse dependency
+checks).\item{default: }{\preformatted{c("-write_checked")}}
+\item{option: }{autovalidateutils.steps}
+\item{envvar: }{AUTOVALIDATEUTILS_STEPS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{installed_packages}{\describe{
+The name of the installed packages json file. It keeps track of
+the information about which packages were installed to the environemnt
+and their versions. File will be written to the log_output directory\item{default: }{\preformatted{"installed_packages.json"}}
+\item{option: }{autovalidateutils.installed_packages}
+\item{envvar: }{AUTOVALIDATEUTILS_INSTALLED_PACKAGES (evaluated if possible, raw string otherwise)}
+}}
+
+\item{use_remotes}{\describe{
+Logical flag or named character mapping dependency types to the mechanism of
+handling remotes, one of "allow", "prefer" or "disallow". "allow"
+option means that the remote sources are allowed but will not take precedence
+over other standard sources if both available. "prefer" means allow and
+overwrite standard sources while "disallow" stands for skipping remote
+sources at all. If no value is provided for a dependency type it is
+considered to be "disallow". Can also be set to TRUE to "prefer" all or
+FALSE to "disallow all.\item{default: }{\preformatted{c(Depends = "disallow", Imports = "disallow", LinkingTo = "disallow", 
+    Suggests = "allow", Enhances = "allow")}}
+\item{option: }{autovalidateutils.use_remotes}
+\item{envvar: }{AUTOVALIDATEUTILS_USE_REMOTES (evaluated if possible, raw string otherwise)}
+}}
+
+\item{version_control}{\describe{
+The file path to which package version control metadata
+should be captured.\item{default: }{\preformatted{"version_control.yml"}}
+\item{option: }{autovalidateutils.version_control}
+\item{envvar: }{AUTOVALIDATEUTILS_VERSION_CONTROL (evaluated if possible, raw string otherwise)}
+}}
+
+\item{version_control.md5}{\describe{
+When a source control hash can't be derived from
+the target directory, this option will be used to populate version control
+metadata. This is of particular interest when the source code has been
+extracted from a tar.gz package bundle. In this case, the md5 hash should
+reflect the hash of the originating package bundle.\item{default: }{\preformatted{NULL}}
+\item{option: }{autovalidateutils.version_control.md5}
+\item{envvar: }{AUTOVALIDATEUTILS_VERSION_CONTROL_MD5 (evaluated if possible, raw string otherwise)}
+}}
+
+\item{version_control.url}{\describe{
+When a source control origin can't be derived from
+the target directory, this option will be used to populate version control
+metadata. This is of particular interest when the source code has been
+extracted from a tar.gz package bundle. In this case, the url should
+reflect the url from which the originating package bundle was downloaded.\item{default: }{\preformatted{NULL}}
+\item{option: }{autovalidateutils.version_control.url}
+\item{envvar: }{AUTOVALIDATEUTILS_VERSION_CONTROL_URL (evaluated if possible, raw string otherwise)}
+}}
+
+\item{vulnerabilities}{\describe{
+The file path to which metadata reagarding possible package's
+vulnerabilities should be captured.\item{default: }{\preformatted{"vulnerabilities.yml"}}
+\item{option: }{autovalidateutils.vulnerabilities}
+\item{envvar: }{AUTOVALIDATEUTILS_VULNERABILITIES (evaluated if possible, raw string otherwise)}
+}}
+
+\item{r_cmd_check}{\describe{
+The file path to which \verb{R CMD check} results should be written.
+Contents are written in yaml format.\item{default: }{\preformatted{"r_cmd_check.yml"}}
+\item{option: }{autovalidateutils.r_cmd_check}
+\item{envvar: }{AUTOVALIDATEUTILS_R_CMD_CHECK (evaluated if possible, raw string otherwise)}
+}}
+
+\item{r_cmd_check_variables}{\describe{
+The named character vector of environmental variables,
+that will be passed to the \code{withr::with_envvar} function and used to execute
+rcmdcheck::rcmdcheck. It can also be a single keyword, either 'cran' or
+'internal' that will result in using predefined set of variables.\item{default: }{\preformatted{"internal"}}
+\item{option: }{autovalidateutils.r_cmd_check_variables}
+\item{envvar: }{AUTOVALIDATEUTILS_R_CMD_CHECK_VARIABLES (evaluated if possible, raw string otherwise)}
+}}
+
+\item{r_cmd_check_clean_tests}{\describe{
+Logical flag whether the \if{html}{\out{<pkg>}}.Rcheck/\if{html}{\out{<pkg>}}/tests
+directory should be cleared by removing all the directories in it\item{default: }{\preformatted{FALSE}}
+\item{option: }{autovalidateutils.r_cmd_check_clean_tests}
+\item{envvar: }{AUTOVALIDATEUTILS_R_CMD_CHECK_CLEAN_TESTS (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{check_dir}{\describe{
+The directory R CMD check results should be written to
+(.tag.gz, .Rcheck).\item{default: }{\preformatted{"check"}}
+\item{option: }{autovalidateutils.check_dir}
+\item{envvar: }{AUTOVALIDATEUTILS_CHECK_DIR (evaluated if possible, raw string otherwise)}
+}}
+
+\item{sonarqube}{\describe{
+The file path in which to record a sonarqube xml coverage output file.\item{default: }{\preformatted{file.path("coverage", "sonarqube.xml")}}
+\item{option: }{autovalidateutils.sonarqube}
+\item{envvar: }{AUTOVALIDATEUTILS_SONARQUBE (evaluated if possible, raw string otherwise)}
+}}
+
+\item{cov_report}{\describe{
+The file path in which to save coverage .html report.\item{default: }{\preformatted{file.path("coverage", "cov_report.html")}}
+\item{option: }{autovalidateutils.cov_report}
+\item{envvar: }{AUTOVALIDATEUTILS_COV_REPORT (evaluated if possible, raw string otherwise)}
+}}
+
+\item{skip_cov_report}{\describe{
+Logical whether interactive coverage report calculation shall be skipped\item{default: }{\preformatted{FALSE}}
+\item{option: }{autovalidateutils.skip_cov_report}
+\item{envvar: }{AUTOVALIDATEUTILS_SKIP_COV_REPORT (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{cov_table}{\describe{
+The file path in which to save markdown table with coverage percentage for
+each file.\item{default: }{\preformatted{file.path("coverage", "cov_table.md")}}
+\item{option: }{autovalidateutils.cov_table}
+\item{envvar: }{AUTOVALIDATEUTILS_COV_TABLE (evaluated if possible, raw string otherwise)}
+}}
+
+\item{cov_logs}{\describe{
+Directory where logs gathered during coverage execution are saved.\item{default: }{\preformatted{file.path("coverage", "logs")}}
+\item{option: }{autovalidateutils.cov_logs}
+\item{envvar: }{AUTOVALIDATEUTILS_COV_LOGS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{testing_session}{\describe{
+The file path of the yml parsed sessionInfo file that
+captures the environment in which units tests were executed.\item{default: }{\preformatted{file.path("coverage", "testing_session.yml")}}
+\item{option: }{autovalidateutils.testing_session}
+\item{envvar: }{AUTOVALIDATEUTILS_TESTING_SESSION (evaluated if possible, raw string otherwise)}
+}}
+
+\item{coverage_threshold}{\describe{
+The numeric value of the minimal code coverage percentage
+required for package to be validated\item{default: }{\preformatted{80}}
+\item{option: }{autovalidateutils.coverage_threshold}
+\item{envvar: }{AUTOVALIDATEUTILS_COVERAGE_THRESHOLD (evaluated if possible, raw string otherwise)}
+}}
+
+\item{reuse_check_source}{\describe{
+Logical whether the source generated when running
+R CMD check should be used when calcualting coverage code coverage instead
+of the raw source.\item{default: }{\preformatted{TRUE}}
+\item{option: }{autovalidateutils.reuse_check_source}
+\item{envvar: }{AUTOVALIDATEUTILS_REUSE_CHECK_SOURCE (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{documentation}{\describe{
+The directory path into which R documentation should
+be written as markdown-formatted files. Files will be named with a prefixed
+index according to their lexical Rd name sorting. This index corresponds to
+the requirements index in the \code{mapper_file} option, and is used by
+\code{autovalidate} to generate a traceability matrix.\item{default: }{\preformatted{file.path("traceability_matrix", "documentation")}}
+\item{option: }{autovalidateutils.documentation}
+\item{envvar: }{AUTOVALIDATEUTILS_DOCUMENTATION (evaluated if possible, raw string otherwise)}
+}}
+
+\item{documentation_fragments}{\describe{
+A \code{character} vector of the types of \code{Rd} fragments
+to be included in the resulting documentation markdown files, or \code{NULL} to
+include all \code{Rd} contents.\item{default: }{\preformatted{c("title", "usage", "description", "details")}}
+\item{option: }{autovalidateutils.documentation_fragments}
+\item{envvar: }{AUTOVALIDATEUTILS_DOCUMENTATION_FRAGMENTS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{rd_transform}{\describe{
+A function which will be applied to the raw rd object before
+converting it to the markdown file. Identity function by default.\item{default: }{\preformatted{function(x) x}}
+\item{option: }{autovalidateutils.rd_transform}
+\item{envvar: }{AUTOVALIDATEUTILS_RD_TRANSFORM (evaluated if possible, raw string otherwise)}
+}}
+
+\item{mapper}{\describe{
+The file path into which an \code{autovalidate}-style mapper file should
+be written.\item{default: }{\preformatted{file.path("traceability_matrix", "mapper.yml")}}
+\item{option: }{autovalidateutils.mapper}
+\item{envvar: }{AUTOVALIDATEUTILS_MAPPER (evaluated if possible, raw string otherwise)}
+}}
+
+\item{mapper_defaults}{\describe{
+If \code{TRUE}, default values will be injected into the
+autovalidate mapper.yml file for fields that have no direct analog in a
+typical testthat-generated junit.xml file. This includes the \code{author},
+\code{reviewer} and \code{review_date}.\item{default: }{\preformatted{TRUE}}
+\item{option: }{autovalidateutils.mapper_defaults}
+\item{envvar: }{AUTOVALIDATEUTILS_MAPPER_DEFAULTS (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{add_missing_traces}{\describe{
+Logical if covr traces which are missing in the testresults file should be
+added to the JUnit\item{default: }{\preformatted{TRUE}}
+\item{option: }{autovalidateutils.add_missing_traces}
+\item{envvar: }{AUTOVALIDATEUTILS_ADD_MISSING_TRACES (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{test_exec_log}{\describe{
+The file path of a file in which console output generated during test
+execution.\item{default: }{\preformatted{"tests.Rout"}}
+\item{option: }{autovalidateutils.test_exec_log}
+\item{envvar: }{AUTOVALIDATEUTILS_TEST_EXEC_LOG (evaluated if possible, raw string otherwise)}
+}}
+
+\item{junit}{\describe{
+The file path into which a JUnit-style xml test results
+file should be written.\item{default: }{\preformatted{file.path("traceability_matrix", "junit.xml")}}
+\item{option: }{autovalidateutils.junit}
+\item{envvar: }{AUTOVALIDATEUTILS_JUNIT (evaluated if possible, raw string otherwise)}
+}}
+
+\item{junit_reporter}{\describe{
+A quoted expression, producing a \code{testthat} reporter. The
+reporter's initialization is expected to match the signature of
+\code{testthat::JunitReporter$new()}, notably expecting a \code{file} argument to
+use as the output \code{junit.xml} filepath.\item{default: }{\preformatted{quote(testthat::JunitReporter)}}
+\item{option: }{autovalidateutils.junit_reporter}
+\item{envvar: }{AUTOVALIDATEUTILS_JUNIT_REPORTER (evaluated if possible, raw string otherwise)}
+}}
+
+\item{use_testthat}{\describe{
+Whether testthat infrastructure should be available within
+autovalidateutils. The actual usage will be determined based on the
+uses_testthat function output. Defaults to \code{TRUE}.\item{default: }{\preformatted{TRUE}}
+\item{option: }{autovalidateutils.use_testthat}
+\item{envvar: }{AUTOVALIDATEUTILS_USE_TESTTHAT (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{inst_deps}{\describe{
+Character vector of dependency types. All packages with those types
+are permitted to be installed from any available repo during validation.
+Defaults to only 'Suggests'\item{default: }{\preformatted{"Suggests"}}
+\item{option: }{autovalidateutils.inst_deps}
+\item{envvar: }{AUTOVALIDATEUTILS_INST_DEPS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{req_deps}{\describe{
+Character vector of dependecies types. All packages with those types
+are required to be installed before the validation can start.\item{default: }{\preformatted{c("Depends", "Imports", "LinkingTo")}}
+\item{option: }{autovalidateutils.req_deps}
+\item{envvar: }{AUTOVALIDATEUTILS_REQ_DEPS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{upgrade_deps}{\describe{
+Whether packages should be upgraded if higher version than installed is
+available. Keep NULL to use the default autovalidateutils behavior
+which is upgrading for DEP_LIB_CORE and not upgrading for DEP_LIB_OPTIONAL.\item{default: }{\preformatted{NULL}}
+\item{option: }{autovalidateutils.upgrade_deps}
+\item{envvar: }{AUTOVALIDATEUTILS_UPGRADE_DEPS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{suggests_repos}{\describe{
+Character vector of libraries that will be appended to
+standard repos during installation of suggested packages.\item{default: }{\preformatted{c("https://cran.r-project.org/")}}
+\item{option: }{autovalidateutils.suggests_repos}
+\item{envvar: }{AUTOVALIDATEUTILS_SUGGESTS_REPOS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{revdep_repos}{\describe{
+Repository used for identyfying reverse dependencies. It should
+be the same as \code{repos} unless using linux binaries, then it should be
+repo URL without binaires part.\item{default: }{\preformatted{getOption("repos")}}
+\item{option: }{autovalidateutils.revdep_repos}
+\item{envvar: }{AUTOVALIDATEUTILS_REVDEP_REPOS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{revdep_n_workers}{\describe{
+Number of subprocesses used by the checked package for
+executing tasks when running reverse dependecy check.\item{default: }{\preformatted{20L}}
+\item{option: }{autovalidateutils.revdep_n_workers}
+\item{envvar: }{AUTOVALIDATEUTILS_REVDEP_N_WORKERS (evaluated if possible, raw string otherwise)}
+}}
+
+\item{revdep_clean_sources}{\describe{
+Logical flag whether the sources of reverse dependencies should be removed.\item{default: }{\preformatted{TRUE}}
+\item{option: }{autovalidateutils.revdep_clean_sources}
+\item{envvar: }{AUTOVALIDATEUTILS_REVDEP_CLEAN_SOURCES (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{revdep_clean_library}{\describe{
+Logical whether the source of the target package should be removed after
+completing checks.\item{default: }{\preformatted{TRUE}}
+\item{option: }{autovalidateutils.revdep_clean_library}
+\item{envvar: }{AUTOVALIDATEUTILS_REVDEP_CLEAN_LIBRARY (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
+\item{checked_debug}{\describe{
+Logical whether checked should use detailed reporter which reports every task
+to allow debuging of the checked state.\item{default: }{\preformatted{FALSE}}
+\item{option: }{autovalidateutils.checked_debug}
+\item{envvar: }{AUTOVALIDATEUTILS_CHECKED_DEBUG (TRUE if one of 'TRUE', '1', FALSE otherwise)}
+}}
+
 \item{tty_tick_interval}{\describe{
 tty refresh interval when reporting results in milliseconds\item{default: }{\preformatted{0.1}}
 \item{option: }{checked.tty_tick_interval}
-\item{envvar: }{R_CHECKED_TTY_TICK_INTERVAL (evaluated if possible, raw string otherwise)}
+\item{envvar: }{CHECKED_TTY_TICK_INTERVAL (evaluated if possible, raw string otherwise)}
 }}
 
 \item{tty_default_height}{\describe{
 deafult tty height used for the ANSI reporter. Used only
 if correct values could not be acquired with system('tput lines')\item{default: }{\preformatted{50}}
 \item{option: }{checked.tty_default_height}
-\item{envvar: }{R_CHECKED_TTY_DEFAULT_HEIGHT (evaluated if possible, raw string otherwise)}
+\item{envvar: }{CHECKED_TTY_DEFAULT_HEIGHT (evaluated if possible, raw string otherwise)}
 }}
 
 \item{proactive_gc}{\describe{
@@ -41,7 +455,7 @@ is recommended to be used for designs with many sub-processes required as
 native garbage collection can lag leading to memory issues. Disable only
 when maximum prefromance is required and memory is not the issue.\item{default: }{\preformatted{TRUE}}
 \item{option: }{checked.proactive_gc}
-\item{envvar: }{R_CHECKED_PROACTIVE_GC (evaluated if possible, raw string otherwise)}
+\item{envvar: }{CHECKED_PROACTIVE_GC (evaluated if possible, raw string otherwise)}
 }}
 
 \item{results_error_on}{\describe{
@@ -50,7 +464,7 @@ are discovered when generating results. "never" means that no errors
 are thrown. If "issues" then errors are emitted only on issues, whereas
 "potential issues" stands for error on both issues and potential issues.\item{default: }{\preformatted{"never"}}
 \item{option: }{checked.results_error_on}
-\item{envvar: }{R_CHECKED_RESULTS_ERROR_ON (evaluated if possible, raw string otherwise)}
+\item{envvar: }{CHECKED_RESULTS_ERROR_ON (evaluated if possible, raw string otherwise)}
 }}
 
 \item{results_keep}{\describe{
@@ -59,7 +473,7 @@ character vector indicating which packages should be included in the results.
 with issues identified, whereas "potential_issues" stands for keeping
 packages with both "issues" and "potential_issues".\item{default: }{\preformatted{"all"}}
 \item{option: }{checked.results_keep}
-\item{envvar: }{R_CHECKED_RESULTS_KEEP (evaluated if possible, raw string otherwise)}
+\item{envvar: }{CHECKED_RESULTS_KEEP (evaluated if possible, raw string otherwise)}
 }}
 
 \item{restore}{\describe{
@@ -67,7 +481,7 @@ packages with both "issues" and "potential_issues".\item{default: }{\preformatte
 running checks. If \code{FALSE}, an attempt will me made to restore previous
 progress from the same \code{output}\item{default: }{\preformatted{NA}}
 \item{option: }{checked.restore}
-\item{envvar: }{R_CHECKED_RESTORE (evaluated if possible, raw string otherwise)}
+\item{envvar: }{CHECKED_RESTORE (evaluated if possible, raw string otherwise)}
 }}
 
 \item{add_remotes}{\describe{
@@ -75,7 +489,7 @@ progress from the same \code{output}\item{default: }{\preformatted{NA}}
 should be scanned for packages in the \code{remotes} field and added while
 constrocuting a plan \code{task_grap}\item{default: }{\preformatted{TRUE}}
 \item{option: }{checked.add_remotes}
-\item{envvar: }{R_CHECKED_ADD_REMOTES (evaluated if possible, raw string otherwise)}
+\item{envvar: }{CHECKED_ADD_REMOTES (evaluated if possible, raw string otherwise)}
 }}
 
 \item{check_envvars}{\describe{
@@ -84,40 +498,40 @@ the R CMD check.\item{default: }{\preformatted{c(`_R_CHECK_FORCE_SUGGESTS_` = "f
     `_R_CHECK_SYSTEM_CLOCK_` = "false", `_R_CHECK_SUGGESTS_ONLY_` = "true", 
     `_R_CHECK_CRAN_INCOMING_` = "false")}}
 \item{option: }{checked.check_envvars}
-\item{envvar: }{R_CHECKED_CHECK_ENVVARS (evaluated if possible, raw string otherwise)}
+\item{envvar: }{CHECKED_CHECK_ENVVARS (evaluated if possible, raw string otherwise)}
 }}
 
 \item{check_build_args}{\describe{
 \code{character} vector of args passed to the R CMD build.\item{default: }{\preformatted{c("--no-build-vignettes", "--no-manual")}}
 \item{option: }{checked.check_build_args}
-\item{envvar: }{R_CHECKED_CHECK_BUILD_ARGS (space-separated R CMD build flags)}
+\item{envvar: }{CHECKED_CHECK_BUILD_ARGS (space-separated R CMD build flags)}
 }}
 
 \item{check_args}{\describe{
 \code{character} vector of args passed to the R CMD check.\item{default: }{\preformatted{c("--timings", "--ignore-vignettes", "--no-manual", "--as-cran")}}
 \item{option: }{checked.check_args}
-\item{envvar: }{R_CHECKED_CHECK_ARGS (space-separated R CMD check flags)}
+\item{envvar: }{CHECKED_CHECK_ARGS (space-separated R CMD check flags)}
 }}
 
 \item{install_envvars}{\describe{
 named \code{character} vector of environment variables to use during
 the package installation.\item{default: }{\preformatted{callr::rcmd_safe_env()}}
 \item{option: }{checked.install_envvars}
-\item{envvar: }{R_CHECKED_INSTALL_ENVVARS (evaluated if possible, raw string otherwise)}
+\item{envvar: }{CHECKED_INSTALL_ENVVARS (evaluated if possible, raw string otherwise)}
 }}
 
 \item{install_system_profile}{\describe{
 \code{logical} used as \code{sytem_profile} parameter passed to the \code{callr::r_bg()}
 function used to install packages\item{default: }{\preformatted{FALSE}}
 \item{option: }{checked.install_system_profile}
-\item{envvar: }{R_CHECKED_INSTALL_SYSTEM_PROFILE (evaluated if possible, raw string otherwise)}
+\item{envvar: }{CHECKED_INSTALL_SYSTEM_PROFILE (evaluated if possible, raw string otherwise)}
 }}
 
 \item{install_user_profile}{\describe{
 value used as \code{user_profile} parameter passed to the \code{callr::r_bg()}
 function used to install packages\item{default: }{\preformatted{"project"}}
 \item{option: }{checked.install_user_profile}
-\item{envvar: }{R_CHECKED_INSTALL_USER_PROFILE (evaluated if possible, raw string otherwise)}
+\item{envvar: }{CHECKED_INSTALL_USER_PROFILE (evaluated if possible, raw string otherwise)}
 }}
 
 }

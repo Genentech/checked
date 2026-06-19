@@ -87,9 +87,7 @@ start_task.install_task <- function(
     upgrade %nif% task$origin$version
   )
 
-  if (is_installed &&
-      is_lib_path_default(task) &&
-      inherits(task$origin, "pkg_origin_repo"))
+  if (is_installed && is_lib_path_default(task) && inherits(task$origin, "pkg_origin_repo")) # nolint
     return(NULL)
 
   install_process$new(
