@@ -67,9 +67,9 @@ path_checker_lib <- function(path) {
   normalizePath(p)
 }
 
-path_install_log <- function(path, package, name = "lib") {
-  dir_create(p <- file.path(path_logs(path), name))
-  normalizePath(file.path(p, sprintf("%s.log", package)), mustWork = FALSE)
+path_install_log <- function(path, package, task) {
+  dir_create(p <- file.path(path_logs(path), package))
+  normalizePath(file.path(p, sprintf("%s.log", task)), mustWork = FALSE)
 }
 
 path_logs <- function(path) {

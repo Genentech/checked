@@ -4,13 +4,21 @@
 \alias{plan_local_checks}
 \title{Plan R CMD Checks}
 \usage{
-plan_local_checks(package, repos = getOption("repos"))
+plan_local_checks(
+  package,
+  repos = getOption("repos"),
+  remotes_dependencies = TRUE
+)
 }
 \arguments{
 \item{package}{A path to either package, directory with packages or name
 of the package (details)}
 
 \item{repos}{repository used to identify packages when name is provided.}
+
+\item{remotes_dependencies}{A vector of length one or a named list.
+Compatible with \code{\link{as_pkg_dependencies}}. Used to filter out remotes
+dependencies.}
 }
 \description{
 Generates a plan for running R CMD check for a specified set of packages.

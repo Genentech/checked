@@ -9,6 +9,7 @@ install_task(
   type = package_install_type(origin),
   INSTALL_opts = NULL,
   lib = lib_path(origin),
+  env = options::opt("install_envvars"),
   ...
 )
 }
@@ -32,6 +33,8 @@ install_task(
 
 \item{lib}{Any object that can be passed to \code{\link[=lib]{lib()}} to generate a library
 path.}
+
+\item{env}{Environment variables to set for the child process.}
 
 \item{...}{
     further arguments to be passed to \code{\link[utils]{download.file}},

@@ -4,7 +4,7 @@
 \alias{run}
 \title{Run a Series of \verb{R CMD check}s}
 \usage{
-run(checker, ..., reporter = reporter_default())
+run(checker, ..., reporter = reporter_default(checker))
 }
 \arguments{
 \item{checker}{\code{character} or \code{checker} If a \code{character} value is

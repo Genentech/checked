@@ -13,12 +13,12 @@
 #'   most expressive command-line reporter given your terminal capabilities.
 #'
 #' @export
-run <- function(checker, ..., reporter = reporter_default()) {
+run <- function(checker, ..., reporter = reporter_default(checker)) {
   UseMethod("run")
 }
 
 #' @export
-run.character <- function(checker, ..., reporter = reporter_default()) {
+run.character <- function(checker, ..., reporter = reporter_default(checker)) {
   checker <- new_rev_dep_checker(checker, ...)
   report_start_setup(
     reporter,
@@ -30,7 +30,7 @@ run.character <- function(checker, ..., reporter = reporter_default()) {
 }
 
 #' @export
-run.checker <- function(checker, ..., reporter = reporter_default()) {
+run.checker <- function(checker, ..., reporter = reporter_default(checker)) {
   on.exit(add = TRUE, {
     checker$terminate()
     report_finalize(reporter, checker)

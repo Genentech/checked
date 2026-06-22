@@ -44,48 +44,75 @@ star_graph <- function(...) {
 #' Primarily intended for cleaning up the result of an [`igraph::union()`],
 #' which adds duplicated attributes when attributes of the same name exist in
 #' multiple graphs. Searches for suffixes and consolidates attributes,
-#' taking the attribute from the first non-NA value observed.
+#' taking the attribute from the first non-NA value observed. The function
+#' rebuilds the graph from scratch as accessing attributes once, operating on
+#' lists and then assigning them to a new graph is significantly faster than
+#' manipulating attribiutes of the existing graph.
 #'
 #' @param g task_graph object
 #'
 #' @keywords internal
 graph_dedup_attrs <- function(g) {
-  # pattern appended to duplicated attributes
   re <- "_\\d+$"
+  v_all <- igraph::vertex_attr(g)
+  e_all <- igraph::edge_attr(g)
+  v_attr_names <- names(v_all)
+  e_attr_names <- names(e_all)
+  v_dup <- grep(re, v_attr_names, value = TRUE)
+  e_dup <- grep(re, e_attr_names, value = TRUE)
 
-  # de-duplicate vertex attributes
-  v_attrs <- igraph::vertex_attr_names(g)
-  v_dup_attrs <- grep(re, v_attrs, value = TRUE)
-  v_dup_group <- sub(re, "", v_dup_attrs)
-  v_dup_attrs <- split(v_dup_attrs, v_dup_group)
-  for (i in seq_along(v_dup_attrs)) {
-    attr_name <- names(v_dup_attrs[i])
-    attr_value <- igraph::vertex_attr(g, v_dup_attrs[[i]][[1L]])
-    g <- igraph::delete_vertex_attr(g, v_dup_attrs[[i]][[1L]])
-    for (attr_dup_name in v_dup_attrs[[i]][-1L]) {
-      is_na <- is.na(attr_value)
-      attr_value[is_na] <- igraph::vertex_attr(g, attr_dup_name)[is_na]
-      g <- igraph::delete_vertex_attr(g, attr_dup_name)
+  # Nothing to deduplicate
+  if (length(v_dup) == 0 && length(e_dup) == 0) return(g)
+
+  first_non_na <- function(list) {
+    out <- list[[1]]
+    if (!any(is.na(out))) return(out)
+
+    for (i in seq(2, length(list))) {
+      is_na <- is.na(out)
+      if (any(is_na)) out[is_na] <- list[[i]][is_na]
     }
-    g <- igraph::set_vertex_attr(g, attr_name, value = attr_value)
+    out
   }
 
-  # de-duplicate edge attributes
-  e_attrs <- igraph::edge_attr_names(g)
-  e_dup_attrs <- grep(re, e_attrs, value = TRUE)
-  e_dup_group <- sub(re, "", e_dup_attrs)
-  e_dup_attrs <- split(e_dup_attrs, e_dup_group)
-  for (i in seq_along(e_dup_attrs)) {
-    attr_name <- names(e_dup_attrs[i])
-    attr_value <- igraph::edge_attr(g, e_dup_attrs[[i]][[1L]])
-    g <- igraph::delete_edge_attr(g, e_dup_attrs[[i]][[1L]])
-    for (attr_dup_name in e_dup_attrs[[i]][-1L]) {
-      is_na <- is.na(attr_value)
-      attr_value[is_na] <- igraph::edge_attr(g, attr_dup_name)[is_na]
-      g <- igraph::delete_edge_attr(g, attr_dup_name)
-    }
-    g <- igraph::set_edge_attr(g, attr_name, value = attr_value)
+  groups <- split(v_dup, sub(re, "", v_dup))
+  for (base in names(groups)) {
+    cols <- groups[[base]]
+    v_all[[base]] <- first_non_na(v_all[cols])
+  }
+  v_all[v_dup] <- NULL
+
+  groups <- split(e_dup, sub(re, "", e_dup))
+  for (base in names(groups)) {
+    cols <- groups[[base]]
+    e_all[[base]] <- first_non_na(e_all[cols])
+  }
+  e_all[e_dup] <- NULL
+
+  vertices <- data.frame(name = V(g)$name)
+
+  for (attr in setdiff(names(v_all), "name")) {
+    vertices[[attr]] <- v_all[[attr]]
   }
 
-  g
+  # Build edges data.frame (keeps current edge order)
+  el <- igraph::as_edgelist(g, names = TRUE)
+  edges <- data.frame(
+    from = el[, 1],
+    to = el[, 2]
+  )
+
+  for (attr in names(e_all)) {
+    edges[[attr]] <- e_all[[attr]]
+  }
+
+  # Rebuild graph
+  g_rebuilt <- igraph::graph_from_data_frame(
+    d = edges,
+    directed = TRUE,
+    vertices = vertices
+  )
+
+  class(g_rebuilt) <- class(g)
+  g_rebuilt
 }

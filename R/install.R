@@ -12,38 +12,38 @@ install_process <- R6::R6Class(
       lib = .libPaths()[[1]],
       libpaths = .libPaths(),
       available_packages_filters = getOption("available_packages_filters"),
-      log = NULL
+      log = NULL,
+      env = callr::rcmd_safe_env()
     ) {
       if (!dir.exists(lib)) dir.create(lib, recursive = TRUE)
       private$package <- pkgs
       self$log <- log
       private$callr_r_bg(
-        function(..., escalate_warning, available_packages_filters) {
-          options(available_packages_filters = available_packages_filters)
-          withCallingHandlers(
-            utils::install.packages(...),
-            warning = function(w) {
-              if (escalate_warning(w)) {
-                print(w$message)
-                stop(w$message)
-              } else {
-                print(w$message)
-                warning(w)
-              }
-            }
+        function(..., available_packages_filters) {
+          options(
+            timeout = 600,
+            available_packages_filters = available_packages_filters
           )
+          invisible(capture.output(withCallingHandlers(
+            utils::install.packages(..., quiet = FALSE, verbose = TRUE),
+            warning = function(w) {
+              print(w$message)
+            }
+          ), split = TRUE))
         },
         args = list(
           private$package,
           ...,
           lib = lib,
-          escalate_warning = is_install_failure_warning,
           available_packages_filters = available_packages_filters
         ),
         libpath = libpaths,
         stdout = self$log,
         stderr = "2>&1",
-        system_profile = TRUE
+        system_profile = options::opt("install_system_profile"),
+        user_profile = options::opt("install_user_profile"),
+        cmdargs = c("--slave", "--no-save", "--no-restore", "--vanilla"),
+        env = env
       )
     },
     get_duration = function() {
@@ -62,7 +62,26 @@ install_process <- R6::R6Class(
       if (is.function(f <- private$finish_callback)) f(self)
     },
     get_r_exit_status = function() {
-      as.integer(inherits(try(self$get_result(), silent = TRUE), "try-error"))
+      res <- self$get_results_safe()
+      if (inherits(self$get_results_safe(), "callr_error")) {
+        1L
+      } else if (any(is_install_failure_warning(res))) {
+        1L
+      } else {
+        0L
+      }
+
+    },
+    get_results_safe = function() {
+      tryCatch(
+        gsub("\\n", "\n", self$get_result(), fixed = TRUE),
+        error = function(e) {
+          e
+        },
+        warning = function(w) {
+          w
+        }
+      )
     }
   ),
   private = list(
@@ -109,5 +128,5 @@ is_install_failure_warning <- function(w) {
   )
 
   re <- paste0("(", paste0(patterns, collapse = "|"), ")")
-  grepl(re, w$message)
+  grepl(re, w)
 }

@@ -62,6 +62,7 @@ be created and stored.}
 \item \href{#method-checker-step}{\code{checker$step()}}
 \item \href{#method-checker-start_next_task}{\code{checker$start_next_task()}}
 \item \href{#method-checker-is_done}{\code{checker$is_done()}}
+\item \href{#method-checker-tasks}{\code{checker$tasks()}}
 \item \href{#method-checker-clone}{\code{checker$clone()}}
 }
 }
@@ -81,6 +82,8 @@ and installation order are embedded.
   lib.loc = .libPaths(),
   repos = getOption("repos"),
   restore = options::opt("restore"),
+  dependencies = TRUE,
+  upgrade = FALSE,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -105,6 +108,13 @@ generating task graph and later pulling dependencies.}
 \item{\code{restore}}{\code{logical} value, whether output directory should be
 unlinked before running checks. If \code{FALSE}, an attempt will me made to
 restore previous progress from the same \code{output}.}
+
+\item{\code{dependencies}}{A vector of length one or a named list.
+Compatible with \code{\link{as_pkg_dependencies}}.}
+
+\item{\code{upgrade}}{\code{logical} value, whether packages should be upgraded
+if more recent version is discovered in available sources. Remotes
+packages, if allowed to be used, are always installed and prioritized.}
 
 \item{\code{...}}{Additional arguments unused}
 }
@@ -183,6 +193,19 @@ Check if checks are done
 Checks whether all the scheduled tasks were successfully executed.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{checker$is_done()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-checker-tasks"></a>}}
+\if{latex}{\out{\hypertarget{method-checker-tasks}{}}}
+\subsection{Method \code{tasks()}}{
+Tasks
+
+Returns what type of tasks the checker consists of and returns a unique
+vector of primary classes
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{checker$tasks()}\if{html}{\out{</div>}}
 }
 
 }

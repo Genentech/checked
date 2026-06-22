@@ -4,13 +4,16 @@
 \alias{task_graph}
 \title{Build task graph edges}
 \usage{
-task_graph(x, repos = getOption("repos"), ...)
+task_graph(x, repos = getOption("repos"), dependencies = TRUE, ...)
 }
 \arguments{
 \item{x}{a \code{plan} object, containing a list of related steps.}
 
 \item{repos}{\code{repos}, as expected by \code{\link[tools:package_dependencies]{tools::package_dependencies()}} to
 determine package relationships.}
+
+\item{dependencies}{A vector of length one or a named list. Compatible with
+\code{\link{as_pkg_dependencies}}.}
 
 \item{...}{params passed to helper methods.}
 }
