@@ -14,13 +14,15 @@ reporter_ansi_tty2(...)
 
 reporter_basic_tty(checks_only = FALSE, ...)
 
-reporter_default()
+reporter_default(checker = NULL)
 }
 \arguments{
 \item{...}{additional values which should be assigned to the reported
 environment.}
 
 \item{checks_only}{whether basic tty reporter should report only check tasks.}
+
+\item{checker}{checker object required to properly derive default reporter.}
 }
 \description{
 Reporters are used to configure how output is communicated while running

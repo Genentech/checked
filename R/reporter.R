@@ -22,6 +22,7 @@
 #' a reporter with minimal assumptions about terminal capabilities.
 #'
 #' @param checks_only whether basic tty reporter should report only check tasks.
+#' @param checker checker object required to properly derive default reporter.
 #' @param ... additional values which should be assigned to the reported
 #'  environment.
 #'
@@ -58,8 +59,11 @@ reporter_basic_tty <- function(checks_only = FALSE, ...) {
 
 #' @rdname reporters
 #' @export
-reporter_default <- function() {
-  if (cli::is_ansi_tty()) {
+reporter_default <- function(checker = NULL) {
+  is_revdep <-
+    !is.null(checker) && "rev_dep_check_meta_task" %in% checker$tasks()
+
+  if (cli::is_ansi_tty() && is_revdep) {
     reporter_ansi_tty()
   } else if (cli::is_dynamic_tty()) {
     reporter_basic_tty()
