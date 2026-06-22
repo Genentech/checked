@@ -7,7 +7,7 @@ latter task can be executed.
 ## Usage
 
 ``` r
-task_graph(x, repos = getOption("repos"), ...)
+task_graph(x, repos = getOption("repos"), dependencies = TRUE, ...)
 ```
 
 ## Arguments
@@ -21,6 +21,11 @@ task_graph(x, repos = getOption("repos"), ...)
   `repos`, as expected by
   [`tools::package_dependencies()`](https://rdrr.io/r/tools/package_dependencies.html)
   to determine package relationships.
+
+- dependencies:
+
+  A vector of length one or a named list. Compatible with
+  [`as_pkg_dependencies`](https://Genentech.github.io/checked/reference/as_pkg_dependencies.md).
 
 - ...:
 

@@ -9,14 +9,29 @@ better suited for automated execution, such as in continuous itegration.
 ## Usage
 
 ``` r
-reporter_ansi_tty()
+reporter_ansi_tty(...)
 
-reporter_ansi_tty2()
+reporter_ansi_tty2(...)
 
-reporter_basic_tty()
+reporter_basic_tty(checks_only = FALSE, ...)
 
-reporter_default()
+reporter_default(checker = NULL)
 ```
+
+## Arguments
+
+- ...:
+
+  additional values which should be assigned to the reported
+  environment.
+
+- checks_only:
+
+  whether basic tty reporter should report only check tasks.
+
+- checker:
+
+  checker object required to properly derive default reporter.
 
 ## Details
 

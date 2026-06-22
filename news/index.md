@@ -1,5 +1,52 @@
 # Changelog
 
+## checked 0.5.4
+
+- Improve error messaging when using basic_tty
+
+- Various improvements to reporters and minor display tweaks
+
+## checked 0.5.3
+
+- Make is possible to construct reporter environments with additional
+  values to better control their behavior.
+
+- Add `checks_only` parameter to `reporter_basic_tty` which if set to
+  TRUE will make the reporter broadcast only check tasks instead of both
+  install and check.
+
+- Address changes related to default parameters changes in `callr` and
+  resulting NULL comparison in `checked`
+  ([@gaborcsardi](https://github.com/gaborcsardi),
+  [\#93](https://github.com/Genentech/checked/issues/93))
+
+- Multiple API changes facilitating additional customization for tasks.
+
+- Ensure packages destined into isolated libraries or those coming from
+  non-standard sources are always installed.
+
+- Redesign logs by grouping them into package specific directories.
+
+## checked 0.5.2
+
+- Add timers striping to `strip_details_from_issue()` to avoid
+  false-positives.
+
+- Remove `pkg_origin_is_base()` helper function and use memoised
+  `base_pkgs()`.
+
+- Update `RE_CHECK` to capture even more edge cases while parsing R CMD
+  check output.
+
+- Finish check process even if checks seem incomplete but 3 or mire
+  minutes have passed since the process ended to avoid infinite loops.
+
+- Further improvements to the check process finisher.
+
+- Make `graph_dedup_attrs` rebuild the graph from scratch with
+  deduplicated attributes rather than manipulating the exiting graph. I
+  significantly speeds up the function.
+
 ## checked 0.5.1
 
 CRAN release: 2026-02-25

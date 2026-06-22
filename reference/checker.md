@@ -49,6 +49,8 @@ Other checks:
 
 - [`checker$is_done()`](#method-checker-is_done)
 
+- [`checker$tasks()`](#method-checker-tasks)
+
 - [`checker$clone()`](#method-checker-clone)
 
 ------------------------------------------------------------------------
@@ -69,6 +71,8 @@ and installation order are embedded.
       lib.loc = .libPaths(),
       repos = getOption("repos"),
       restore = options::opt("restore"),
+      dependencies = TRUE,
+      upgrade = FALSE,
       ...
     )
 
@@ -102,6 +106,17 @@ and installation order are embedded.
   `logical` value, whether output directory should be unlinked before
   running checks. If `FALSE`, an attempt will me made to restore
   previous progress from the same `output`.
+
+- `dependencies`:
+
+  A vector of length one or a named list. Compatible with
+  [`as_pkg_dependencies`](https://Genentech.github.io/checked/reference/as_pkg_dependencies.md).
+
+- `upgrade`:
+
+  `logical` value, whether packages should be upgraded if more recent
+  version is discovered in available sources. Remotes packages, if
+  allowed to be used, are always installed and prioritized.
 
 - `...`:
 
@@ -183,6 +198,19 @@ Checks whether all the scheduled tasks were successfully executed.
 #### Usage
 
     checker$is_done()
+
+------------------------------------------------------------------------
+
+### Method `tasks()`
+
+Tasks
+
+Returns what type of tasks the checker consists of and returns a unique
+vector of primary classes
+
+#### Usage
+
+    checker$tasks()
 
 ------------------------------------------------------------------------
 

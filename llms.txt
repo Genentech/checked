@@ -112,7 +112,6 @@ run("/home/dev/praise")
   : Make a Library Location
 - [`pkg_origin()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
   [`pkg_origin_repo()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
-  [`pkg_origin_is_base()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
   [`pkg_origin_base()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
   [`pkg_origin_unknown()`](https://Genentech.github.io/checked/reference/pkg_origin.md)
   [`pkg_origin_local()`](https://Genentech.github.io/checked/reference/pkg_origin.md)

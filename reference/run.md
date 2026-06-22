@@ -9,7 +9,7 @@ executed using `run()`.
 ## Usage
 
 ``` r
-run(checker, ..., reporter = reporter_default())
+run(checker, ..., reporter = reporter_default(checker))
 ```
 
 ## Arguments

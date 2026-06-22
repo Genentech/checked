@@ -6,7 +6,11 @@ packages.
 ## Usage
 
 ``` r
-plan_local_checks(package, repos = getOption("repos"))
+plan_local_checks(
+  package,
+  repos = getOption("repos"),
+  remotes_dependencies = TRUE
+)
 ```
 
 ## Arguments
@@ -19,6 +23,12 @@ plan_local_checks(package, repos = getOption("repos"))
 - repos:
 
   repository used to identify packages when name is provided.
+
+- remotes_dependencies:
+
+  A vector of length one or a named list. Compatible with
+  [`as_pkg_dependencies`](https://Genentech.github.io/checked/reference/as_pkg_dependencies.md).
+  Used to filter out remotes dependencies.
 
 ## Details
 

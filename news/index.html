@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">checked</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,29 @@
       <small>Source: <a href="https://github.com/Genentech/checked/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.4" id="checked-054">checked 0.5.4<a class="anchor" aria-label="anchor" href="#checked-054"></a></h2>
+<ul><li><p>Improve error messaging when using basic_tty</p></li>
+<li><p>Various improvements to reporters and minor display tweaks</p></li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.3" id="checked-053">checked 0.5.3<a class="anchor" aria-label="anchor" href="#checked-053"></a></h2>
+<ul><li><p>Make is possible to construct reporter environments with additional values to better control their behavior.</p></li>
+<li><p>Add <code>checks_only</code> parameter to <code>reporter_basic_tty</code> which if set to TRUE will make the reporter broadcast only check tasks instead of both install and check.</p></li>
+<li><p>Address changes related to default parameters changes in <code>callr</code> and resulting NULL comparison in <code>checked</code> (<a href="https://github.com/gaborcsardi" class="external-link">@gaborcsardi</a>, <a href="https://github.com/Genentech/checked/issues/93" class="external-link">#93</a>)</p></li>
+<li><p>Multiple API changes facilitating additional customization for tasks.</p></li>
+<li><p>Ensure packages destined into isolated libraries or those coming from non-standard sources are always installed.</p></li>
+<li><p>Redesign logs by grouping them into package specific directories.</p></li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.2" id="checked-052">checked 0.5.2<a class="anchor" aria-label="anchor" href="#checked-052"></a></h2>
+<ul><li><p>Add timers striping to <code>strip_details_from_issue()</code> to avoid false-positives.</p></li>
+<li><p>Remove <code>pkg_origin_is_base()</code> helper function and use memoised <code>base_pkgs()</code>.</p></li>
+<li><p>Update <code>RE_CHECK</code> to capture even more edge cases while parsing R CMD check output.</p></li>
+<li><p>Finish check process even if checks seem incomplete but 3 or mire minutes have passed since the process ended to avoid infinite loops.</p></li>
+<li><p>Further improvements to the check process finisher.</p></li>
+<li><p>Make <code>graph_dedup_attrs</code> rebuild the graph from scratch with deduplicated attributes rather than manipulating the exiting graph. I significantly speeds up the function.</p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.1" id="checked-051">checked 0.5.1<a class="anchor" aria-label="anchor" href="#checked-051"></a></h2><p class="text-muted">CRAN release: 2026-02-25</p>
 <ul><li><p>Export STATUS vector to make external statuses analysis easier.</p></li>

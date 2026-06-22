@@ -10,6 +10,7 @@ install_task(
   type = package_install_type(origin),
   INSTALL_opts = NULL,
   lib = lib_path(origin),
+  env = options::opt("install_envvars"),
   ...
 )
 ```
@@ -42,6 +43,10 @@ install_task(
   Any object that can be passed to
   [`lib()`](https://Genentech.github.io/checked/reference/lib.md) to
   generate a library path.
+
+- env:
+
+  Environment variables to set for the child process.
 
 - ...:
 

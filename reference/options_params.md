@@ -25,12 +25,28 @@ Checked Options
   'checked.results_error_on' or environment variable
   'R_CHECKED_RESULTS_ERROR_ON')
 
+- install_envvars:
+
+  named `character` vector of environment variables to use during the
+  package installation. (Defaults to
+  [`callr::rcmd_safe_env()`](https://callr.r-lib.org/reference/rcmd_safe_env.html),
+  overwritable using option 'checked.install_envvars' or environment
+  variable 'R_CHECKED_INSTALL_ENVVARS')
+
 - check_args:
 
   `character` vector of args passed to the R CMD check. (Defaults to
   `c("--timings", "--ignore-vignettes", "--no-manual", "--as-cran")`,
   overwritable using option 'checked.check_args' or environment variable
   'R_CHECKED_CHECK_ARGS')
+
+- install_system_profile:
+
+  `logical` used as `sytem_profile` parameter passed to the
+  [`callr::r_bg()`](https://callr.r-lib.org/reference/r_bg.html)
+  function used to install packages (Defaults to `FALSE`, overwritable
+  using option 'checked.install_system_profile' or environment variable
+  'R_CHECKED_INSTALL_SYSTEM_PROFILE')
 
 - results_keep:
 
@@ -77,6 +93,14 @@ Checked Options
   previous progress from the same `output` (Defaults to `NA`,
   overwritable using option 'checked.restore' or environment variable
   'R_CHECKED_RESTORE')
+
+- install_user_profile:
+
+  value used as `user_profile` parameter passed to the
+  [`callr::r_bg()`](https://callr.r-lib.org/reference/r_bg.html)
+  function used to install packages (Defaults to `"project"`,
+  overwritable using option 'checked.install_user_profile' or
+  environment variable 'R_CHECKED_INSTALL_USER_PROFILE')
 
 - tty_default_height:
 

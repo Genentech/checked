@@ -165,6 +165,51 @@ package name to `env`.
 
   :   R_CHECKED_CHECK_ARGS (space-separated R CMD check flags)
 
+- install_envvars:
+
+  default:
+
+  :   callr::rcmd_safe_env()
+
+  option:
+
+  :   checked.install_envvars
+
+  envvar:
+
+  :   R_CHECKED_INSTALL_ENVVARS (evaluated if possible, raw string
+      otherwise)
+
+- install_system_profile:
+
+  default:
+
+  :   FALSE
+
+  option:
+
+  :   checked.install_system_profile
+
+  envvar:
+
+  :   R_CHECKED_INSTALL_SYSTEM_PROFILE (evaluated if possible, raw
+      string otherwise)
+
+- install_user_profile:
+
+  default:
+
+  :   "project"
+
+  option:
+
+  :   checked.install_user_profile
+
+  envvar:
+
+  :   R_CHECKED_INSTALL_USER_PROFILE (evaluated if possible, raw string
+      otherwise)
+
 ## See also
 
 options getOption Sys.setenv Sys.getenv
