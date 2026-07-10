@@ -79,7 +79,16 @@ options::define_options(
 
   "value used as `user_profile` parameter passed to the `callr::r_bg()`
    function used to install packages",
-  install_user_profile = "project"
+  install_user_profile = "project",
+
+  "`list` of characters which specifies names of the R session options that
+   should be inherited by the install subprocesses, from the main process ",
+  install_opts_to_inherit = list(
+    "timeout",
+    "available_packages_filters",
+    "HTTPUserAgent",
+    "pkgType"
+  )
 )
 
 #' @eval options::as_roxygen_docs()

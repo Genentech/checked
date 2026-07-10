@@ -120,6 +120,14 @@ function used to install packages\item{default: }{\preformatted{"project"}}
 \item{envvar: }{R_CHECKED_INSTALL_USER_PROFILE (evaluated if possible, raw string otherwise)}
 }}
 
+\item{install_opts_to_inherit}{\describe{
+\code{list} of characters which specifies names of the R session options that
+should be inherited by the install subprocesses, from the main process\item{default: }{\preformatted{list("timeout", "available_packages_filters", "HTTPUserAgent", 
+    "pkgType")}}
+\item{option: }{checked.install_opts_to_inherit}
+\item{envvar: }{R_CHECKED_INSTALL_OPTS_TO_INHERIT (evaluated if possible, raw string otherwise)}
+}}
+
 }
 }
 
