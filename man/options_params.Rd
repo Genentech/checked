@@ -36,6 +36,9 @@ constrocuting a plan \code{task_grap} (Defaults to \code{TRUE}, overwritable usi
 \item{check_envvars}{named \code{character} vector of environment variables to use during
 the R CMD check. (Defaults to \verb{c(}\emph{R_CHECK_FORCE_SUGGESTS}\verb{= "false",}\emph{R_CHECK_RD_XREFS}\verb{= "false", ;    }\emph{R_CHECK_SYSTEM_CLOCK}\verb{= "false",}\emph{R_CHECK_SUGGESTS_ONLY}\verb{= "true", ;    }\emph{R_CHECK_CRAN_INCOMING}\verb{ = "false")}, overwritable using option 'checked.check_envvars' or environment variable 'R_CHECKED_CHECK_ENVVARS')}
 
+\item{install_opts_to_inherit}{\code{list} of characters which specifies names of the R session options that
+should be inherited by the install subprocesses, from the main process (Defaults to \verb{list("timeout", "available_packages_filters", "HTTPUserAgent", ;     "pkgType")}, overwritable using option 'checked.install_opts_to_inherit' or environment variable 'R_CHECKED_INSTALL_OPTS_TO_INHERIT')}
+
 \item{tty_tick_interval}{tty refresh interval when reporting results in milliseconds (Defaults to \code{0.1}, overwritable using option 'checked.tty_tick_interval' or environment variable 'R_CHECKED_TTY_TICK_INTERVAL')}
 
 \item{check_build_args}{\code{character} vector of args passed to the R CMD build. (Defaults to \code{c("--no-build-vignettes", "--no-manual")}, overwritable using option 'checked.check_build_args' or environment variable 'R_CHECKED_CHECK_BUILD_ARGS')}
