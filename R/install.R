@@ -11,19 +11,15 @@ install_process <- R6::R6Class(
       ...,
       lib = .libPaths()[[1]],
       libpaths = .libPaths(),
-      available_packages_filters = getOption("available_packages_filters"),
       log = NULL,
-      env = callr::rcmd_safe_env()
+      env = options::opt("install_envvars")
     ) {
       if (!dir.exists(lib)) dir.create(lib, recursive = TRUE)
       private$package <- pkgs
       self$log <- log
       private$callr_r_bg(
-        function(..., available_packages_filters) {
-          options(
-            timeout = 600,
-            available_packages_filters = available_packages_filters
-          )
+        function(..., opts_to_inherit) {
+          do.call(options, opts_to_inherit)
           invisible(capture.output(withCallingHandlers(
             utils::install.packages(..., quiet = FALSE, verbose = TRUE),
             warning = function(w) {
@@ -35,7 +31,9 @@ install_process <- R6::R6Class(
           private$package,
           ...,
           lib = lib,
-          available_packages_filters = available_packages_filters
+          opts_to_inherit = do.call(
+            options, options::opt("install_opts_to_inherit")
+          )
         ),
         libpath = libpaths,
         stdout = self$log,
