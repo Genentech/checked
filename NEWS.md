@@ -1,3 +1,8 @@
+# checked 0.5.5
+
+* Add 'install_opts_to_inherit' option which can be used to specify parameters
+  that install subprocess should inherit from the main process
+
 # checked 0.5.4
 
 * Improve error messaging when using basic_tty
