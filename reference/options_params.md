@@ -73,6 +73,15 @@ Checked Options
   overwritable using option 'checked.check_envvars' or environment
   variable 'R_CHECKED_CHECK_ENVVARS')
 
+- install_opts_to_inherit:
+
+  `list` of characters which specifies names of the R session options
+  that should be inherited by the install subprocesses, from the main
+  process (Defaults to
+  `list("timeout", "available_packages_filters", "HTTPUserAgent", ; "pkgType")`,
+  overwritable using option 'checked.install_opts_to_inherit' or
+  environment variable 'R_CHECKED_INSTALL_OPTS_TO_INHERIT')
+
 - tty_tick_interval:
 
   tty refresh interval when reporting results in milliseconds (Defaults

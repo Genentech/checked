@@ -96,6 +96,11 @@ constrocuting a plan <code>task_grap</code> (Defaults to <code>TRUE</code>, over
 the R CMD check. (Defaults to <code>c(</code><em>R_CHECK_FORCE_SUGGESTS</em><code>= "false",</code><em>R_CHECK_RD_XREFS</em><code>= "false", ;    </code><em>R_CHECK_SYSTEM_CLOCK</em><code>= "false",</code><em>R_CHECK_SUGGESTS_ONLY</em><code>= "true", ;    </code><em>R_CHECK_CRAN_INCOMING</em><code> = "false")</code>, overwritable using option 'checked.check_envvars' or environment variable 'R_CHECKED_CHECK_ENVVARS')</p></dd>
 
 
+<dt id="arg-install-opts-to-inherit">install_opts_to_inherit<a class="anchor" aria-label="anchor" href="#arg-install-opts-to-inherit"></a></dt>
+<dd><p><code>list</code> of characters which specifies names of the R session options that
+should be inherited by the install subprocesses, from the main process (Defaults to <code>list("timeout", "available_packages_filters", "HTTPUserAgent", ;     "pkgType")</code>, overwritable using option 'checked.install_opts_to_inherit' or environment variable 'R_CHECKED_INSTALL_OPTS_TO_INHERIT')</p></dd>
+
+
 <dt id="arg-tty-tick-interval">tty_tick_interval<a class="anchor" aria-label="anchor" href="#arg-tty-tick-interval"></a></dt>
 <dd><p>tty refresh interval when reporting results in milliseconds (Defaults to <code>0.1</code>, overwritable using option 'checked.tty_tick_interval' or environment variable 'R_CHECKED_TTY_TICK_INTERVAL')</p></dd>
 
@@ -135,7 +140,7 @@ if correct values could not be acquired with system('tput lines') (Defaults to <
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

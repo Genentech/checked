@@ -210,6 +210,22 @@ package name to `env`.
   :   R_CHECKED_INSTALL_USER_PROFILE (evaluated if possible, raw string
       otherwise)
 
+- install_opts_to_inherit:
+
+  default:
+
+  :   list("timeout", "available_packages_filters", "HTTPUserAgent",
+              "pkgType")
+
+  option:
+
+  :   checked.install_opts_to_inherit
+
+  envvar:
+
+  :   R_CHECKED_INSTALL_OPTS_TO_INHERIT (evaluated if possible, raw
+      string otherwise)
+
 ## See also
 
 options getOption Sys.setenv Sys.getenv

@@ -2,6 +2,8 @@
 
 ## checked 0.5.4
 
+CRAN release: 2026-06-22
+
 - Improve error messaging when using basic_tty
 
 - Various improvements to reporters and minor display tweaks
