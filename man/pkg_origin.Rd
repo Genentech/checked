@@ -44,7 +44,7 @@ Create package specification list which consists of all the details required
 to identify and acquire source of the package.
 }
 \seealso{
-Other specs: 
-\code{\link{lib_path}()}
+Other specs:
+\code{\link[=lib_path]{lib_path()}}
 }
 \concept{specs}
