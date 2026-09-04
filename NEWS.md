@@ -1,3 +1,10 @@
+# checked 0.6.0
+
+* Add 'install_cmdargs' option which can be used to specify R CMD args
+  for subprocesses installing packages.
+  
+* Add version information R CMD check diff output.
+
 # checked 0.5.5
 
 * Add 'install_opts_to_inherit' option which can be used to specify parameters

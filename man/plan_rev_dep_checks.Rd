@@ -26,8 +26,8 @@ path to the development version of the package and \code{repos} should be a
 repository for which reverse dependencies should be identified.
 }
 \seealso{
-Other plan: 
-\code{\link{plan_local_checks}()},
-\code{\link{plan_local_install}()}
+Other plan:
+\code{\link[=plan_local_checks]{plan_local_checks()}},
+\code{\link[=plan_local_install]{plan_local_install()}}
 }
 \concept{plan}

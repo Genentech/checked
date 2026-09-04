@@ -168,3 +168,27 @@ package.task <- function(x) {
 package.pkg_origin <- function(x) {
   x$package
 }
+
+version <- function(x) {
+  UseMethod("version")
+}
+
+#' @export
+version.default <- function(x) {
+  stop("Unrecognized type")
+}
+
+#' @export
+version.NULL <- function(x) {
+  ""
+}
+
+#' @export
+version.task <- function(x) {
+  version(x$origin)
+}
+
+#' @export
+version.pkg_origin <- function(x) {
+  x$version
+}

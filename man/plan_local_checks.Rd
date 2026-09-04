@@ -34,8 +34,8 @@ the source.
 }
 }
 \seealso{
-Other plan: 
-\code{\link{plan_local_install}()},
-\code{\link{plan_rev_dep_checks}()}
+Other plan:
+\code{\link[=plan_local_install]{plan_local_install()}},
+\code{\link[=plan_rev_dep_checks]{plan_rev_dep_checks()}}
 }
 \concept{plan}

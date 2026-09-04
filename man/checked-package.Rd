@@ -22,6 +22,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Szymon Maksymiuk \email{sz.maksymiuk@gmail.com} (\href{https://orcid.org/0000-0002-3120-1601}{ORCID})
   \item Doug Kelkhoff \email{doug.kelkhoff@gmail.com} (\href{https://orcid.org/0009-0003-7845-4061}{ORCID})
 }
 
