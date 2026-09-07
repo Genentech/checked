@@ -1,6 +1,6 @@
 Package: checked
 Title: Systematically Run R CMD Checks
-Version: 0.6.0
+Version: 0.6.1
 Authors@R:
     c(
       person(
@@ -37,7 +37,7 @@ Imports:
     callr,
     cli,
     glue,
-    igraph,
+    igraph (>= 2.1.1),
     jsonlite,
     memoise,
     options,

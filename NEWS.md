@@ -1,3 +1,14 @@
+# checked 0.6.1
+
+* Further improve the logic behind install_process making it less
+  vulnerable to errors coming from user configuration.
+  
+* Fix `subscript out of bounds` error when `repos` includes an R-universe
+  repository. Such repositories report the `Repository` field as a full
+  per-package tarball url rather than a plain `src/contrib` path, which
+  prevented packages from being traced back to their originating repository.
+  (@ddsjoberg, #106)
+
 # checked 0.6.0
 
 * Add 'install_cmdargs' option which can be used to specify R CMD args
@@ -9,12 +20,6 @@
 
 * Add 'install_opts_to_inherit' option which can be used to specify parameters
   that install subprocess should inherit from the main process
-
-* Fix `subscript out of bounds` error when `repos` includes an R-universe
-  repository. Such repositories report the `Repository` field as a full
-  per-package tarball url rather than a plain `src/contrib` path, which
-  prevented packages from being traced back to their originating repository.
-  (@ddsjoberg, #106)
 
 # checked 0.5.4
 
