@@ -1,6 +1,11 @@
 strip_src_contrib <- function(x, repos) {
+  # Repositories are matched by prefix rather than equality. For CRAN-like
+  # repositories the `Repository` field is exactly the contrib url, but some
+  # repositories (notably R-universe) report it as the full, per-package
+  # tarball url, e.g.
+  # `https://<user>.r-universe.dev/src/contrib/<pkg>_<ver>.tar.gz?sha256=...&file=`
   match <- vlapply(repos, function(r) {
-    utils::contrib.url(r) == x
+    startsWith(x, utils::contrib.url(r))
   })
   repos[match]
 }

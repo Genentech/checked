@@ -15,6 +15,12 @@
 * Add 'install_opts_to_inherit' option which can be used to specify parameters
   that install subprocess should inherit from the main process
 
+* Fix `subscript out of bounds` error when `repos` includes an R-universe
+  repository. Such repositories report the `Repository` field as a full
+  per-package tarball url rather than a plain `src/contrib` path, which
+  prevented packages from being traced back to their originating repository.
+  (@ddsjoberg, #106)
+
 # checked 0.5.4
 
 * Improve error messaging when using basic_tty
