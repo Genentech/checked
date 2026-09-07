@@ -24,9 +24,12 @@ install_process <- R6::R6Class(
         ""
       }
       private$callr_r_bg(
-        function(..., opts_to_inherit, hooks) {
+        function(..., opts_to_inherit, libpaths, hooks) {
           eval(parse(text = hooks))
           do.call(options, opts_to_inherit)
+          # If --vanilla set, libapths option is skipped, therefore
+          # we make sure it is always set properly
+          .libPaths(libpaths)
           invisible(capture.output(withCallingHandlers(
             utils::install.packages(..., quiet = FALSE, verbose = TRUE),
             warning = function(w) {
@@ -41,6 +44,7 @@ install_process <- R6::R6Class(
           opts_to_inherit = do.call(
             options, options::opt("install_opts_to_inherit")
           ),
+          libpaths = libpaths,
           hooks = hooks
         ),
         libpath = libpaths,

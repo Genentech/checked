@@ -1,3 +1,8 @@
+# checked 0.6.1
+
+* Further improve the logic behind install_process making it less
+  vulnerable to errors coming from user configuration.
+
 # checked 0.6.0
 
 * Add 'install_cmdargs' option which can be used to specify R CMD args
