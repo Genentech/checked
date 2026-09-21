@@ -1,5 +1,12 @@
 # checked 0.6.1
 
+* Ignore package-dep pairs duplicate in the `pkg_dependencies` helper
+  when constructing dependencies data.frame. This makes sure `checked`
+  does not fail with packages that have multiple entries for the same dep
+  in the DESCRIPTION,.
+
+# checked 0.6.1
+
 * Further improve the logic behind install_process making it less
   vulnerable to errors coming from user configuration.
   
