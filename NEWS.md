@@ -1,3 +1,33 @@
+# checked 0.6.3
+
+* When fetching remotes dependencies, untar output if git endpoint
+  returns `.tar.gz` file.
+
+# checked 0.6.2
+
+* Ignore package-dep pairs duplicate in the `pkg_dependencies` helper
+  when constructing dependencies data.frame. This makes sure `checked`
+  does not fail with packages that have multiple entries for the same dep
+  in the DESCRIPTION,.
+
+# checked 0.6.1
+
+* Further improve the logic behind install_process making it less
+  vulnerable to errors coming from user configuration.
+  
+* Fix `subscript out of bounds` error when `repos` includes an R-universe
+  repository. Such repositories report the `Repository` field as a full
+  per-package tarball url rather than a plain `src/contrib` path, which
+  prevented packages from being traced back to their originating repository.
+  (@ddsjoberg, #106)
+
+# checked 0.6.0
+
+* Add 'install_cmdargs' option which can be used to specify R CMD args
+  for subprocesses installing packages.
+  
+* Add version information R CMD check diff output.
+
 # checked 0.5.5
 
 * Add 'install_opts_to_inherit' option which can be used to specify parameters

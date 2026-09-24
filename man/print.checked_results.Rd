@@ -28,8 +28,8 @@ packages with both "issues" and "potential_issues". (Defaults to \code{"all"}, o
 Print checked results
 }
 \seealso{
-Other results: 
-\code{\link{results}()},
-\code{\link{results_to_df}()}
+Other results:
+\code{\link[=results]{results()}},
+\code{\link[=results_to_df]{results_to_df()}}
 }
 \concept{results}

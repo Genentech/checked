@@ -38,7 +38,8 @@ path.}
 
 \item{...}{
     further arguments to be passed to \code{\link[utils]{download.file}},
-    \code{\link[utils]{available.packages}}, or to the functions for binary
+    \code{\link[utils]{available.packages}}, or to
+    the functions for binary
     installs on macOS and Windows (which accept an argument \code{"lock"}:
     see the section on \sQuote{Locking}).
   }
@@ -47,9 +48,9 @@ path.}
 Create a task to install a package and dependencies
 }
 \seealso{
-Other tasks: 
-\code{\link{check_task}()},
-\code{\link{meta_task}()},
-\code{\link{task}()}
+Other tasks:
+\code{\link[=check_task]{check_task()}},
+\code{\link[=meta_task]{meta_task()}},
+\code{\link[=task]{task()}}
 }
 \concept{tasks}

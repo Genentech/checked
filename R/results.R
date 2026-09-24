@@ -169,6 +169,7 @@ results_revdep_check <- function(dev, release, output = NULL, ...) {
     }),
     names = CHECK_ISSUES_TYPES,
     package = dev_check$package,
+    version = dev_check$version,
     class = c("rcmdcheck_rev_dep_results", "rcmdcheck_results")
   )
 }
@@ -372,13 +373,25 @@ rcmdcheck_from_json <- function(file) {
 
 #' @export
 print.rcmdcheck_rev_dep_results <- function(x, ...) {
-  cat(sprintf("%s package R CMD check diff \n", attr(x, "package")))
+  cat(
+    sprintf(
+      "%s (v%s) package R CMD check diff \n",
+      attr(x, "package"),
+      attr(x, "version")
+    )
+  )
   NextMethod()
 }
 
 #' @export
 print.rcmdcheck_check_results <- function(x, ...) {
-  cat(sprintf("%s package R CMD check \n", attr(x, "package")))
+  cat(
+    sprintf(
+      "%s (v%s) package R CMD check \n",
+      attr(x, "package"),
+      attr(x, "version")
+    )
+  )
   NextMethod()
 }
 

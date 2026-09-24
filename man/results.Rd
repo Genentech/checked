@@ -40,8 +40,8 @@ are thrown. If "issues" then errors are emitted only on issues, whereas
 Get R CMD check results
 }
 \seealso{
-Other results: 
-\code{\link{print.checked_results}()},
-\code{\link{results_to_df}()}
+Other results:
+\code{\link[=print.checked_results]{print.checked_results()}},
+\code{\link[=results_to_df]{results_to_df()}}
 }
 \concept{results}

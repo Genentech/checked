@@ -88,7 +88,11 @@ options::define_options(
     "available_packages_filters",
     "HTTPUserAgent",
     "pkgType"
-  )
+  ),
+  
+  "`character` vector of args passed to the separate R package installation 
+   process.",
+  install_cmdargs = c("--slave", "--no-save", "--no-restore")
 )
 
 #' @eval options::as_roxygen_docs()

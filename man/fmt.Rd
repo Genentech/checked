@@ -23,4 +23,19 @@ fmt(..., g, nodes, task = NULL, .envir = parent.frame(), ansi = TRUE)
 Provided a task, allows for use of a handful of shorthand symbols which will
 use the task as a context for formatting task fields.
 }
+\examples{
+task <- install_task(origin = pkg_origin(
+  package = "pkg",
+  version = package_version("1.2.3"),
+  source = system.file(
+    "example_packages",
+    "exampleGood",
+    package = "checked"
+   )
+))
+
+# Examples for unexported functions are not supported
+# fmt(task = task, "{action} {package} ({version}) from {source}")
+
+}
 \keyword{internal}

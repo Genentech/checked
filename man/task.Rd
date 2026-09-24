@@ -20,9 +20,9 @@ Tasks can be nested, representing either a singular task, or a set of
 related tasks.
 }
 \seealso{
-Other tasks: 
-\code{\link{check_task}()},
-\code{\link{install_task}()},
-\code{\link{meta_task}()}
+Other tasks:
+\code{\link[=check_task]{check_task()}},
+\code{\link[=install_task]{install_task()}},
+\code{\link[=meta_task]{meta_task()}}
 }
 \concept{tasks}

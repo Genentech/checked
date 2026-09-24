@@ -11,6 +11,9 @@ is recommended to be used for designs with many sub-processes required as
 native garbage collection can lag leading to memory issues. Disable only
 when maximum prefromance is required and memory is not the issue. (Defaults to \code{TRUE}, overwritable using option 'checked.proactive_gc' or environment variable 'R_CHECKED_PROACTIVE_GC')}
 
+\item{install_cmdargs}{\code{character} vector of args passed to the separate R package installation
+process. (Defaults to \code{c("--slave", "--no-save", "--no-restore")}, overwritable using option 'checked.install_cmdargs' or environment variable 'R_CHECKED_INSTALL_CMDARGS')}
+
 \item{results_error_on}{character vector indicating whether R error should be thrown when issues
 are discovered when generating results. "never" means that no errors
 are thrown. If "issues" then errors are emitted only on issues, whereas
@@ -57,7 +60,7 @@ if correct values could not be acquired with system('tput lines') (Defaults to \
 Checked Options
 }
 \seealso{
-Other documentation: 
-\code{\link{options}()}
+Other documentation:
+\code{\link{options}}
 }
 \concept{documentation}
