@@ -1,4 +1,9 @@
-# checked 0.6.1
+# checked 0.6.3
+
+* When fetching remotes dependencies, untar output if git endpoint
+  returns `.tar.gz` file.
+
+# checked 0.6.2
 
 * Ignore package-dep pairs duplicate in the `pkg_dependencies` helper
   when constructing dependencies data.frame. This makes sure `checked`
