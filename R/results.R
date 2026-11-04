@@ -18,9 +18,9 @@ results <- function(x, ...) {
 #' @export
 #' @rdname results
 results.checker <- function(
-    x,
-    error_on = options::opt("results_error_on"),
-    ...) {
+  x,
+  error_on = options::opt("results_error_on"),
+  ...) {
   error_on <- match.arg(error_on, c("never", "issues", "potential_issues"))
 
   if (!x$is_done()) {

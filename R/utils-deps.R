@@ -97,6 +97,8 @@ pkg_dependencies <- function(
         deps <- .tools$.split_dependencies(depstr)
         out <- proto_df[seq_along(deps), , drop = FALSE]
 
+        if (NROW(out) == 0) return(out)
+
         out$package <- package
         out$type <- DEP[deptype]
         out$name <- vcapply(deps, `[[`, "name")
@@ -117,7 +119,7 @@ pkg_dependencies <- function(
         # use the latest available version in the repo, as this is the only
         # way to reasonable assess satisfiability. Therefore constraints are
         # ignored for now letting R CMD check and deps installation
-        # speak for itself. Subject for possible discussions in the future. 
+        # speak for itself. Subject for possible discussions in the future.
         out <- out[!duplicated(out[, c("package", "name")]), ]
         rownames(out) <- paste0(out$package, "-", out$name)
         out
