@@ -1,3 +1,8 @@
+# checked 0.6.4
+
+* In `pkg_dependencies` don't fail if a dependency type is declared but no
+  packages are specified.
+
 # checked 0.6.3
 
 * When fetching remotes dependencies, untar output if git endpoint

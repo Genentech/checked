@@ -3,7 +3,7 @@ strip_src_contrib <- function(x, repos) {
   # repositories the `Repository` field is exactly the contrib url, but some
   # repositories (notably R-universe) report it as the full, per-package
   # tarball url, e.g.
-  # `https://<user>.r-universe.dev/src/contrib/<pkg>_<ver>.tar.gz?sha256=...&file=`
+  # `https://<user>.r-universe.dev/src/contrib/<pkg>_<ver>.tar.gz?sha256=...&file=` # nolint 
   match <- vlapply(repos, function(r) {
     startsWith(x, utils::contrib.url(r))
   })
