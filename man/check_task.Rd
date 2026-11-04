@@ -25,7 +25,7 @@ Windows.)}
 set in the check process.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=task]{task}}
+  Arguments passed on to \code{\link{task}}
   \describe{
     \item{\code{.subclass}}{Additional subclasses.}
   }}
@@ -34,9 +34,9 @@ set in the check process.}
 Create a task to run \verb{R CMD check}
 }
 \seealso{
-Other tasks: 
-\code{\link{install_task}()},
-\code{\link{meta_task}()},
-\code{\link{task}()}
+Other tasks:
+\code{\link[=install_task]{install_task()}},
+\code{\link[=meta_task]{meta_task()}},
+\code{\link[=task]{task()}}
 }
 \concept{tasks}

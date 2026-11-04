@@ -1,6 +1,6 @@
 #' @importFrom utils packageName install.packages
 #' @importFrom R6 R6Class
-#' @importFrom callr r_process
+#' @importFrom callr r_process r_process_options
 install_process <- R6::R6Class(
   "install_process",
   inherit = callr::r_process,
@@ -17,9 +17,19 @@ install_process <- R6::R6Class(
       if (!dir.exists(lib)) dir.create(lib, recursive = TRUE)
       private$package <- pkgs
       self$log <- log
+      cmdargs <- options::opt("install_cmdargs")
+      hooks <- if (any(c("--vanilla", "--no-init-file") %in% cmdargs)) {
+        callr::r_process_options()$load_hook
+      } else {
+        ""
+      }
       private$callr_r_bg(
-        function(..., opts_to_inherit) {
+        function(..., opts_to_inherit, libpaths, hooks) {
+          eval(parse(text = hooks))
           do.call(options, opts_to_inherit)
+          # If --vanilla set, libapths option is skipped, therefore
+          # we make sure it is always set properly
+          .libPaths(libpaths)
           invisible(capture.output(withCallingHandlers(
             utils::install.packages(..., quiet = FALSE, verbose = TRUE),
             warning = function(w) {
@@ -33,14 +43,16 @@ install_process <- R6::R6Class(
           lib = lib,
           opts_to_inherit = do.call(
             options, options::opt("install_opts_to_inherit")
-          )
+          ),
+          libpaths = libpaths,
+          hooks = hooks
         ),
         libpath = libpaths,
         stdout = self$log,
         stderr = "2>&1",
         system_profile = options::opt("install_system_profile"),
         user_profile = options::opt("install_user_profile"),
-        cmdargs = c("--slave", "--no-save", "--no-restore", "--vanilla"),
+        cmdargs = cmdargs,
         env = env
       )
     },

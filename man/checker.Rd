@@ -28,54 +28,55 @@ while (!orchestrator$is_done()) {
 
 }
 \seealso{
-Other checks: 
+Other checks:
 \code{\link{STATUS}},
-\code{\link{check_pkgs}()},
-\code{\link{check_rev_deps}()},
-\code{\link{new_checker}()}
+\code{\link[=check_pkgs]{check_pkgs()}},
+\code{\link[=check_rev_deps]{check_rev_deps()}},
+\code{\link[=new_checker]{new_checker()}}
 }
 \concept{checks}
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{graph}}{(\code{igraph::igraph()})\cr
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{graph}}{(\code{igraph::igraph()})\cr
 A dependency graph, storing information about which dependencies
 are required prior to execution of each check task.
 Created with \code{\link[=task_graph]{task_graph()}}}
 
-\item{\code{plan}}{(\code{data.frame()})\cr
+    \item{\code{plan}}{(\code{data.frame()})\cr
 Checks task \code{data.frame} which is the source of all the checks.}
 
-\item{\code{output}}{(\code{character(1)})\cr
+    \item{\code{output}}{(\code{character(1)})\cr
 Output directory where raw results and temporary library will
 be created and stored.}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-checker-new}{\code{checker$new()}}
-\item \href{#method-checker-active_processes}{\code{checker$active_processes()}}
-\item \href{#method-checker-failed_tasks}{\code{checker$failed_tasks()}}
-\item \href{#method-checker-terminate}{\code{checker$terminate()}}
-\item \href{#method-checker-step}{\code{checker$step()}}
-\item \href{#method-checker-start_next_task}{\code{checker$start_next_task()}}
-\item \href{#method-checker-is_done}{\code{checker$is_done()}}
-\item \href{#method-checker-tasks}{\code{checker$tasks()}}
-\item \href{#method-checker-clone}{\code{checker$clone()}}
-}
+  \itemize{
+    \item \href{#method-checker-initialize}{\code{checker$new()}}
+    \item \href{#method-checker-active_processes}{\code{checker$active_processes()}}
+    \item \href{#method-checker-failed_tasks}{\code{checker$failed_tasks()}}
+    \item \href{#method-checker-terminate}{\code{checker$terminate()}}
+    \item \href{#method-checker-step}{\code{checker$step()}}
+    \item \href{#method-checker-start_next_task}{\code{checker$start_next_task()}}
+    \item \href{#method-checker-is_done}{\code{checker$is_done()}}
+    \item \href{#method-checker-tasks}{\code{checker$tasks()}}
+    \item \href{#method-checker-clone}{\code{checker$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-checker-new"></a>}}
-\if{latex}{\out{\hypertarget{method-checker-new}{}}}
-\subsection{Method \code{new()}}{
-Initialize a new check design
+\if{html}{\out{<a id="method-checker-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-checker-initialize}{}}}
+\subsection{\code{checker$new()}}{
+  Initialize a new check design
 
 Use checks data.frame to generate task graph in which all dependencies
 and installation order are embedded.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{checker$new(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{checker$new(
   plan,
   n = 2L,
   output = file.path(tempdir(), paste(packageName(), Sys.Date(), sep = "-")),
@@ -85,145 +86,154 @@ and installation order are embedded.
   dependencies = TRUE,
   upgrade = FALSE,
   ...
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{plan}}{\code{plan} \code{data.frame}.}
-
-\item{\code{n}}{\code{integer} value indicating maximum number of subprocesses that
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{plan}}{\code{plan} \code{data.frame}.}
+      \item{\code{n}}{\code{integer} value indicating maximum number of subprocesses that
 can be simultaneously spawned when executing tasks.}
-
-\item{\code{output}}{\code{character} value specifying path where the output should
+      \item{\code{output}}{\code{character} value specifying path where the output should
 be stored.}
-
-\item{\code{lib.loc}}{\code{character} vector with libraries allowed to be used when
+      \item{\code{lib.loc}}{\code{character} vector with libraries allowed to be used when
 checking packages, defaults to entire .libPaths().}
-
-\item{\code{repos}}{\code{character} vector of repositories which will be used when
+      \item{\code{repos}}{\code{character} vector of repositories which will be used when
 generating task graph and later pulling dependencies.}
-
-\item{\code{restore}}{\code{logical} value, whether output directory should be
+      \item{\code{restore}}{\code{logical} value, whether output directory should be
 unlinked before running checks. If \code{FALSE}, an attempt will me made to
 restore previous progress from the same \code{output}.}
-
-\item{\code{dependencies}}{A vector of length one or a named list.
+      \item{\code{dependencies}}{A vector of length one or a named list.
 Compatible with \code{\link{as_pkg_dependencies}}.}
-
-\item{\code{upgrade}}{\code{logical} value, whether packages should be upgraded
+      \item{\code{upgrade}}{\code{logical} value, whether packages should be upgraded
 if more recent version is discovered in available sources. Remotes
 packages, if allowed to be used, are always installed and prioritized.}
+      \item{\code{...}}{Additional arguments unused}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \link{checker}.
+  }
+}
 
-\item{\code{...}}{Additional arguments unused}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\link{checker}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-checker-active_processes"></a>}}
 \if{latex}{\out{\hypertarget{method-checker-active_processes}{}}}
-\subsection{Method \code{active_processes()}}{
-Get Active Processes list
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{checker$active_processes()}\if{html}{\out{</div>}}
+\subsection{\code{checker$active_processes()}}{
+  Get Active Processes list
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{checker$active_processes()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-checker-failed_tasks"></a>}}
 \if{latex}{\out{\hypertarget{method-checker-failed_tasks}{}}}
-\subsection{Method \code{failed_tasks()}}{
-Get Failed Tasks list
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{checker$failed_tasks()}\if{html}{\out{</div>}}
+\subsection{\code{checker$failed_tasks()}}{
+  Get Failed Tasks list
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{checker$failed_tasks()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-checker-terminate"></a>}}
 \if{latex}{\out{\hypertarget{method-checker-terminate}{}}}
-\subsection{Method \code{terminate()}}{
-Kill All Active Design Processes
+\subsection{\code{checker$terminate()}}{
+  Kill All Active Design Processes
 
 Immediately terminates all the active processes.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{checker$terminate()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{checker$terminate()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-checker-step"></a>}}
 \if{latex}{\out{\hypertarget{method-checker-step}{}}}
-\subsection{Method \code{step()}}{
-Fill Available Processes with Tasks
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{checker$step()}\if{html}{\out{</div>}}
+\subsection{\code{checker$step()}}{
+  Fill Available Processes with Tasks
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{checker$step()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A logical value, indicating whether processes are actively
+running.
+  }
 }
 
-\subsection{Returns}{
-A logical value, indicating whether processes are actively
-running.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-checker-start_next_task"></a>}}
 \if{latex}{\out{\hypertarget{method-checker-start_next_task}{}}}
-\subsection{Method \code{start_next_task()}}{
-Start Next Task
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{checker$start_next_task()}\if{html}{\out{</div>}}
+\subsection{\code{checker$start_next_task()}}{
+  Start Next Task
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{checker$start_next_task()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A integer value, coercible to logical to indicate whether a new
+process was spawned, or \code{-1} if all tasks have finished.
+  }
 }
 
-\subsection{Returns}{
-A integer value, coercible to logical to indicate whether a new
-process was spawned, or \code{-1} if all tasks have finished.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-checker-is_done"></a>}}
 \if{latex}{\out{\hypertarget{method-checker-is_done}{}}}
-\subsection{Method \code{is_done()}}{
-Check if checks are done
+\subsection{\code{checker$is_done()}}{
+  Check if checks are done
 
 Checks whether all the scheduled tasks were successfully executed.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{checker$is_done()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{checker$is_done()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-checker-tasks"></a>}}
 \if{latex}{\out{\hypertarget{method-checker-tasks}{}}}
-\subsection{Method \code{tasks()}}{
-Tasks
+\subsection{\code{checker$tasks()}}{
+  Tasks
 
 Returns what type of tasks the checker consists of and returns a unique
 vector of primary classes
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{checker$tasks()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{checker$tasks()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-checker-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-checker-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{checker$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{checker$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{checker$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

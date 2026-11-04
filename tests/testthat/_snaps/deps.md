@@ -8,7 +8,7 @@
       2  checked  Imports      callr <NA>        
       3  checked  Imports        cli <NA>        
       4  checked  Imports       glue <NA>        
-      5  checked  Imports     igraph <NA>        
+      5  checked  Imports     igraph   >= 2, 1, 1
       6  checked  Imports   jsonlite <NA>        
       7  checked  Imports    memoise <NA>        
       8  checked  Imports    options <NA>        

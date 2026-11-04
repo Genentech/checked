@@ -26,7 +26,7 @@ lib_path method creates default path handlers for given pkg origin while
 lib_path_x creates an actual object.
 }
 \seealso{
-Other specs: 
-\code{\link{pkg_origin}()}
+Other specs:
+\code{\link[=pkg_origin]{pkg_origin()}}
 }
 \concept{specs}

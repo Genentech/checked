@@ -12,9 +12,9 @@ format_status_line_ansi <- function(process, ...) {
 
 #' @export
 format_status_line_ansi.check_process <- function(
-    process,
-    ...,
-    width = getOption("width", 80L)) {
+  process,
+  ...,
+  width = getOption("width", 80L)) {
   checks <- process$get_checks()
 
   # runtime of process
@@ -60,10 +60,10 @@ format_status_line_ansi.check_process <- function(
 
 #' @export
 format_status_line_ansi.default <- function(
-    process,
-    ...,
-    status,
-    width = getOption("width", 80L)) {
+  process,
+  ...,
+  status,
+  width = getOption("width", 80L)) {
 
   if (status == STATUS$done) {
     msg <- "restored from system file."

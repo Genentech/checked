@@ -97,6 +97,8 @@ pkg_dependencies <- function(
         deps <- .tools$.split_dependencies(depstr)
         out <- proto_df[seq_along(deps), , drop = FALSE]
 
+        if (NROW(out) == 0) return(out)
+
         out$package <- package
         out$type <- DEP[deptype]
         out$name <- vcapply(deps, `[[`, "name")
@@ -113,7 +115,12 @@ pkg_dependencies <- function(
         # TODO: there is a singe package MatrixModels which specifies it.
         # TODO: For now we decided to skip such requirements to assess
         # TODO: the severity of this.
-        out <- out[!out$op %in% c("<", "<="), ]
+        # Additionally, the current logic behind revdep check is to always
+        # use the latest available version in the repo, as this is the only
+        # way to reasonable assess satisfiability. Therefore constraints are
+        # ignored for now letting R CMD check and deps installation
+        # speak for itself. Subject for possible discussions in the future.
+        out <- out[!duplicated(out[, c("package", "name")]), ]
         rownames(out) <- paste0(out$package, "-", out$name)
         out
       }

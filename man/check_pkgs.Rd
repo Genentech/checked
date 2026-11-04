@@ -47,10 +47,10 @@ first identifies and installs, in parallel, all dependencies required
 to check the package. Then, it runs \verb{R CMD check} for each specified package.
 }
 \seealso{
-Other checks: 
+Other checks:
 \code{\link{STATUS}},
-\code{\link{check_rev_deps}()},
+\code{\link[=check_rev_deps]{check_rev_deps()}},
 \code{\link{checker}},
-\code{\link{new_checker}()}
+\code{\link[=new_checker]{new_checker()}}
 }
 \concept{checks}

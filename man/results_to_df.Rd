@@ -17,8 +17,8 @@ Such form makes quick results analysis easier by providing a general overview
 of identified failures.
 }
 \seealso{
-Other results: 
-\code{\link{print.checked_results}()},
-\code{\link{results}()}
+Other results:
+\code{\link[=print.checked_results]{print.checked_results()}},
+\code{\link[=results]{results()}}
 }
 \concept{results}

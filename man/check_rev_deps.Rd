@@ -61,10 +61,10 @@ installed from local source. Both \verb{R CMD checks} are later compared to
 identify changes in reverse dependency behaviors.
 }
 \seealso{
-Other checks: 
+Other checks:
 \code{\link{STATUS}},
-\code{\link{check_pkgs}()},
+\code{\link[=check_pkgs]{check_pkgs()}},
 \code{\link{checker}},
-\code{\link{new_checker}()}
+\code{\link[=new_checker]{new_checker()}}
 }
 \concept{checks}

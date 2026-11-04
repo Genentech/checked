@@ -18,16 +18,10 @@ new_rev_dep_checker(x, ...)
 Instantiate a check design from a path or directory.
 }
 \seealso{
-Other checks: 
+Other checks:
 \code{\link{STATUS}},
-\code{\link{check_pkgs}()},
-\code{\link{check_rev_deps}()},
-\code{\link{checker}}
-
-Other checks: 
-\code{\link{STATUS}},
-\code{\link{check_pkgs}()},
-\code{\link{check_rev_deps}()},
+\code{\link[=check_pkgs]{check_pkgs()}},
+\code{\link[=check_rev_deps]{check_rev_deps()}},
 \code{\link{checker}}
 }
 \concept{checks}

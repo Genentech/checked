@@ -128,13 +128,20 @@ should be inherited by the install subprocesses, from the main process\item{defa
 \item{envvar: }{R_CHECKED_INSTALL_OPTS_TO_INHERIT (evaluated if possible, raw string otherwise)}
 }}
 
+\item{install_cmdargs}{\describe{
+\code{character} vector of args passed to the separate R package installation
+process.\item{default: }{\preformatted{c("--slave", "--no-save", "--no-restore")}}
+\item{option: }{checked.install_cmdargs}
+\item{envvar: }{R_CHECKED_INSTALL_CMDARGS (evaluated if possible, raw string otherwise)}
+}}
+
 }
 }
 
 \seealso{
 options getOption Sys.setenv Sys.getenv
 
-Other documentation: 
+Other documentation:
 \code{\link{options_params}}
 }
 \concept{documentation}

@@ -27,8 +27,8 @@ Check \code{\link[utils:install.packages]{utils::install.packages}} for details.
 Generates a plan for running installing a package from source.
 }
 \seealso{
-Other plan: 
-\code{\link{plan_local_checks}()},
-\code{\link{plan_rev_dep_checks}()}
+Other plan:
+\code{\link[=plan_local_checks]{plan_local_checks()}},
+\code{\link[=plan_rev_dep_checks]{plan_rev_dep_checks()}}
 }
 \concept{plan}

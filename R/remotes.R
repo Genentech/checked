@@ -125,9 +125,18 @@ get_remote_tasks.pkg_origin_remote <- function(x) {
 
 get_remote_package_source <- function(remote) {
   path <- file.path(path_remotes(), hash(remote))
-  if (dir.exists(path)) return(path)
+  if (file.exists(file.path(path, "DESCRIPTION"))) return(path)
   dir_create(path)
   tmp <- remotes::remote_download(remote, quiet = TRUE)
+  if (endsWith(tmp, ".tar.gz")) {
+    tmp2 <- tempfile()
+    untar(tmp, exdir = tmp2)
+    tmp <- if (file.exists(file.path(tmp, "DESCRIPTION"))) {
+      tmp2
+    } else {
+      list.dirs(tmp2, full.names = TRUE, recursive = FALSE)
+    }
+  }
   file.copy(
     from = list.files(tmp, full.names = TRUE, recursive = FALSE),
     to = path,
