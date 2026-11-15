@@ -1,3 +1,9 @@
+# checked (development version)
+
+* Handle duplicated entries within a single dependency field (e.g.
+  `Imports: scales, scales (>= 1.3.0)`), keeping the one with the highest
+  version requirement (#102).
+
 # checked 0.5.5
 
 * Add 'install_opts_to_inherit' option which can be used to specify parameters

@@ -31,3 +31,39 @@ test_that("pkg_dependencies works as expected for cran package", {
   # for different version of R regardless of used snapshot
   expect_snapshot(df)
 })
+
+test_that("pkg_dependencies handles duplicated dependency entries", {
+  # CRAN allows the same package to be listed more than once within a single
+  # dependency field, e.g. crane lists `scales, scales (>= 1.3.0)` in Imports
+  desc <- matrix(
+    c(
+      "dup",
+      "R (>= 4.2)",
+      "cli, scales, glue (>= 1.6.0), scales (>= 1.3.0), utils (>= 4.0.0), utils (>= 4.5.0)", # nolint
+      "withr, withr"
+    ),
+    nrow = 1L,
+    dimnames = list("dup", c("Package", "Depends", "Imports", "Suggests"))
+  )
+
+  deps <- expect_no_error(pkg_dependencies(
+    packages = "dup",
+    dependencies = TRUE,
+    db = desc
+  ))
+
+  imports <- deps[deps$type == "Imports", ]
+  expect_identical(imports$name, c("cli", "glue", "scales", "utils"))
+  expect_identical(
+    imports$version[imports$name == "scales"][[1L]],
+    package_version("1.3.0")
+  )
+  expect_identical(
+    imports$version[imports$name == "utils"][[1L]],
+    package_version("4.5.0")
+  )
+
+  suggests <- deps[deps$type == "Suggests", ]
+  expect_identical(suggests$name, "withr")
+  expect_true(is.na(suggests$version[[1L]]))
+})

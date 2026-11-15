@@ -114,6 +114,7 @@ pkg_dependencies <- function(
         # TODO: For now we decided to skip such requirements to assess
         # TODO: the severity of this.
         out <- out[!out$op %in% c("<", "<="), ]
+        out <- dedup_dependencies(out)
         rownames(out) <- paste0(out$package, "-", out$name)
         out
       }
@@ -127,6 +128,33 @@ pkg_dependencies <- function(
   out <- do.call(rbind, unlist(out, recursive = FALSE))
   rownames(out) <- NULL
   out
+}
+
+#' Deduplicate dependency entries
+#'
+#' CRAN technically allows the same package to be listed more than once
+#' within a single dependency field (e.g. `Imports: scales, scales (>= 1.3.0)`).
+#' Such entries are collapsed into a single one, keeping the entry with the
+#' highest version requirement, or the first entry if none of them specifies
+#' a version. The original order of dependencies is preserved.
+#'
+#' @param x A `data.frame` of dependencies of a single package and a single
+#'   dependency type, as constructed within [`pkg_dependencies()`].
+#'
+#' @keywords internal
+dedup_dependencies <- function(x) {
+  if (!anyDuplicated(x$name)) return(x)
+
+  groups <- split(seq_len(NROW(x)), factor(x$name, levels = unique(x$name)))
+  keep <- vapply(groups, FUN.VALUE = integer(1L), function(idx) {
+    has_version <- !vlapply(x$version[idx], is.na)
+    if (!any(has_version)) return(idx[[1L]])
+    idx <- idx[has_version]
+    versions <- do.call(c, x$version[idx])
+    idx[[order(versions, decreasing = TRUE)[[1L]]]]
+  })
+
+  x[sort(keep), , drop = FALSE]
 }
 
 safe_db_subset <- function(db, r, c, drop = FALSE) {
